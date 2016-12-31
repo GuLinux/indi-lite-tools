@@ -1,0 +1,92 @@
+$('#stop-framing').hide();
+var events_listener = new EventSource('/events');
+events_listener.onmessage = function(e) {
+    event = JSON.parse(e.data);
+    console.log('event type: ' + event['type']);
+    if(event['type'] == 'image') {
+        console.log('showing image: ' + event['url']);
+        $('#ccd-image').attr('src', event['url']);
+        $('.image-container').show();
+    }
+};
+
+
+var current_device = function() {
+    return $('#device').val();
+};
+
+var current_property = function() {
+    return $('#setting').val();
+};
+
+
+var select_callback = function(dom_element, transform, data) {
+    data.map(transform).forEach(function(element) {
+        dom_element.append($('<option />').val(element.value).text(element.text));
+    });
+};
+
+var refresh_select = function(select_name, url, transform) {
+    refresh_element(select_name, url, select_callback.bind(this, select_name, transform));
+};
+
+var refresh_element = function(name, url, on_success) {
+    $('#' + name).empty();
+    $.ajax(url, {success: on_success.bind(this, $('#' + name)) });
+};
+
+var refresh_devices = function() {
+    $('#setting').empty();
+    $('#setting-value').val(null);
+    refresh_element('device', '/devices', function(select, data) {
+        select_callback(select, function(x) {return {text: x, value: x}; }, data);
+        refresh_settings();
+    });
+};
+
+var get_properties_url = function() {
+    return ['/device', current_device(), 'properties'].join('/');
+};
+
+var get_setting_url = function() {
+    return ['/device', current_device(), 'properties', current_property()].join('/')
+};
+
+var refresh_settings = function() {
+    $('#setting-value').val(null);
+    refresh_element('setting', get_properties_url(), function(select, data) {
+        select_callback(select, function(x) {
+            property_element = [x['property'], x['element']].join('.');
+            return { text: property_element, value: property_element };
+        }, data);
+        refresh_value();
+    });
+};
+
+
+var refresh_value = function() {
+    refresh_element('setting-value', get_setting_url(), function(txt, d) {
+        $('#setting-value').val(d['value']);
+    });
+};
+
+var set_value = function() {
+    value = $('#setting-value').val();
+    $('#setting-value').val(null);
+    $.ajax(get_setting_url(), {method: 'PUT', data: {value: value}, success: refresh_settings});
+};
+
+var preview = function() {
+    $.ajax('/device/' + current_device() + '/preview/' + $('#exposure').val());
+};
+
+$('#refresh-devices').click(refresh_devices);
+$('#refresh-settings').click(refresh_settings);
+$('#reset-value').click(refresh_value);
+$('#set-value').click(set_value);
+$('#preview').click(preview);
+
+$('#device').change(refresh_settings);
+$('#setting').change(refresh_value);
+
+refresh_devices();
