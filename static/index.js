@@ -112,4 +112,8 @@ $('#stop-framing').click(stop_framing);
 $('#device').change(refresh_settings);
 $('#setting').change(refresh_value);
 
+$('#ccd-preview').click(function() {
+    $('#ccd-preview').toggleClass('img-responsive');
+});
+
 refresh_devices();
