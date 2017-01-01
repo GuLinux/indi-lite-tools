@@ -19,7 +19,7 @@ def controller():
     # if 'controller' not in app.config:
     #     app.config['controller'] = INDIController()
     # return app.config['controller']
-    return INDIController()
+    return INDIController(app.static_folder)
 
 def logger():
     logger = logging.getLogger('indi-preview')
@@ -36,7 +36,7 @@ def index():
 
 @app.route('/devices')
 def devices():
-    return jsonify(INDIController().devices())
+    return jsonify(controller().devices())
 
 @app.route('/device/<devicename>/properties')
 def properties(devicename):
@@ -53,10 +53,15 @@ def set_property(devicename, property):
 def image_path(file):
     return '/'.join([app.static_url_path, file]) 
 
+def image_event(name, type):
+    put_event({'type': type, 'url': image_path( name )})
+
 @app.route('/device/<devicename>/preview/<exposure>')
 def preview(devicename, exposure):
     def exp():
-        put_event({'type': 'image', 'url': image_path(controller().preview(devicename, float(exposure), app.static_folder) )})
+        image = controller().preview(devicename, float(exposure) )
+        image_event(image[0], 'image')
+        image_event(image[1], 'histogram')
     t = threading.Thread(target = exp)
     t.start()
     return ('', 204)
@@ -65,7 +70,9 @@ def preview(devicename, exposure):
 def framing(devicename, exposure):
     def exp():
         while(app.config['framing']):
-            put_event({'type': 'image', 'url': image_path(controller().preview(devicename, float(exposure), app.static_folder) )})
+            image = controller().preview(devicename, float(exposure) )
+            image_event(image[0], 'image')
+            image_event(image[1], 'histogram')
     app.config['framing'] = exposure != 'stop'
     if app.config['framing']:
         t = threading.Thread(target = exp)

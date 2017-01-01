@@ -2,12 +2,15 @@ $('#stop-framing').hide();
 var events_listener = new EventSource('/events');
 events_listener.onmessage = function(e) {
     event = JSON.parse(e.data);
-    console.log('event type: ' + event['type']);
     if(event['type'] == 'image') {
-        console.log('showing image: ' + event['url']);
         $('#ccd-preview').attr('src', event['url']);
         $('.image-container').show();
     }
+    if(event['type'] == 'histogram') {
+        $('#histogram-image').attr('src', event['url']);
+        $('.histogram-container').show();
+    }
+
 };
 
 
@@ -115,5 +118,9 @@ $('#setting').change(refresh_value);
 $('#ccd-preview').click(function() {
     $('#ccd-preview').toggleClass('img-responsive');
 });
+$('#histogram-image').click(function() {
+    $('#histogram-image').toggleClass('img-responsive');
+});
+
 
 refresh_devices();

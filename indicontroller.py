@@ -4,12 +4,30 @@ from astropy.io import fits
 from datetime import datetime
 import os
 import scipy.misc
+import numpy
+import matplotlib.pyplot as plt
 from glob import glob
+import pprint
+
+class ImageFiles:
+    def __init__(self, workdir, extension = 'jpg'):
+        self.timestamp = datetime.utcnow().isoformat()
+        self.extension = extension
+        self.workdir = workdir
+
+    def filename(self, name):
+        return '{0}-{1}.{2}'.format(name, self.timestamp, self.extension)
+
+    def path(self, name):
+        return '{0}/{1}'.format(self.workdir, self.filename(name))
+
+    def glob(self, name):
+        return glob('{0}/{1}-*.{2}'.format(self.workdir, name, self.extension))
 
 class INDIController:
-    def __init__(self):
+    def __init__(self, workdir):
         self.client = INDIClient()
-
+        self.workdir = workdir
 
     def devices(self):
         properties = self.client.get_properties()
@@ -29,19 +47,36 @@ class INDIController:
         self.client.set_property_sync(device, property_element[0], property_element[1], value)
         return self.property(device, property)
 
-    def preview(self, device, exposure, workdir):
+    def preview(self, device, exposure):
+        images = ImageFiles(self.workdir)
+        fits_data = self.__shoot(device, exposure)
+
+        scipy.misc.imsave(images.path('preview'), fits_data)
+        self.__make_histogram(fits_data, images.path('histogram'))
+
+        self.__clean(images, ['preview', 'histogram'])
+        return images.filename('preview'), images.filename('histogram')
+
+    def __shoot(self, device, exposure):
         imager = INDICamera(device, self.client)
         if not imager.is_connected():
             imager.connect()
-        imager.set_output(workdir, 'IMAGE_PREVIEW')
+        imager.set_output(self.workdir, 'IMAGE_PREVIEW')
         imager.shoot(exposure)
-        current_file_name = 'preview-{0}.jpg'.format(datetime.utcnow().isoformat())
-        current_file = '{0}/{1}'.format( workdir, current_file_name )
-        scipy.misc.imsave(current_file, fits.getdata(workdir + '/IMAGE_PREVIEW.fits'))
-        self.__clean(workdir)
-        return current_file_name
+        fits_data = fits.getdata(self.workdir + '/IMAGE_PREVIEW.fits')
+        return fits_data
 
-    def __clean(self, workdir):
-        for file in sorted(glob('{0}/preview-*.jpg'.format(workdir)))[:-3]:
+
+
+    def __make_histogram(self, data, filename, log_y = True, bins = 256):
+        plt.clf()
+        plt.hist(data.flatten(), bins=256)
+        if log_y:
+            plt.yscale('log')
+        plt.savefig(filename)
+
+    def __clean(self, images, names):
+        for name in names:
+            for file in images.glob(name)[:-3]:
                 os.remove(file)
 
