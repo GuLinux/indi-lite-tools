@@ -4,11 +4,11 @@ from astropy.io import fits
 from datetime import datetime
 import os
 import scipy.misc
+from glob import glob
 
 class INDIController:
     def __init__(self):
         self.client = INDIClient()
-        self.previous_image = None
 
 
     def devices(self):
@@ -38,7 +38,10 @@ class INDIController:
         current_file_name = 'preview-{0}.jpg'.format(datetime.utcnow().isoformat())
         current_file = '{0}/{1}'.format( workdir, current_file_name )
         scipy.misc.imsave(current_file, fits.getdata(workdir + '/IMAGE_PREVIEW.fits'))
-        if self.previous_image:
-            os.remove(self.previous_image)
-        self.previous_image = current_file
+        self.__clean(workdir)
         return current_file_name
+
+    def __clean(self, workdir):
+        for file in sorted(glob('{0}/preview-*.jpg'.format(workdir)))[:-3]:
+                os.remove(file)
+

@@ -5,7 +5,7 @@ events_listener.onmessage = function(e) {
     console.log('event type: ' + event['type']);
     if(event['type'] == 'image') {
         console.log('showing image: ' + event['url']);
-        $('#ccd-image').attr('src', event['url']);
+        $('#ccd-preview').attr('src', event['url']);
         $('.image-container').show();
     }
 };
@@ -80,11 +80,34 @@ var preview = function() {
     $.ajax('/device/' + current_device() + '/preview/' + $('#exposure').val());
 };
 
+var framing = function() {
+    $.ajax('/device/' + current_device() + '/framing/' + $('#exposure').val());
+    $('#framing').hide();
+    $('#stop-framing').show();
+};
+
+var stop_framing = function() {
+    $.ajax('/device/' + current_device() + '/framing/stop');
+    $('#framing').show();
+    $('#stop-framing').hide();
+}
+
+
+var nav = function(name) {
+    $('.navlink').removeClass('active');
+    $('#nav-' + name).addClass('active');
+};
+
+//$('#nav-ccd-settings a').click(nav.bind(this, 'ccd-settings'));
+//$('#nav-ccd-image a').click(nav.bind(this, 'ccd-image'));
+
 $('#refresh-devices').click(refresh_devices);
 $('#refresh-settings').click(refresh_settings);
 $('#reset-value').click(refresh_value);
 $('#set-value').click(set_value);
 $('#preview').click(preview);
+$('#framing').click(framing);
+$('#stop-framing').click(stop_framing);
 
 $('#device').change(refresh_settings);
 $('#setting').change(refresh_value);

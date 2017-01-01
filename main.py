@@ -16,9 +16,10 @@ app.config['jquery_version']='3.1.1'
 subscriptions = []
 
 def controller():
-    if 'controller' not in app.config:
-        app.config['controller'] = INDIController()
-    return app.config['controller']
+    # if 'controller' not in app.config:
+    #     app.config['controller'] = INDIController()
+    # return app.config['controller']
+    return INDIController()
 
 def logger():
     logger = logging.getLogger('indi-preview')
@@ -49,14 +50,27 @@ def property(devicename, property):
 def set_property(devicename, property):
     return jsonify(controller().set_property(devicename, property, request.form['value']))
 
+def image_path(file):
+    return '/'.join([app.static_url_path, file]) 
+
 @app.route('/device/<devicename>/preview/<exposure>')
 def preview(devicename, exposure):
     def exp():
-        impath = '/'.join([app.static_url_path, controller().preview(devicename, float(exposure), app.static_folder)])
-        put_event({'type': 'image', 'url': impath})
+        put_event({'type': 'image', 'url': image_path(controller().preview(devicename, float(exposure), app.static_folder) )})
     t = threading.Thread(target = exp)
     t.start()
     return ('', 204)
+
+@app.route('/device/<devicename>/framing/<exposure>')
+def framing(devicename, exposure):
+    def exp():
+        while(app.config['framing']):
+            put_event({'type': 'image', 'url': image_path(controller().preview(devicename, float(exposure), app.static_folder) )})
+    app.config['framing'] = exposure != 'stop'
+    if app.config['framing']:
+        t = threading.Thread(target = exp)
+        t.start()
+    return('', 204)
 
 @app.route('/events')
 def events():
@@ -75,7 +89,7 @@ app.secret_key = b'\xcc\xfc\xbe6^\x9a\xbf>\xbc\xaa\x9e\xe8\xa6\n7'
 
 
 if __name__ == '__main__':
-    app.run(threaded=True)
+    app.run(threaded=True, host="0.0.0.0")
 
 
 # vim: set tabstop=4 shiftwidth=4 expandtab
