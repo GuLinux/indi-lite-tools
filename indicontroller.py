@@ -59,8 +59,8 @@ class INDIController:
 
     def __shoot(self, device, exposure):
         imager = INDICamera(device, self.client)
-        if not imager.is_connected():
-            imager.connect()
+        if not imager.is_camera():
+            raise RuntimeError('Device {0} is not an INDI CCD Camera'.format(device))
         imager.set_output(self.workdir, 'IMAGE_PREVIEW')
         imager.shoot(exposure)
         fits_data = fits.getdata(self.workdir + '/IMAGE_PREVIEW.fits')

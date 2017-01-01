@@ -56,12 +56,19 @@ def image_path(file):
 def image_event(name, type):
     put_event({'type': type, 'url': image_path( name )})
 
+def notification(level, title, message):
+    put_event({'type': 'notification', 'level': level, 'title': title, 'message': message})
+
 @app.route('/device/<devicename>/preview/<exposure>')
 def preview(devicename, exposure):
     def exp():
-        image = controller().preview(devicename, float(exposure) )
-        image_event(image[0], 'image')
-        image_event(image[1], 'histogram')
+        try:
+            image = controller().preview(devicename, float(exposure) )
+            image_event(image[0], 'image')
+            image_event(image[1], 'histogram')
+        except Exception as e:
+            notification('warning', 'Error', e.args[0])
+
     t = threading.Thread(target = exp)
     t.start()
     return ('', 204)
@@ -69,10 +76,14 @@ def preview(devicename, exposure):
 @app.route('/device/<devicename>/framing/<exposure>')
 def framing(devicename, exposure):
     def exp():
-        while(app.config['framing']):
-            image = controller().preview(devicename, float(exposure) )
-            image_event(image[0], 'image')
-            image_event(image[1], 'histogram')
+        try:
+            while(app.config['framing']):
+                image = controller().preview(devicename, float(exposure) )
+                image_event(image[0], 'image')
+                image_event(image[1], 'histogram')
+        except Exception as e:
+            notification('warning', 'Error', e.args[0])
+
     app.config['framing'] = exposure != 'stop'
     if app.config['framing']:
         t = threading.Thread(target = exp)

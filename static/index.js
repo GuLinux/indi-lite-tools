@@ -10,7 +10,12 @@ events_listener.onmessage = function(e) {
         $('#histogram-image').attr('src', event['url']);
         $('.histogram-container').show();
     }
-
+    if(event['type'] == 'notification') {
+        $('.notifications').append(
+            '<div class="alert alert-' + event['level'] +
+            ' alert-dismissible fade in"><button type="button" class="close" data-dismiss="alert"><span>×</span></button><strong>' +
+            event['title'] + '</strong> ' + event['message'] + '</div>');
+    }
 };
 
 

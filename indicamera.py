@@ -13,6 +13,11 @@ class INDICamera:
   def is_connected(self):
     return property('CONNECTION', 'CONNECT') == 'On'
 
+  def is_camera(self):
+      if not self.is_connected():
+          self.connect()
+      return len(self.properties('CCD_EXPOSURE', 'CCD_EXPOSURE_VALUE')) > 0
+
   def output_dir(self):
     return property('UPLOAD_SETTINGS', 'UPLOAD_DIR')
 
