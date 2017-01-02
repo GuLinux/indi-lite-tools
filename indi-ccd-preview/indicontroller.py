@@ -74,7 +74,8 @@ class INDIController:
 
     def __make_histogram(self, data, filename, log_y = True, bins = 256):
         plt.clf()
-        plt.hist(data.flatten(), bins=256)
+        plt.hist(data.flatten() , bins=256)
+        plt.xlim([0, 255])
         if log_y:
             plt.yscale('log')
         plt.savefig(filename)
