@@ -113,7 +113,7 @@ if __name__ == '__main__':
     parser.add_argument('--host', help="Hostname for server listening (default: 127.0.0.1)", default='127.0.0.1')
     parser.add_argument('-p', '--port', help="Port for server listening (default: 5000)", default='5000')
     args = parser.parse_args()
-    app.run(threaded=True, host=args.host, port=args.port, debug=args.debug)
+    app.run(threaded=True, host=args.host, port=int(args.port), debug=args.debug)
 
 
 # vim: set tabstop=4 shiftwidth=4 expandtab
