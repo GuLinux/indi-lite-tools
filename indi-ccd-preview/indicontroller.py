@@ -32,16 +32,19 @@ class INDIImage:
 
     def __make_histogram(self, data, log_y, bins):
         plt.clf()
-        plt.hist(data.flatten() , bins=256)
-        plt.xlim([0, 255])
+        plt.hist(data.flatten() , bins=bins)
+        plt.xlim([0, bins-1])
         if log_y:
             plt.yscale('log')
         plt.savefig(self.__path('histogram'))
 
 
 class INDIController:
-    def __init__(self, workdir):
+    def __init__(self, workdir, format = 'jpg', bins = 256, log_y = True):
         self.client = INDIClient()
+        self.format = format
+        self.log_y = log_y
+        self.bins = bins
 
         self.workdir = workdir
         if not os.path.isdir(self.workdir):
@@ -72,6 +75,6 @@ class INDIController:
             raise RuntimeError('Device {0} is not an INDI CCD Camera'.format(device))
         imager.set_output(self.workdir, 'IMAGE_PREVIEW')
         imager.shoot(exposure)
-        return INDIImage(self.workdir, 'IMAGE_PREVIEW.fits')
+        return INDIImage(self.workdir, 'IMAGE_PREVIEW.fits', bins=self.bins, log_y=self.log_y)
 
 

@@ -2,6 +2,8 @@
 
 var SETTING_EXPOSURE='setting_exposure';
 var SETTING_DEVICE='setting_device';
+var SETTING_HISTOGRAM_BINS='setting_histogram_bins';
+var SETTING_HISTOGRAM_LOG='setting_histogram_log';
 
 var get_setting = function(key, default_value) {
     var value = localStorage.getItem(key);
@@ -136,6 +138,14 @@ var nav = function(name) {
     $('#nav-' + name).addClass('active');
 };
 
+var update_histogram_settings = function() {
+    var bins = parseInt($('#histogram-bins').val());
+    var logarithmic = $('#histogram-logarithmic').prop('checked')
+    localStorage.setItem(SETTING_HISTOGRAM_BINS, bins);
+    localStorage.setItem(SETTING_HISTOGRAM_LOG, logarithmic);
+    $.ajax('/histogram', {method: 'PUT', data: {bins: bins, logarithmic: logarithmic} });
+};
+
 //$('#nav-ccd-settings a').click(nav.bind(this, 'ccd-settings'));
 //$('#nav-ccd-image a').click(nav.bind(this, 'ccd-image'));
 
@@ -146,6 +156,7 @@ $('#set-value').click(set_value);
 $('#preview').click(preview);
 $('#framing').click(framing);
 $('#stop-framing').click(stop_framing);
+$('#histogram-update-settings').click(update_histogram_settings);
 
 $('#device').change(function() {
     localStorage.setItem(SETTING_DEVICE, current_device());
@@ -161,6 +172,11 @@ $('#histogram-image').click(function() {
 });
 
 
+
 $('#exposure').val(get_setting(SETTING_EXPOSURE, 1));
+$('#histogram-bins').val(get_setting(SETTING_HISTOGRAM_BINS, 256));
+$('#histogram-logarithmic').prop('checked', get_setting(SETTING_HISTOGRAM_LOG, 'true') == 'true');
+update_histogram_settings();
+
 $('#stop-framing').hide();
 refresh_devices();

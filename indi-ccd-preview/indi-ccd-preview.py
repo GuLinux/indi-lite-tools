@@ -13,6 +13,8 @@ import argparse
 app = Flask(__name__)
 app.config['bootstrap_version']='3.3.7'
 app.config['jquery_version']='3.1.1'
+app.config['histogram_bins'] = 256
+app.config['histogram_logarithmic'] = True
 
 subscriptions = []
 
@@ -20,7 +22,7 @@ def controller():
     # if 'controller' not in app.config:
     #     app.config['controller'] = INDIController()
     # return app.config['controller']
-    return INDIController(app.static_folder + '/images')
+    return INDIController(app.static_folder + '/images', bins=app.config['histogram_bins'], log_y=app.config['histogram_logarithmic'])
 
 def logger():
     logger = logging.getLogger('indi-preview')
@@ -50,6 +52,12 @@ def property(devicename, property):
 @app.route('/device/<devicename>/properties/<property>', methods=['PUT'])
 def set_property(devicename, property):
     return jsonify(controller().set_property(devicename, property, request.form['value']))
+
+@app.route('/histogram', methods=['PUT'])
+def histogram_settings():
+    app.config['histogram_bins'] = int(request.form['bins'])
+    app.config['histogram_logarithmic'] = request.form['logarithmic'] == 'true'
+    return ('', 204)
 
 def image_path(file):
     return '/'.join([app.static_url_path, 'images', file]) 

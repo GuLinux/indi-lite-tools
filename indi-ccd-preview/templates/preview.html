@@ -1,15 +1,18 @@
-<form class="form-inline"> 
-    <label for="exposure" class="col-sm-1 control-label">Exposure</label>
-    <div class="input-group">
-        <input type="number" class="form-control" id="exposure" placeholder="1" value="1">
-        <div class="input-group-btn">
-            <button type="button" id="preview" class="btn btn-default">Preview</button>
-            <button type="button" id="framing" class="btn btn-default">Framing</button>
-            <button type="button" id="stop-framing" class="btn btn-default">Stop Framing</button>
+<div class="container-fluid">
+    <form class="form-inline"> 
+        <div class="form-group">
+            <label for="exposure" class="control-label">Exposure</label>
+            <div class="input-group">
+                <input type="number" class="form-control" id="exposure" placeholder="1" value="1">
+                <div class="input-group-btn">
+                    <button type="button" id="preview" class="btn btn-default">Preview</button>
+                    <button type="button" id="framing" class="btn btn-default">Framing</button>
+                    <button type="button" id="stop-framing" class="btn btn-default">Stop Framing</button>
+                </div>
+            </div>
         </div>
+    </form>
+    <div id="ccd-preview-container" style="display: none; margin-top: 10px">
+        <img id="ccd-preview-image" class='img-responsive' style='cursor: zoom-in'> 
     </div>
-</form>
-<div id="ccd-preview-container" style="display: none; margin-top: 10px">
-    <img id="ccd-preview-image" class='img-responsive' style='cursor: zoom-in'> 
 </div>
-
