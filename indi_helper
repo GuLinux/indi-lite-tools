@@ -1,0 +1,258 @@
+#!/bin/bash
+
+
+INDI_parse_cli() {
+  DEV="$DEFAULT_DEVICE"
+  while [[ -n "$1" ]]; do
+    case "$1" in
+      -d|--device)
+        DEV="$2"; shift
+        ;;
+    esac
+    shift
+  done
+}
+
+INDI_log() {
+  echo "$( date +%FT%T ) - $@" | tee -a indi.log >&2
+}
+
+INDI_set_property_sync() {
+  local DEV="$1"
+  local PROPERTY="$2"
+  local KEY="$3"
+  local VALUE="$4"
+  local TIMEOUT="${5:-2}" 
+  if [[ -z "$TIMEOUT" ]]; then
+    echo "Usage: set_property_sync DEVICE PROPERTY KEY VALUE TIMEOUT"
+    exit 1
+  fi
+  indi_setprop "$DEV.$PROPERTY.$KEY"="$VALUE"
+  indi_eval -w -t $TIMEOUT "\"$DEV.$PROPERTY._STATE\"==1"
+}
+
+INDI_set_local_upload_dir() {
+  INDI_parse_cli "$@"  
+  local DIR="$1"
+  INDI_set_property_sync "$DEV" UPLOAD_MODE UPLOAD_LOCAL On 
+  INDI_set_property_sync "$DEV" UPLOAD_SETTINGS UPLOAD_DIR "$DIR"
+}
+
+INDI_set_file_prefix() {
+  INDI_parse_cli "$@"  
+  local PREFIX="$1"
+  INDI_set_property_sync "$DEV" UPLOAD_SETTINGS UPLOAD_PREFIX "$PREFIX"
+}
+
+INDI_compose_file_prefix() {
+  INDI_parse_cli "$@"
+  local name="$1"
+  local image_type="$2"
+  local exposure="$3"
+  printf -v file_prefix "%s_%s_%07.3fsecs_XXX" "$name" "$image_type" "$exposure"
+  INDI_set_file_prefix "$file_prefix" -d "$DEV"
+}
+
+INDI_expose() {
+  INDI_parse_cli "$@"  
+  local EXPTIME="$1"
+  INDI_set_property_sync "$DEV" CCD_EXPOSURE CCD_EXPOSURE_VALUE "$EXPTIME" "$( perl -e "print $EXPTIME + 10")"
+}
+
+INDI_expose_sequence() {
+  INDI_parse_cli "$@"
+  local shots="$1"
+  local exposure="$2"
+  for i in $( seq 1 $shots ); do
+    INDI_log "sequence: exposure $i of $shots ($exposure seconds)"
+    INDI_expose "$exposure" -d "$DEV"
+  done
+}
+
+INDI_connect() {
+  INDI_parse_cli "$@"
+  INDI_set_property_sync "$DEV" CONNECTION CONNECT On
+}
+
+INDI_disconnect() {
+  INDI_parse_cli "$@"
+  INDI_set_property_sync "$DEV" CONNECTION DISCONNECT On
+}
+
+
+INDI_session_template() {
+  i=0
+  while read dev; do
+    i="$(( $i + 1 ))"
+    echo "$i) $dev"
+    devices_choces[$i]="$dev"
+  done < <(indi_getprop | cut -d. -f1 | sort | uniq)
+  local choice=0
+  while [[ "$choice" -gt "$i" || "$choice" -lt 1 ]]; do
+    read -p "Enter index of device to be used as default: " choice
+  done
+  device="${devices_choces[$choice]}"
+  echo "$choice: $device"
+
+  session_name="$1"
+  if [[ -z "$session_name" ]]; then
+    echo "Usage: INDI_session_template session_name"
+    exit 1
+  fi  
+  mkdir -p "$session_name"
+  cp "$0" "$session_name/"
+  cat > "$session_name/settings" <<EOF
+DEFAULT_DEVICE="$device"
+SESSION_NAME="$session_name"
+FILTERS="L R G B"
+DARK=AFTER_ALL
+DARK_SEQUENCE=10
+EXPOSURES[L]="1:10 3:10 5:10"
+EXPOSURES[R]="5:5 10:5 15:5"
+EXPOSURES[G]="\${EXPOSURES[R]}"
+EXPOSURES[B]="\${EXPOSURES[R]}"
+EOF
+
+cat >"$session_name/customizations.sample" <<'EOF'
+# This file contains an example to customize all the steps preparation functions
+
+# This will be executed as the first step, to initialize everything
+global_prepare() {
+  true
+}
+
+# This will be executed at the begin of each sequence group (darks, filter change, etc)
+# To override: $1=filter(sequence) name
+sequence_prepare() {
+  confirmation
+}
+
+
+# This will be executed at the begin of each sequence
+# To override: $1=filter(sequence) name, $2=sequence length (shots), $3: exposure
+sequence_starting() {
+  true
+}
+
+# This will be executed after each sequence finishes
+# To override: $1=filter(sequence) name, $2=sequence length (shots), $3: exposure
+sequence_finished() {
+  true
+}
+
+
+EOF
+
+  cat > "$session_name/start_sequence" <<'EOF'
+#!/bin/bash
+
+declare -A EXPOSURES
+FILTERS="L"
+EXPOSURES[L]="1"
+DARK=AFTER_ALL
+DARK_SEQUENCE=10
+
+. settings
+# Read a local copy of the indi_helper script
+. indi_helper
+
+confirmation() {
+  echo "Enter 'y' to continue."
+  local conf_var=""
+  while [[ "$conf_var" != y ]]; do
+    read -n 1 -s conf_var
+  done
+}
+
+sum_exposures() {
+  local sum="0"
+  for i in $@; do
+    sum="$( perl -e "print $sum + ${i%%:*}*${i##*:}" )"
+    shift
+  done
+  echo "$sum"
+}
+
+date_inc() {
+  local secs="$1"; shift
+  local new_date="$( perl -e "use POSIX; print ceil($( date +%s ) + $secs)" )"
+  date -d @$new_date "$@"
+}
+
+global_prepare() { true; }
+sequence_prepare() { confirmation; }
+sequence_starting() { true; }
+sequence_finished() { true; }
+
+if [[ -r customizations ]]; then
+  . customizations
+fi
+
+
+dark_exposures=""
+
+add_dark_exposure() {
+  exposure="$( perl -e "print $1" ):$DARK_SEQUENCE"
+  if ! grep -q "$exposure" <<<"$dark_exposures"; then
+    dark_exposures="$dark_exposures$( [[ -z "$dark_exposures" ]] || echo " ")$exposure:$DARK_SEQUENCE"
+  fi
+}
+
+sequence_with_name() {
+  local image_type="$1"
+  local shots="$2"
+  local exposure="$3"
+  INDI_log "Starting sequence '$image_type', $shots shots, $exposure seconds"
+  INDI_compose_file_prefix "$SESSION_NAME" "$image_type" "$exposure"
+  INDI_expose_sequence "$shots" "$exposure"
+  add_dark_exposure "$exposure"
+}
+
+sequence_group() {
+  local name="$1"
+  local exposures="$2"
+  local total_exposure="$( sum_exposures "$exposures" )"
+
+  INDI_log "*** Starting sequences group $name: exposures=$exposures, total exposure: ${total_exposure}s"
+
+  sequence_prepare "$name"
+
+  local finish_date="$( date_inc "$total_exposure" +%FT%T )"
+  INDI_log "**** Sequence group $name started; will finish at $finish_date"
+  for exp_seq in $exposures; do
+    local exp="${exp_seq%%:*}"
+    local sequence_size="${exp_seq##*:}"
+    sequence_starting "$filter" "$sequence_size" "$exp"
+    INDI_set_local_upload_dir "$PWD"
+    sequence_with_name $filter $sequence_size $exp
+    sequence_finished "$filter" "$sequence_size" "$exp"
+  done
+  INDI_log "**** Sequence group $name finished"
+}
+
+INDI_connect
+
+
+
+INDI_log "============================================="
+INDI_log "** Starting session $SESSION_NAME"
+
+global_prepare
+
+for filter in ${FILTERS}; do
+  sequence_group "$filter" "${EXPOSURES[$filter]}"
+done
+
+if [[ "\$DARK" == "AFTER_ALL" ]]; then
+  sequence_group "DARK" "$dark_exposures"
+fi
+
+INDI_log "** Finished session $SESSION_NAME"
+EOF
+chmod a+x "$session_name/start_sequence"
+}
+
+if [[ "$( basename "$0" )" == "indi_helper" ]] && [[ "$1" == "create-script" ]]; then
+    shift
+    INDI_session_template "$@"
+fi
