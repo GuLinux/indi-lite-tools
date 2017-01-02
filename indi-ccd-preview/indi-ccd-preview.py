@@ -9,6 +9,7 @@ import pprint
 import threading
 import json
 import argparse
+import subprocess
 
 app = Flask(__name__)
 app.config['bootstrap_version']='3.3.7'
@@ -110,6 +111,26 @@ def events():
             print("sending event...")
             yield("data: {0}\n\n".format(json.dumps(data)))
     return Response(gen(), mimetype="text/event-stream")
+
+@app.route('/shutdown')
+def shutdown():
+    func = request.environ.get('werkzeug.server.shutdown')
+    if func is None:
+        notification('warning', 'Error', 'unable to shutdown the server')
+        return('', 500)
+    func()
+    return ('', 204)
+
+@app.route('/run_command', methods=['POST'])
+def run_command():
+    try:
+        command = request.form['command']
+        result = subprocess.call(command)
+        level = 'success' if result == 0 else 'warning'
+        return notification(level, 'Run command', 'command "{0}" finished with exit code {1}'.format(command, result))
+    except Exception as e:
+        notification('warning', 'Run command error', e.args[0])
+    return ('', 204)
 
 
 

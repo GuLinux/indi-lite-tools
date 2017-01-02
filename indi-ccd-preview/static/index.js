@@ -4,6 +4,7 @@ var SETTING_EXPOSURE='setting_exposure';
 var SETTING_DEVICE='setting_device';
 var SETTING_HISTOGRAM_BINS='setting_histogram_bins';
 var SETTING_HISTOGRAM_LOG='setting_histogram_log';
+var SETTING_RUN_COMMAND='setting_run_command';
 
 var get_setting = function(key, default_value) {
     var value = localStorage.getItem(key);
@@ -167,16 +168,25 @@ $('#setting').change(refresh_value);
 $('#ccd-preview').click(function() {
     $('#ccd-preview').toggleClass('img-responsive');
 });
+
 $('#histogram-image').click(function() {
     $('#histogram-image').toggleClass('img-responsive');
 });
 
-
+var run_command = function() {
+    var command = $('#run-command').val();
+    localStorage.setItem(SETTING_RUN_COMMAND, command);
+    $.ajax('/run_command', {method: 'POST', data: {command: command}});
+};
 
 $('#exposure').val(get_setting(SETTING_EXPOSURE, 1));
 $('#histogram-bins').val(get_setting(SETTING_HISTOGRAM_BINS, 256));
 $('#histogram-logarithmic').prop('checked', get_setting(SETTING_HISTOGRAM_LOG, 'true') == 'true');
+$('#shutdown-server').click(function() { $.ajax('/shutdown', {success: function(){ notification('danger', 'Shutdown', 'Server is shutting down...'); }}); });
 update_histogram_settings();
+$('#run-command-btn').click(run_command);
+
+$('#run-command').val(get_setting(SETTING_RUN_COMMAND), '');
 
 $('#stop-framing').hide();
 refresh_devices();
