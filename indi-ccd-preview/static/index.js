@@ -25,7 +25,7 @@ events_listener.onmessage = function(e) {
     if(event['type'] == 'image') {
         set_image_url('ccd-preview', event['image_url']);
         set_image_url('histogram', event['histogram']);
-        $('.image-received-notification').alert('close');
+        $('.image-received-notification').remove();
         notification('success', 'image received', event['image_id'], 5, 'image-received-notification')
     }
     if(event['type'] == 'notification') {
