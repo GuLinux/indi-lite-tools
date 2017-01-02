@@ -20,7 +20,7 @@ def controller():
     # if 'controller' not in app.config:
     #     app.config['controller'] = INDIController()
     # return app.config['controller']
-    return INDIController(app.static_folder)
+    return INDIController(app.static_folder + '/images')
 
 def logger():
     logger = logging.getLogger('indi-preview')
@@ -52,10 +52,15 @@ def set_property(devicename, property):
     return jsonify(controller().set_property(devicename, property, request.form['value']))
 
 def image_path(file):
-    return '/'.join([app.static_url_path, file]) 
+    return '/'.join([app.static_url_path, 'images', file]) 
 
-def image_event(name, type):
-    put_event({'type': type, 'url': image_path( name )})
+def image_event(image) :
+    put_event({
+        'type': 'image',
+        'image_url': image_path( image.imagefile() ),
+        'histogram': image_path(image.histogram()),
+        'image_id': image.id
+    })
 
 def notification(level, title, message):
     put_event({'type': 'notification', 'level': level, 'title': title, 'message': message})
@@ -64,9 +69,7 @@ def notification(level, title, message):
 def preview(devicename, exposure):
     def exp():
         try:
-            image = controller().preview(devicename, float(exposure) )
-            image_event(image[0], 'image')
-            image_event(image[1], 'histogram')
+            image_event(controller().preview(devicename, float(exposure) ) )
         except Exception as e:
             notification('warning', 'Error', e.args[0])
 
@@ -79,9 +82,7 @@ def framing(devicename, exposure):
     def exp():
         try:
             while(app.config['framing']):
-                image = controller().preview(devicename, float(exposure) )
-                image_event(image[0], 'image')
-                image_event(image[1], 'histogram')
+                image_event( controller().preview(devicename, float(exposure) ) )
         except Exception as e:
             notification('warning', 'Error', e.args[0])
 

@@ -6,10 +6,12 @@ var set_image_url = function(basename, url) {
     $('#' + basename + '-container').show();
 };
 
-var notification = function(level, title, message, timeout) {
+var notification = function(level, title, message, timeout, additional_class) {
+    if(additional_class === undefined)
+        additional_class = '';
     var notification_id = 'notification-' + new Date().getTime();
     $('.notifications').append(
-        '<div id="' + notification_id + '" class="alert alert-' + level +
+        '<div id="' + notification_id + '" class="alert alert-' + level + ' ' + additional_class + 
         ' alert-dismissible fade in"><button type="button" class="close" data-dismiss="alert"><span>×</span></button><strong>' +
         title + '</strong> ' + message + '</div>');
     if(timeout > 0) {
@@ -21,10 +23,10 @@ var events_listener = new EventSource('/events');
 events_listener.onmessage = function(e) {
     event = JSON.parse(e.data);
     if(event['type'] == 'image') {
-        set_image_url('ccd-preview', event['url']);
-    }
-    if(event['type'] == 'histogram') {
-        set_image_url('histogram', event['url']);
+        set_image_url('ccd-preview', event['image_url']);
+        set_image_url('histogram', event['histogram']);
+        $('.image-received-notification').alert('close');
+        notification('success', 'image received', event['image_id'], 5, 'image-received-notification')
     }
     if(event['type'] == 'notification') {
         notification(event['level'], event['title'], event['message'], -1)
