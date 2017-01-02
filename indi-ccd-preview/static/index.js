@@ -47,7 +47,7 @@ var refresh_devices = function() {
     $('#setting').empty();
     $('#setting-value').val(null);
     refresh_element('device', '/devices', function(select, data) {
-        select_callback(select, function(x) {return {text: x, value: x}; }, data);
+        select_callback(select, function(x) {return {text: x, value: x}; }, data['devices']);
         refresh_settings();
     });
 };
@@ -66,7 +66,7 @@ var refresh_settings = function() {
         select_callback(select, function(x) {
             property_element = [x['property'], x['element']].join('.');
             return { text: property_element, value: property_element };
-        }, data);
+        }, data['properties']);
         refresh_value();
     });
 };

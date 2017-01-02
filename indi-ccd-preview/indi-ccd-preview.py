@@ -37,11 +37,11 @@ def index():
 
 @app.route('/devices')
 def devices():
-    return jsonify(controller().devices())
+    return jsonify({'devices': controller().devices()})
 
 @app.route('/device/<devicename>/properties')
 def properties(devicename):
-    return jsonify(controller().properties(devicename))
+    return jsonify({'device': devicename, 'properties': controller().properties(devicename)})
 
 @app.route('/device/<devicename>/properties/<property>')
 def property(devicename, property):
