@@ -1,6 +1,4 @@
 *.swp
 __pycache__
-indi-ccd-preview/static/preview*.jpg
-indi-ccd-preview/static/histogram*.jpg
-indi-ccd-preview/static/*.fits
+indi-ccd-preview/static/images
 

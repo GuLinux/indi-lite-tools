@@ -12,8 +12,8 @@ import pprint
 class ImageFiles:
     def __init__(self, workdir, extension = 'jpg'):
         self.timestamp = datetime.utcnow().isoformat()
-        self.extension = extension
         self.workdir = workdir
+        self.extension = extension
 
     def filename(self, name):
         return '{0}-{1}.{2}'.format(name, self.timestamp, self.extension)
@@ -27,7 +27,11 @@ class ImageFiles:
 class INDIController:
     def __init__(self, workdir):
         self.client = INDIClient()
-        self.workdir = workdir
+
+        self.workdir = '{0}/images'.format(workdir)
+        if not os.path.isdir(self.workdir):
+            os.makedirs(self.workdir)
+
 
     def devices(self):
         properties = self.client.get_properties()
@@ -54,8 +58,8 @@ class INDIController:
         scipy.misc.imsave(images.path('preview'), fits_data)
         self.__make_histogram(fits_data, images.path('histogram'))
 
-        self.__clean(images, ['preview', 'histogram'])
-        return images.filename('preview'), images.filename('histogram')
+        # self.__clean(images, ['preview', 'histogram'])
+        return 'images/' + images.filename('preview'), 'images/' + images.filename('histogram')
 
     def __shoot(self, device, exposure):
         imager = INDICamera(device, self.client)
