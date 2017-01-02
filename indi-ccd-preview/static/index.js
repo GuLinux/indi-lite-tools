@@ -1,20 +1,33 @@
 $('#stop-framing').hide();
+
+
+var set_image_url = function(basename, url) {
+    $('#' + basename + '-image').attr('src', url);
+    $('#' + basename + '-container').show();
+};
+
+var notification = function(level, title, message, timeout) {
+    var notification_id = 'notification-' + new Date().getTime();
+    $('.notifications').append(
+        '<div id="' + notification_id + '" class="alert alert-' + level +
+        ' alert-dismissible fade in"><button type="button" class="close" data-dismiss="alert"><span>×</span></button><strong>' +
+        title + '</strong> ' + message + '</div>');
+    if(timeout > 0) {
+        window.setTimeout(function() { $('#' + notification_id).alert('close'); }, timeout * 1000);
+    }
+};
+
 var events_listener = new EventSource('/events');
 events_listener.onmessage = function(e) {
     event = JSON.parse(e.data);
     if(event['type'] == 'image') {
-        $('#ccd-preview').attr('src', event['url']);
-        $('.image-container').show();
+        set_image_url('ccd-preview', event['url']);
     }
     if(event['type'] == 'histogram') {
-        $('#histogram-image').attr('src', event['url']);
-        $('.histogram-container').show();
+        set_image_url('histogram', event['url']);
     }
     if(event['type'] == 'notification') {
-        $('.notifications').append(
-            '<div class="alert alert-' + event['level'] +
-            ' alert-dismissible fade in"><button type="button" class="close" data-dismiss="alert"><span>×</span></button><strong>' +
-            event['title'] + '</strong> ' + event['message'] + '</div>');
+        notification(event['level'], event['title'], event['message'], -1)
     }
 };
 
