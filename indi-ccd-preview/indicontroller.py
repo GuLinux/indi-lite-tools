@@ -8,7 +8,7 @@ import numpy
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-
+import threading
 from glob import glob
 import pprint
 
@@ -18,8 +18,11 @@ class INDIImage:
         self.id = datetime.utcnow().isoformat()
         self.workdir = workdir
         self.extension = extension
+        t = threading.Thread(target=INDIImage.__make_histogram, args=(self.fits_file[0].data, log_y, bins, self.__path('histogram') ) )
+        #INDIImage.__make_histogram(self.fits_file[0].data, log_y, bins, self.__path('histogram'))
+        t.start()
         scipy.misc.imsave(self.__path('image'), self.fits_file[0].data)
-        self.__make_histogram(self.fits_file[0].data, log_y, bins)
+        t.join()
 
     def imagefile(self):
         return self.__filename('image')
@@ -33,13 +36,13 @@ class INDIImage:
     def __path(self, name):
         return '{0}/{1}'.format(self.workdir, self.__filename(name))
 
-    def __make_histogram(self, data, log_y, bins):
+    def __make_histogram(data, log_y, bins, path):
         plt.clf()
         plt.hist(data.flatten() , bins=bins)
         plt.xlim([0, bins-1])
         if log_y:
             plt.yscale('log')
-        plt.savefig(self.__path('histogram'))
+        plt.savefig(path)
 
 
 class INDIController:
