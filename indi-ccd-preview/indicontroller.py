@@ -5,7 +5,10 @@ from datetime import datetime
 import os
 import scipy.misc
 import numpy
+import matplotlib
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+
 from glob import glob
 import pprint
 
