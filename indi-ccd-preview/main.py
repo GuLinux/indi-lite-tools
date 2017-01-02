@@ -111,7 +111,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-d', '--debug', help="Run server in debug mode (default: off)", action='store_true')
     parser.add_argument('--host', help="Hostname for server listening (default: 127.0.0.1)", default='127.0.0.1')
-    parser.add_argument('-p', '--port', help="Port for server listening (default: 127.0.0.1)", default='5000')
+    parser.add_argument('-p', '--port', help="Port for server listening (default: 5000)", default='5000')
     args = parser.parse_args()
     app.run(threaded=True, host=args.host, port=args.port, debug=args.debug)
 
