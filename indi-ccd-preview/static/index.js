@@ -1,4 +1,14 @@
-$('#stop-framing').hide();
+
+
+var SETTING_EXPOSURE='setting_exposure';
+var SETTING_DEVICE='setting_device';
+
+var get_setting = function(key, default_value) {
+    var value = localStorage.getItem(key);
+    return value == null ? default_value : value;
+}
+
+
 
 
 var set_image_url = function(basename, url) {
@@ -63,6 +73,9 @@ var refresh_devices = function() {
     $('#setting-value').val(null);
     refresh_element('device', '/devices', function(select, data) {
         select_callback(select, function(x) {return {text: x, value: x}; }, data['devices']);
+        if(data['devices'].length > 0) {
+            $('#device').val(get_setting(SETTING_DEVICE, data['devices'][0]));
+        }
         refresh_settings();
     });
 };
@@ -100,10 +113,12 @@ var set_value = function() {
 };
 
 var preview = function() {
+    localStorage.setItem(SETTING_EXPOSURE, $('#exposure').val());
     $.ajax('/device/' + current_device() + '/preview/' + $('#exposure').val());
 };
 
 var framing = function() {
+    localStorage.setItem(SETTING_EXPOSURE, $('#exposure').val());
     $.ajax('/device/' + current_device() + '/framing/' + $('#exposure').val());
     $('#framing').hide();
     $('#stop-framing').show();
@@ -132,7 +147,10 @@ $('#preview').click(preview);
 $('#framing').click(framing);
 $('#stop-framing').click(stop_framing);
 
-$('#device').change(refresh_settings);
+$('#device').change(function() {
+    localStorage.setItem(SETTING_DEVICE, current_device());
+    refresh_settings();
+});
 $('#setting').change(refresh_value);
 
 $('#ccd-preview').click(function() {
@@ -143,4 +161,6 @@ $('#histogram-image').click(function() {
 });
 
 
+$('#exposure').val(get_setting(SETTING_EXPOSURE, 1));
+$('#stop-framing').hide();
 refresh_devices();
