@@ -10,6 +10,7 @@ import threading
 import json
 import argparse
 import subprocess
+import traceback
 
 app = Flask(__name__)
 app.config['bootstrap_version']='3.3.7'
@@ -80,6 +81,7 @@ def preview(devicename, exposure):
         try:
             image_event(controller().preview(devicename, float(exposure) ) )
         except Exception as e:
+            traceback.print_exc()
             notification('warning', 'Error', e.args[0])
 
     t = threading.Thread(target = exp)
@@ -93,6 +95,7 @@ def framing(devicename, exposure):
             while(app.config['framing']):
                 image_event( controller().preview(devicename, float(exposure) ) )
         except Exception as e:
+            traceback.print_exc()
             notification('warning', 'Error', e.args[0])
 
     app.config['framing'] = exposure != 'stop'
@@ -129,6 +132,7 @@ def run_command():
         level = 'success' if result == 0 else 'warning'
         return notification(level, 'Run command', 'command "{0}" finished with exit code {1}'.format(command, result))
     except Exception as e:
+        traceback.print_exc()
         notification('warning', 'Run command error', e.args[0])
     return ('', 204)
 
