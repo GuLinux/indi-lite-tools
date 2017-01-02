@@ -46,6 +46,14 @@ events_listener.onmessage = function(e) {
     }
 };
 
+$('#ccd-preview-image').click(function() {
+    $('#ccd-preview-image').toggleClass('img-responsive');
+});
+
+$('#histogram-image').click(function() {
+    $('#histogram-image').toggleClass('img-responsive');
+});
+
 
 var current_device = function() {
     return $('#device').val();
@@ -165,13 +173,6 @@ $('#device').change(function() {
 });
 $('#setting').change(refresh_value);
 
-$('#ccd-preview').click(function() {
-    $('#ccd-preview').toggleClass('img-responsive');
-});
-
-$('#histogram-image').click(function() {
-    $('#histogram-image').toggleClass('img-responsive');
-});
 
 var run_command = function() {
     var command = $('#run-command').val();
