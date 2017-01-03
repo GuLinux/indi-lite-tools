@@ -1,5 +1,5 @@
 var SETTING_EXPOSURE='setting_exposure';
-var SETTING_DEVICE='setting_device';
+
 var SETTING_HISTOGRAM_BINS='setting_histogram_bins';
 var SETTING_HISTOGRAM_LOG='setting_histogram_log';
 var SETTING_RUN_COMMAND='setting_run_command';
@@ -62,66 +62,21 @@ var current_property = function() {
 
 
 var indi = new INDI();
+var localSettings = new LocalSettings()
+var settingsPage = new SettingsPage(localSettings, indi);
 
 var current_indi_device = function() {
     var current_devices = indi.device_names();
     if(current_devices.length == 0)
         return null;
-    var devicename = get_setting(SETTING_DEVICE, current_devices);
+    var devicename = localSettings.get(SettingsPage.SETTING_DEVICE, current_devices[0]);
     if(current_devices.indexOf(devicename) == 0)
         devicename = current_devices[0];
     return indi.devices[devicename];
 };
 
-var on_property_value = function(property, device) {
-    $('#setting-value').val(property['value']);
-};
-
-var on_properties_reloaded = function(device) {
-    $('#setting-value').val(null);
-    device.properties.forEach( function(property) {
-        var setting = property['property'] + '.' + property['element'];
-        $('#setting').append($('<option />').val(setting).text(setting) );
-    } );
-    device.get(current_property(), on_property_value);
-};
-
-var on_devices_reloaded = function(indi) {
-    $('#setting').empty();
-    $('#setting-value').val(null);
-    indi.device_names().forEach( function(name) {
-        $('#device').append($('<option />').val(name).text(name));
-    });
-    var current_device = current_indi_device();
-    $('#device').val(current_device.name);
-    on_properties_reloaded(current_device);
-};
-
-var reload_value = function() {
-    $('#setting-value').val(null);
-    current_indi_device().reload(on_properties_reloaded);
-};
-
-var reload_devices = function() {
-    $('#device').empty();
-    $('#setting').empty();
-    $('#setting-value').val(null);
-    indi.get_devices(on_devices_reloaded);
-};
-
-var reload_settings = function() {
-    $('#setting').empty();
-    $('#setting-value').val(null);
-    reload_value();
-};
 
 
-var set_value = function() {
-    value = $('#setting-value').val();
-    property = $('#setting').val();
-    $('#setting-value').val(null);
-    current_indi_device().set(property, value, reload_value)
-};
 
 var preview = function() {
     localStorage.setItem(SETTING_EXPOSURE, $('#exposure').val());
@@ -152,20 +107,10 @@ var update_histogram_settings = function() {
 };
 
 
-$('#refresh-devices').click(reload_devices);
-$('#refresh-settings').click(reload_settings);
-$('#reset-value').click(reload_value);
-$('#set-value').click(set_value);
 $('#preview').click(preview);
 $('#framing').click(framing);
 $('#stop-framing').click(stop_framing);
 $('#histogram-update-settings').click(update_histogram_settings);
-
-$('#device').change(function() {
-    localStorage.setItem(SETTING_DEVICE, current_indi_device().name);
-    reload_settings();
-});
-$('#setting').change(reload_value);
 
 $('.navbar-collapse a').click(function(){
     $(".navbar-collapse").collapse('hide');
@@ -188,4 +133,4 @@ $('#run-command-btn').click(run_command);
 $('#run-command').val(get_setting(SETTING_RUN_COMMAND), '');
 
 $('#stop-framing').hide();
-reload_devices();
+settingsPage.reload_devices();
