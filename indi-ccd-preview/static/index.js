@@ -1,8 +1,11 @@
-
-
 var SETTING_HISTOGRAM_BINS='setting_histogram_bins';
 var SETTING_HISTOGRAM_LOG='setting_histogram_log';
 var SETTING_RUN_COMMAND='setting_run_command';
+
+var indi = new INDI();
+var localSettings = new LocalSettings()
+var settingsPage = new SettingsPage(localSettings, indi);
+var previewPage = new PreviewPage(localSettings, indi);
 
 var get_setting = function(key, default_value) {
     var value = localStorage.getItem(key);
@@ -30,7 +33,7 @@ var notification = function(level, title, message, timeout, additional_class) {
 
 var event_handlers = {
     image: function(event) {
-        set_image_url('ccd-preview', event['image_url']);
+        previewPage.setImage(event['image_url']);
         set_image_url('histogram', event['histogram']);
         $('.image-received-notification').remove();
         notification('success', 'image received', event['image_id'], 5, 'image-received-notification');
@@ -58,10 +61,6 @@ var current_property = function() {
 };
 
 
-var indi = new INDI();
-var localSettings = new LocalSettings()
-var settingsPage = new SettingsPage(localSettings, indi);
-var previewPage = new PreviewPage(localSettings, indi);
 
 var current_indi_device = function() {
     var current_devices = indi.device_names();
