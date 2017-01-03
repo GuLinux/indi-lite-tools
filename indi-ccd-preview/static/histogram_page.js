@@ -21,8 +21,10 @@ var HistogramPage = function(localsettings, indi) {
         var mapped = data.map(function(item, index){
             return { x: index, y: item};
         });
+        var is_logarithmic = this.localsettings.get(HistogramPage.SETTING_HISTOGRAM_LOG, true) == 'true';
         var chart = new CanvasJS.Chart("histogram-plot", {
             title: { text: "Histogram Data" },
+            axisY: {logarithmic: is_logarithmic},
             data: [ {
                 type: "area",
                 dataPoints: mapped

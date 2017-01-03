@@ -76,7 +76,6 @@ def image_event(image) :
     put_event({
         'type': 'image',
         'image_url': image_path( image.imagefile() ),
-        'histogram': image_path(image.histogram()),
         'histogram-data': image.hist[0].tolist(),
         'histogram-bins': image.hist[1].tolist(),
         'image_id': image.id

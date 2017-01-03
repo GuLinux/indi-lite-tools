@@ -67,7 +67,7 @@ var SettingsPage = function(localsettings, indi) {
     $('#reset-value').click(this.reload_value.bind(this));
     $('#set-value').click(this.set_value.bind(this));
     $('#device').change(function() {
-        this.localsettings.set(SettingsPage.SETTING_DEVICE, current_indi_device().name);
+        this.localsettings.set(SettingsPage.SETTING_DEVICE, $('#device').val());
         this.reload_settings();
     }.bind(this));
     $('#setting').change(this.reload_value.bind(this));
