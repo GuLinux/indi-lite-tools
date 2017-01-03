@@ -173,6 +173,10 @@ $('#device').change(function() {
 });
 $('#setting').change(refresh_value);
 
+$('.navbar-collapse a').click(function(){
+    $(".navbar-collapse").collapse('hide');
+});
+
 
 var run_command = function() {
     var command = $('#run-command').val();
