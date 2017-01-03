@@ -5,10 +5,8 @@ from datetime import datetime
 import os
 import scipy.misc
 import numpy
-import matplotlib
-matplotlib.use('Agg')
-import matplotlib.pyplot as plt
 import threading
+import math
 from glob import glob
 import pprint
 
@@ -18,8 +16,9 @@ class INDIImage:
         self.id = datetime.utcnow().isoformat()
         self.workdir = workdir
         self.extension = extension
-        self.hist = numpy.histogram(self.fits_file[0].data.flatten(), bins = bins)
-        scipy.misc.imsave(self.__path('image'), self.fits_file[0].data)
+        self.bins = bins
+        self.__histogram()
+        self.__save_image()
 
     def imagefile(self):
         return self.__filename('image')
@@ -30,7 +29,16 @@ class INDIImage:
     def __path(self, name):
         return '{0}/{1}'.format(self.workdir, self.__filename(name))
 
+    def __histogram(self):
+        bins = self.bins
+        # TODO: calculate absolute histogram, or relative to the values?
+        # data_max = math.pow(2, int(self.fits_file[0].header['BITPIX'])) # TODO: this should be a bit more flexible, perhaps
+        # steps = data_max / self.bins
+        # bins = numpy.arange(0, data_max + 1, steps)
+        self.hist = numpy.histogram(self.fits_file[0].data.flatten(), bins = bins)
 
+    def __save_image(self):
+        scipy.misc.imsave(self.__path('image'), self.fits_file[0].data)
 
 class INDIController:
     def __init__(self, workdir, format = 'jpg', bins = 256, log_y = True):
