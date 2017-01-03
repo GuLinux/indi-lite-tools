@@ -1,4 +1,4 @@
-var SETTING_EXPOSURE='setting_exposure';
+
 
 var SETTING_HISTOGRAM_BINS='setting_histogram_bins';
 var SETTING_HISTOGRAM_LOG='setting_histogram_log';
@@ -46,9 +46,6 @@ events_listener.onmessage = function(e) {
     event_handlers[event['type']](event);
 };
 
-$('#ccd-preview-image').click(function() {
-    $('#ccd-preview-image').toggleClass('img-responsive');
-});
 
 $('#histogram-image').click(function() {
     $('#histogram-image').toggleClass('img-responsive');
@@ -64,6 +61,7 @@ var current_property = function() {
 var indi = new INDI();
 var localSettings = new LocalSettings()
 var settingsPage = new SettingsPage(localSettings, indi);
+var previewPage = new PreviewPage(localSettings, indi);
 
 var current_indi_device = function() {
     var current_devices = indi.device_names();
@@ -78,25 +76,6 @@ var current_indi_device = function() {
 
 
 
-var preview = function() {
-    localStorage.setItem(SETTING_EXPOSURE, $('#exposure').val());
-    current_indi_device().preview($('#exposure').val());
-};
-
-var framing = function() {
-    localStorage.setItem(SETTING_EXPOSURE, $('#exposure').val());
-    current_indi_device().framing($('#exposure').val());
-    $('#framing').hide();
-    $('#stop-framing').show();
-
-};
-
-var stop_framing = function() {
-    current_indi_device().stop_framing();
-    $('#framing').show();
-    $('#stop-framing').hide();
-}
-
 
 var update_histogram_settings = function() {
     var bins = parseInt($('#histogram-bins').val());
@@ -107,9 +86,6 @@ var update_histogram_settings = function() {
 };
 
 
-$('#preview').click(preview);
-$('#framing').click(framing);
-$('#stop-framing').click(stop_framing);
 $('#histogram-update-settings').click(update_histogram_settings);
 
 $('.navbar-collapse a').click(function(){
@@ -123,14 +99,12 @@ var run_command = function() {
     $.ajax('/run_command', {method: 'POST', data: {command: command}});
 };
 
-$('#exposure').val(get_setting(SETTING_EXPOSURE, 1));
+
 $('#histogram-bins').val(get_setting(SETTING_HISTOGRAM_BINS, 256));
 $('#histogram-logarithmic').prop('checked', get_setting(SETTING_HISTOGRAM_LOG, 'true') == 'true');
 $('#shutdown-server').click(function() { $.ajax('/shutdown', {success: function(){ notification('danger', 'Shutdown', 'Server is shutting down...'); }}); });
 update_histogram_settings();
 $('#run-command-btn').click(run_command);
-
 $('#run-command').val(get_setting(SETTING_RUN_COMMAND), '');
 
-$('#stop-framing').hide();
 settingsPage.reload_devices();
