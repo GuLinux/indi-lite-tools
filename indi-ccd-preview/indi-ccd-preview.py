@@ -3,7 +3,11 @@ from flask import Flask, render_template, g, request, session, Response
 from flask.json import jsonify
 from indicontroller import INDIController
 from time import sleep
-import queue
+import sys
+if sys.version_info[0] == 2:
+    import Queue as queue
+else:
+    import queue
 import logging
 import pprint
 import threading
