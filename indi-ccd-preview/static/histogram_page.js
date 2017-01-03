@@ -17,6 +17,17 @@ var HistogramPage = function(localsettings, indi) {
         $('#histogram-image').attr('src', url);
     };
 
+    this.setData = function(data, bins) {
+        var plot_data = {
+            labels: ['histogram'],
+            datasets: [{
+                data: data,
+                fill: true
+            }]
+        };
+        this.chart = new Chart($('#histogram-plot'), {type: 'line', data: plot_data});
+    };
+
 
 
     $('#histogram-update-settings').click(this.updateHistogramSettings.bind(this));

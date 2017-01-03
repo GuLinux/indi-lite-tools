@@ -20,9 +20,11 @@ class INDIImage:
         self.extension = extension
         t = threading.Thread(target=INDIImage.__make_histogram, args=(self, self.fits_file[0].data, log_y, bins, self.__path('histogram') ) )
         #INDIImage.__make_histogram(self.fits_file[0].data, log_y, bins, self.__path('histogram'))
+        self.hist = numpy.histogram(self.fits_file[0].data.flatten(), bins = bins)
         t.start()
         scipy.misc.imsave(self.__path('image'), self.fits_file[0].data)
         t.join()
+
 
     def imagefile(self):
         return self.__filename('image')
@@ -43,6 +45,7 @@ class INDIImage:
         if log_y:
             plt.yscale('log')
         plt.savefig(path)
+
 
 
 class INDIController:

@@ -23,6 +23,7 @@ var event_handlers = {
     image: function(event) {
         previewPage.setImage(event['image_url']);
         histogramPage.setImage(event['histogram']);
+        histogramPage.setData(event['histogram-data'], event['histogram-bins']);
         $('.image-received-notification').remove();
         notification('success', 'image received', event['image_id'], 5, 'image-received-notification');
     },
