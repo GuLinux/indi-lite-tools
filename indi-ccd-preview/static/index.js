@@ -6,13 +6,13 @@ var histogramPage = new HistogramPage(localSettings, indi);
 var miscPage = new MiscPage(localSettings, indi);
 
 var notification = function(level, title, message, timeout, additional_class) {
-    if(additional_class === undefined)
-        additional_class = '';
     var notification_id = 'notification-' + new Date().getTime();
-    $('.notifications').append(
-        '<div id="' + notification_id + '" class="alert alert-' + level + ' ' + additional_class + 
-        ' alert-dismissible fade in"><button type="button" class="close" data-dismiss="alert"><span>×</span></button><strong>' +
-        title + '</strong> ' + message + '</div>');
+    var notification = $('#notification-template').clone().prop('id', notification_id).addClass('alert-' + level).prop('style', '');
+    if(additional_class !== undefined)
+        notification.addClass(additional_class);
+    notification.children('.notification-title').text(title);
+    notification.children('.notification-text').text(message);
+    $('.notifications').append(notification);
     if(timeout > 0) {
         window.setTimeout(function() { $('#' + notification_id).alert('close'); }, timeout * 1000);
     }
