@@ -1,4 +1,5 @@
-
+$.getScript('/static/indi.js');
+$.getScript('/static/localsettings.js');
 
 var SETTING_EXPOSURE='setting_exposure';
 var SETTING_DEVICE='setting_device';

@@ -56,8 +56,15 @@ class INDIController:
         if not os.path.isdir(self.workdir):
             os.makedirs(self.workdir)
 
-
     def devices(self):
+        properties = self.client.get_properties()
+        devices = list(set([property['device'] for property in properties]))
+        result = {}
+        for device in devices:
+            result[device] = [p for p in properties if p['device'] == device]
+        return result
+
+    def device_names(self):
         properties = self.client.get_properties()
         devices = list(set([property['device'] for property in properties]))
         devices.sort()
