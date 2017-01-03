@@ -22,7 +22,7 @@ var HistogramPage = function(localsettings, indi) {
         var ctx = document.getElementById('histogram-plot').getContext('2d');
         var bins_labels = bins.filter( function(x) { return x > 0; }).map(function(x, i, a) {
             var prev = i == 0 ? 0 : a[i-1];
-            return 'from ' + prev + ' to ' + x;
+            return 'from ' + Number(prev).toFixed(1) + ' to ' + Number(x).toFixed(1);
         });
         console.log(bins_labels);
         var chart = new Chart(ctx, {
