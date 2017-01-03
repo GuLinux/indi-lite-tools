@@ -82,10 +82,10 @@ class INDIController:
     def preview(self, device, exposure):
         if INDIController.__status['shooting']:
             raise RuntimeError('Anoter exposure is already in progress')
-        INDIController.__status = {'shooting': True, 'exposure': exposure, 'started': time.time() }
         imager = INDICamera(device, self.client)
         if not imager.is_camera():
             raise RuntimeError('Device {0} is not an INDI CCD Camera'.format(device))
+        INDIController.__status = {'shooting': True, 'exposure': exposure, 'started': time.time() }
         imager.set_output(self.workdir, 'IMAGE_PREVIEW')
         imager.shoot(exposure)
         INDIController.__status = {'shooting': False, 'last_exposure': exposure, 'last_ended': time.time() }
