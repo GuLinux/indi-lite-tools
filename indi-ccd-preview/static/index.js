@@ -27,18 +27,23 @@ var notification = function(level, title, message, timeout, additional_class) {
     }
 };
 
-var events_listener = new EventSource('/events');
-events_listener.onmessage = function(e) {
-    event = JSON.parse(e.data);
-    if(event['type'] == 'image') {
+
+var event_handlers = {
+    image: function(event) {
         set_image_url('ccd-preview', event['image_url']);
         set_image_url('histogram', event['histogram']);
         $('.image-received-notification').remove();
-        notification('success', 'image received', event['image_id'], 5, 'image-received-notification')
+        notification('success', 'image received', event['image_id'], 5, 'image-received-notification');
+    },
+    notification: function(event) {
+        notification(event['level'], event['title'], event['message'], -1);
     }
-    if(event['type'] == 'notification') {
-        notification(event['level'], event['title'], event['message'], -1)
-    }
+};
+
+var events_listener = new EventSource('/events');
+events_listener.onmessage = function(e) {
+    event = JSON.parse(e.data);
+    event_handlers[event['type']](event);
 };
 
 $('#ccd-preview-image').click(function() {
