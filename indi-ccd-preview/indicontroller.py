@@ -85,4 +85,8 @@ class INDIController:
         imager.shoot(exposure)
         return INDIImage(self.workdir, 'IMAGE_PREVIEW.fits', bins=self.bins, log_y=self.log_y)
 
+    def clean_cache(self):
+        for file in glob(self.workdir + '/*'):
+            os.remove(file)
+        return len( [f for f in os.listdir(self.workdir) if os.isfile(f)] )    
 

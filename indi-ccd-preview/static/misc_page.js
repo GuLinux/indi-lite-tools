@@ -14,6 +14,14 @@ var MiscPage = function(localsettings, indi) {
             notification('danger', 'Shutdown', 'Server is shutting down...');
         }});
     });
+
+    $('#clean-cache').click(function() {
+        $.ajax('/clean-cache', {success: function(data){
+            level = data['files'] == 0 ? 'success' : 'warning';
+            notification(level, 'Clean cache', 'Cache cleared, files remaining: ' + data['files'], 5);
+        }});
+    });
+
     $('#run-command-btn').click(this.run_command.bind(this));
     $('#run-command').val(localsettings.get(MiscPage.SETTING_RUN_COMMAND), '');
 };

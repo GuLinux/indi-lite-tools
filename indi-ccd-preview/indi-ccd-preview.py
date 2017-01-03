@@ -133,6 +133,11 @@ def shutdown():
     func()
     return ('', 204)
 
+@app.route('/clean-cache')
+def clean_cache():
+    numfiles = controller().clean_cache()
+    return jsonify({'files': numfiles})
+
 @app.route('/run_command', methods=['POST'])
 def run_command():
     try:
