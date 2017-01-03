@@ -8,6 +8,7 @@ import numpy
 import threading
 import math
 from glob import glob
+import time
 import pprint
 
 class INDIImage:
@@ -41,6 +42,7 @@ class INDIImage:
         scipy.misc.imsave(self.__path('image'), self.fits_file[0].data)
 
 class INDIController:
+    __status = {'shooting': False}
     def __init__(self, workdir, format = 'jpg', bins = 256, log_y = True):
         self.client = INDIClient()
         self.format = format
@@ -78,11 +80,15 @@ class INDIController:
         return self.property(device, property)
 
     def preview(self, device, exposure):
+        if INDIController.__status['shooting']:
+            raise RuntimeError('Anoter exposure is already in progress')
+        INDIController.__status = {'shooting': True, 'exposure': exposure, 'started': time.time() }
         imager = INDICamera(device, self.client)
         if not imager.is_camera():
             raise RuntimeError('Device {0} is not an INDI CCD Camera'.format(device))
         imager.set_output(self.workdir, 'IMAGE_PREVIEW')
         imager.shoot(exposure)
+        INDIController.__status = {'shooting': False, 'last_exposure': exposure, 'last_ended': time.time() }
         return INDIImage(self.workdir, 'IMAGE_PREVIEW.fits', bins=self.bins, log_y=self.log_y)
 
     def clean_cache(self):
@@ -90,3 +96,6 @@ class INDIController:
             os.remove(file)
         return len( [f for f in os.listdir(self.workdir) if os.isfile(f)] )    
 
+
+    def status(self):
+        return dict({'now': time.time(), **INDIController.__status })

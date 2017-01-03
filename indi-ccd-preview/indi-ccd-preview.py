@@ -84,6 +84,10 @@ def image_event(image) :
 def notification(level, title, message):
     put_event({'type': 'notification', 'level': level, 'title': title, 'message': message})
 
+@app.route('/status')
+def status():
+    return jsonify(controller().status())
+
 @app.route('/device/<devicename>/preview/<exposure>')
 def preview(devicename, exposure):
     def exp():
