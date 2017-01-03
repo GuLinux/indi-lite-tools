@@ -62,10 +62,11 @@ var HistogramPage = function(localsettings, indi) {
 
 
     $('#histogram-update-settings').click(this.updateHistogramSettings.bind(this));
+    /*
     $('#histogram-image').click(function() {
         $('#histogram-image').toggleClass('img-responsive');
     });
-
+    */
     $('#histogram-bins').val(this.localsettings.get(HistogramPage.SETTING_HISTOGRAM_BINS, 256));
     $('#histogram-logarithmic').prop('checked', this.localsettings.get(HistogramPage.SETTING_HISTOGRAM_LOG, 'true') == 'true');
 
