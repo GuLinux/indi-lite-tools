@@ -18,14 +18,18 @@ var HistogramPage = function(localsettings, indi) {
     };
 
     this.setData = function(data, bins) {
-        var plot_data = {
-            labels: ['histogram'],
-            datasets: [{
-                data: data,
-                fill: true
+        var mapped = data.map(function(item, index){
+            return { x: index, y: item};
+        });
+        var chart = new CanvasJS.Chart("histogram-plot", {
+            title: { text: "Histogram Data" },
+            data: [ {
+                type: "area",
+                dataPoints: mapped
             }]
-        };
-        this.chart = new Chart($('#histogram-plot'), {type: 'line', data: plot_data});
+        });
+
+    chart.render();
     };
 
 
