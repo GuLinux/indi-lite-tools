@@ -1,20 +1,9 @@
-var SETTING_RUN_COMMAND='setting_run_command';
-
 var indi = new INDI();
 var localSettings = new LocalSettings()
 var settingsPage = new SettingsPage(localSettings, indi);
 var previewPage = new PreviewPage(localSettings, indi);
 var histogramPage = new HistogramPage(localSettings, indi);
-
-var get_setting = function(key, default_value) {
-    var value = localStorage.getItem(key);
-    return value == null ? default_value : value;
-}
-
-var set_image_url = function(basename, url) {
-    $('#' + basename + '-image').attr('src', url);
-    $('#' + basename + '-container').show();
-};
+var miscPage = new MiscPage(localSettings, indi);
 
 var notification = function(level, title, message, timeout, additional_class) {
     if(additional_class === undefined)
@@ -60,23 +49,9 @@ var current_indi_device = function() {
     return indi.devices[devicename];
 };
 
-
-
-
-
 $('.navbar-collapse a').click(function(){
     $(".navbar-collapse").collapse('hide');
 });
 
-
-var run_command = function() {
-    var command = $('#run-command').val();
-    localStorage.setItem(SETTING_RUN_COMMAND, command);
-    $.ajax('/run_command', {method: 'POST', data: {command: command}});
-};
-
-$('#shutdown-server').click(function() { $.ajax('/shutdown', {success: function(){ notification('danger', 'Shutdown', 'Server is shutting down...'); }}); });
-$('#run-command-btn').click(run_command);
-$('#run-command').val(get_setting(SETTING_RUN_COMMAND), '');
 
 settingsPage.reload_devices();
