@@ -24,7 +24,6 @@ var HistogramPage = function(localsettings, indi) {
             var prev = i == 0 ? 0 : a[i-1];
             return 'from ' + Number(prev).toFixed(1) + ' to ' + Number(x).toFixed(1);
         });
-        console.log(bins_labels);
         var chart = new Chart(ctx, {
             type: 'line',
             data: {
