@@ -18,6 +18,17 @@ var INDIDevice = function(devicename, properties) {
         }); 
     };
 
+    this.filter_properties = function(property, element) {
+        return properties.filter(function(each) {
+            var matches = true;
+            if(property !== undefined)
+                matches &= each['property'] == property;
+            if(element !== undefined)
+                matches &= each['element'] == element;
+            return matches;
+        });
+    };
+
     this.preview = function(exposure) {
         $.ajax(this.__url(['preview', exposure]));
     }; 
