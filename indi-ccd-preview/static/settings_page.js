@@ -33,13 +33,19 @@ var SettingsPage = function(localsettings, indi) {
         $('#setting-value').val(property['value']);
     };
 
+    this.current_property = function() {
+        return $('#setting').val();
+    };
+
+
+
     this.__on_properties_reloaded = function(device) {
         $('#setting-value').val(null);
         device.properties.forEach( function(property) {
             var setting = property['property'] + '.' + property['element'];
             $('#setting').append($('<option />').val(setting).text(setting) );
         } );
-        device.get(current_property(), this.__on_property_value.bind(this));
+        device.get(this.current_property(), this.__on_property_value.bind(this));
     };
 
 

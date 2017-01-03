@@ -1,11 +1,10 @@
-var SETTING_HISTOGRAM_BINS='setting_histogram_bins';
-var SETTING_HISTOGRAM_LOG='setting_histogram_log';
 var SETTING_RUN_COMMAND='setting_run_command';
 
 var indi = new INDI();
 var localSettings = new LocalSettings()
 var settingsPage = new SettingsPage(localSettings, indi);
 var previewPage = new PreviewPage(localSettings, indi);
+var histogramPage = new HistogramPage(localSettings, indi);
 
 var get_setting = function(key, default_value) {
     var value = localStorage.getItem(key);
@@ -34,7 +33,7 @@ var notification = function(level, title, message, timeout, additional_class) {
 var event_handlers = {
     image: function(event) {
         previewPage.setImage(event['image_url']);
-        set_image_url('histogram', event['histogram']);
+        histogramPage.setImage(event['histogram']);
         $('.image-received-notification').remove();
         notification('success', 'image received', event['image_id'], 5, 'image-received-notification');
     },
@@ -47,17 +46,6 @@ var events_listener = new EventSource('/events');
 events_listener.onmessage = function(e) {
     event = JSON.parse(e.data);
     event_handlers[event['type']](event);
-};
-
-
-$('#histogram-image').click(function() {
-    $('#histogram-image').toggleClass('img-responsive');
-});
-
-
-
-var current_property = function() {
-    return $('#setting').val();
 };
 
 
@@ -76,17 +64,6 @@ var current_indi_device = function() {
 
 
 
-var update_histogram_settings = function() {
-    var bins = parseInt($('#histogram-bins').val());
-    var logarithmic = $('#histogram-logarithmic').prop('checked')
-    localStorage.setItem(SETTING_HISTOGRAM_BINS, bins);
-    localStorage.setItem(SETTING_HISTOGRAM_LOG, logarithmic);
-    $.ajax('/histogram', {method: 'PUT', data: {bins: bins, logarithmic: logarithmic} });
-};
-
-
-$('#histogram-update-settings').click(update_histogram_settings);
-
 $('.navbar-collapse a').click(function(){
     $(".navbar-collapse").collapse('hide');
 });
@@ -98,11 +75,7 @@ var run_command = function() {
     $.ajax('/run_command', {method: 'POST', data: {command: command}});
 };
 
-
-$('#histogram-bins').val(get_setting(SETTING_HISTOGRAM_BINS, 256));
-$('#histogram-logarithmic').prop('checked', get_setting(SETTING_HISTOGRAM_LOG, 'true') == 'true');
 $('#shutdown-server').click(function() { $.ajax('/shutdown', {success: function(){ notification('danger', 'Shutdown', 'Server is shutting down...'); }}); });
-update_histogram_settings();
 $('#run-command-btn').click(run_command);
 $('#run-command').val(get_setting(SETTING_RUN_COMMAND), '');
 
