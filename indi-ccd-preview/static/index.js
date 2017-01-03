@@ -50,6 +50,18 @@ var current_indi_device = function() {
     return indi.devices[devicename];
 };
 
+var on_server_status = function(status) {
+    var text = 'server is idle.';
+    if(status['shooting']) {
+        var elapsed = Number(status['now'] - status['started']).toFixed(1);
+        var remaining = Number(status['exposure'] - elapsed).toFixed(1);
+        text = 'server is currently shooting: exposure is ' + Number(status['exposure']).toFixed(1) + 's, elapsed: ' + elapsed + 's, remaining: ' + remaining + 's.';
+    }
+    $('.server-status-notification').remove();
+    notification('info', 'Server Status', text, 5, 'server-status-notification');
+};
+
+$('#server-status').click(function() { $.ajax('/status', {success: on_server_status}); });
 $('.navbar-collapse a').click(function(){
     $(".navbar-collapse").collapse('hide');
 });
