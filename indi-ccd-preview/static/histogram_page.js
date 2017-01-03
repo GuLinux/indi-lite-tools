@@ -18,10 +18,35 @@ var HistogramPage = function(localsettings, indi) {
     };
 
     this.setData = function(data, bins) {
+        var is_logarithmic = this.localsettings.get(HistogramPage.SETTING_HISTOGRAM_LOG, true) == 'true';
+        var ctx = document.getElementById('histogram-plot').getContext('2d');
+        var bins_labels = bins.filter( function(x) { return x > 0; }).map(function(x, i, a) {
+            var prev = i == 0 ? 0 : a[i-1];
+            return 'from ' + prev + ' to ' + x;
+        });
+        console.log(bins_labels);
+        var chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: bins_labels,
+                datasets: [{
+                    label: "histogram",
+                    data: data
+                }]
+            },
+            options: {
+                scales: {
+                    yAxes: [{
+                        type: is_logarithmic ? 'logarithmic' : 'linear'
+                    }]
+                }
+            }
+        });
+/*
         var mapped = data.map(function(item, index){
             return { x: index, y: item};
         });
-        var is_logarithmic = this.localsettings.get(HistogramPage.SETTING_HISTOGRAM_LOG, true) == 'true';
+
         var chart = new CanvasJS.Chart("histogram-plot", {
             title: { text: "Histogram Data" },
             axisY: {logarithmic: is_logarithmic},
@@ -29,9 +54,9 @@ var HistogramPage = function(localsettings, indi) {
                 type: "area",
                 dataPoints: mapped
             }]
-        });
-
+        });  
     chart.render();
+*/
     };
 
 
