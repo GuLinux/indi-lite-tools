@@ -7,17 +7,39 @@ var INDIDevice = function(devicename, properties) {
     }
 
     this.get = function(property, callback) {
-        $.ajax(this.__url(['properties', property]), {success: callback});
+        $.ajax(this.__url(['properties', property]), {success: this.__got_property.bind(this, callback)});
     };
 
     this.set = function(property, value, callback) {
-       $.ajax(this.__url(['properties', property]), {method: 'PUT', data: {value: value}, success: callback}); 
+        $.ajax(this.__url(['properties', property]), {
+            method: 'PUT',
+            data: {value: value},
+            success: this.__got_property.bind(this, callback)
+        }); 
     };
+
+    this.preview = function(exposure) {
+        $.ajax(this.__url(['preview', exposure]));
+    }; 
+
+    this.framing = function(exposure) {
+        $.ajax(this.__url(['framing', exposure]));
+    }; 
+
+    this.stop_framing = function() {
+        $.ajax(this.__url(['framing', 'stop']));
+    };
+
 
     this.__got_properties = function(callback, data) {
         this.properties = data['properties'];
-        if(callback)
+        if(callback !== undefined)
             callback(this);
+    }
+
+    this.__got_property = function(callback, data) {
+        if(callback !== undefined)
+            callback(data, this);
     }
 
     this.__url = function(suburl) {
