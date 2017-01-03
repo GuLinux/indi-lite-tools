@@ -57,6 +57,10 @@ var INDI = function() {
         $.ajax('/devices', {success: this.__got_devices.bind(this, callback)});
     };
 
+    this.device_names = function() {
+        return Object.keys(this.devices);
+    };
+
 
     this.__got_devices = function(callback, data) {
         this.devices = {};

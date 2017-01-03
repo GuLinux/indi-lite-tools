@@ -1,6 +1,3 @@
-$.getScript('/static/indi.js');
-$.getScript('/static/localsettings.js');
-
 var SETTING_EXPOSURE='setting_exposure';
 var SETTING_DEVICE='setting_device';
 var SETTING_HISTOGRAM_BINS='setting_histogram_bins';
@@ -11,9 +8,6 @@ var get_setting = function(key, default_value) {
     var value = localStorage.getItem(key);
     return value == null ? default_value : value;
 }
-
-
-
 
 var set_image_url = function(basename, url) {
     $('#' + basename + '-image').attr('src', url);
@@ -56,97 +50,93 @@ $('#histogram-image').click(function() {
 });
 
 
-var current_device = function() {
-    return $('#device').val();
-};
 
 var current_property = function() {
     return $('#setting').val();
 };
 
 
-var select_callback = function(dom_element, transform, data) {
-    data.map(transform).forEach(function(element) {
-        dom_element.append($('<option />').val(element.value).text(element.text));
-    });
+var indi = new INDI();
+
+var current_indi_device = function() {
+    var current_devices = indi.device_names();
+    if(current_devices.length == 0)
+        return null;
+    var devicename = get_setting(SETTING_DEVICE, current_devices);
+    if(current_devices.indexOf(devicename) == 0)
+        devicename = current_devices[0];
+    return indi.devices[devicename];
 };
 
-var refresh_select = function(select_name, url, transform) {
-    refresh_element(select_name, url, select_callback.bind(this, select_name, transform));
+var on_property_value = function(property, device) {
+    $('#setting-value').val(property['value']);
 };
 
-var refresh_element = function(name, url, on_success) {
-    $('#' + name).empty();
-    $.ajax(url, {success: on_success.bind(this, $('#' + name)) });
+var on_properties_reloaded = function(device) {
+    $('#setting-value').val(null);
+    device.properties.forEach( function(property) {
+        var setting = property['property'] + '.' + property['element'];
+        $('#setting').append($('<option />').val(setting).text(setting) );
+    } );
+    device.get(current_property(), on_property_value);
 };
 
-var refresh_devices = function() {
+var on_devices_reloaded = function(indi) {
     $('#setting').empty();
     $('#setting-value').val(null);
-    refresh_element('device', '/device_names', function(select, data) {
-        select_callback(select, function(x) {return {text: x, value: x}; }, data['devices']);
-        if(data['devices'].length > 0) {
-            $('#device').val(get_setting(SETTING_DEVICE, data['devices'][0]));
-        }
-        refresh_settings();
+    indi.device_names().forEach( function(name) {
+        $('#device').append($('<option />').val(name).text(name));
     });
+    var current_device = current_indi_device();
+    $('#device').val(current_device.name);
+    on_properties_reloaded(current_device);
 };
 
-var get_properties_url = function() {
-    return ['/device', current_device(), 'properties'].join('/');
-};
-
-var get_setting_url = function() {
-    return ['/device', current_device(), 'properties', current_property()].join('/')
-};
-
-var refresh_settings = function() {
+var reload_value = function() {
     $('#setting-value').val(null);
-    refresh_element('setting', get_properties_url(), function(select, data) {
-        select_callback(select, function(x) {
-            property_element = [x['property'], x['element']].join('.');
-            return { text: property_element, value: property_element };
-        }, data['properties']);
-        refresh_value();
-    });
+    current_indi_device().reload(on_properties_reloaded);
 };
 
-
-var refresh_value = function() {
-    refresh_element('setting-value', get_setting_url(), function(txt, d) {
-        $('#setting-value').val(d['value']);
-    });
+var reload_devices = function() {
+    $('#device').empty();
+    $('#setting').empty();
+    $('#setting-value').val(null);
+    indi.get_devices(on_devices_reloaded);
 };
+
+var reload_settings = function() {
+    $('#setting').empty();
+    $('#setting-value').val(null);
+    reload_value();
+};
+
 
 var set_value = function() {
     value = $('#setting-value').val();
+    property = $('#setting').val();
     $('#setting-value').val(null);
-    $.ajax(get_setting_url(), {method: 'PUT', data: {value: value}, success: refresh_settings});
+    current_indi_device().set(property, value, reload_value)
 };
 
 var preview = function() {
     localStorage.setItem(SETTING_EXPOSURE, $('#exposure').val());
-    $.ajax('/device/' + current_device() + '/preview/' + $('#exposure').val());
+    current_indi_device().preview($('#exposure').val());
 };
 
 var framing = function() {
     localStorage.setItem(SETTING_EXPOSURE, $('#exposure').val());
-    $.ajax('/device/' + current_device() + '/framing/' + $('#exposure').val());
+    current_indi_device().framing($('#exposure').val());
     $('#framing').hide();
     $('#stop-framing').show();
+
 };
 
 var stop_framing = function() {
-    $.ajax('/device/' + current_device() + '/framing/stop');
+    current_indi_device().stop_framing();
     $('#framing').show();
     $('#stop-framing').hide();
 }
 
-
-var nav = function(name) {
-    $('.navlink').removeClass('active');
-    $('#nav-' + name).addClass('active');
-};
 
 var update_histogram_settings = function() {
     var bins = parseInt($('#histogram-bins').val());
@@ -156,12 +146,10 @@ var update_histogram_settings = function() {
     $.ajax('/histogram', {method: 'PUT', data: {bins: bins, logarithmic: logarithmic} });
 };
 
-//$('#nav-ccd-settings a').click(nav.bind(this, 'ccd-settings'));
-//$('#nav-ccd-image a').click(nav.bind(this, 'ccd-image'));
 
-$('#refresh-devices').click(refresh_devices);
-$('#refresh-settings').click(refresh_settings);
-$('#reset-value').click(refresh_value);
+$('#refresh-devices').click(reload_devices);
+$('#refresh-settings').click(reload_settings);
+$('#reset-value').click(reload_value);
 $('#set-value').click(set_value);
 $('#preview').click(preview);
 $('#framing').click(framing);
@@ -169,10 +157,10 @@ $('#stop-framing').click(stop_framing);
 $('#histogram-update-settings').click(update_histogram_settings);
 
 $('#device').change(function() {
-    localStorage.setItem(SETTING_DEVICE, current_device());
-    refresh_settings();
+    localStorage.setItem(SETTING_DEVICE, current_indi_device().name);
+    reload_settings();
 });
-$('#setting').change(refresh_value);
+$('#setting').change(reload_value);
 
 $('.navbar-collapse a').click(function(){
     $(".navbar-collapse").collapse('hide');
@@ -195,4 +183,4 @@ $('#run-command-btn').click(run_command);
 $('#run-command').val(get_setting(SETTING_RUN_COMMAND), '');
 
 $('#stop-framing').hide();
-refresh_devices();
+reload_devices();
