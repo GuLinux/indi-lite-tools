@@ -82,7 +82,7 @@ var refresh_element = function(name, url, on_success) {
 var refresh_devices = function() {
     $('#setting').empty();
     $('#setting-value').val(null);
-    refresh_element('device', '/devices', function(select, data) {
+    refresh_element('device', '/device_names', function(select, data) {
         select_callback(select, function(x) {return {text: x, value: x}; }, data['devices']);
         if(data['devices'].length > 0) {
             $('#device').val(get_setting(SETTING_DEVICE, data['devices'][0]));

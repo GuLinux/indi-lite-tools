@@ -43,8 +43,8 @@ def put_event(evt):
 def index():
     return render_template('index.html')
 
-@app.route('/devices')
-def devices():
+@app.route('/device_names')
+def device_names():
     return jsonify({'devices': controller().devices()})
 
 @app.route('/device/<devicename>/properties')
