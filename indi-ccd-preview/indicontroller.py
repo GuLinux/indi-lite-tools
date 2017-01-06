@@ -98,4 +98,6 @@ class INDIController:
 
 
     def status(self):
-        return dict({'now': time.time(), **INDIController.__status })
+        status ={'now': time.time()}
+        status.update(INDIController.__status)
+        return status
