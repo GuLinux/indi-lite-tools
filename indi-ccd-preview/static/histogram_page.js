@@ -27,7 +27,10 @@ var HistogramPage = function(localsettings, indi) {
             var prev = i == 0 ? 0 : a[i-1];
             return 'from ' + Number(prev).toFixed(1) + ' to ' + Number(x).toFixed(1);
         });
-        var chart = new Chart(ctx, {
+        if(this.chart !== undefined) {
+            this.chart.destroy();
+        }
+        this.chart = new Chart(ctx, {
             type: 'line',
             data: {
                 labels: bins_labels,
@@ -44,21 +47,6 @@ var HistogramPage = function(localsettings, indi) {
                 }
             }
         });
-/*
-        var mapped = data.map(function(item, index){
-            return { x: index, y: item};
-        });
-
-        var chart = new CanvasJS.Chart("histogram-plot", {
-            title: { text: "Histogram Data" },
-            axisY: {logarithmic: is_logarithmic},
-            data: [ {
-                type: "area",
-                dataPoints: mapped
-            }]
-        });  
-    chart.render();
-*/
     };
 
 
