@@ -21,6 +21,7 @@ app.config['bootstrap_version']='3.3.7'
 app.config['jquery_version']='3.1.1'
 app.config['histogram_bins'] = 256
 app.config['histogram_logarithmic'] = True
+app.config['histogram_absolute'] = False
 
 subscriptions = []
 
@@ -28,7 +29,7 @@ def controller():
     # if 'controller' not in app.config:
     #     app.config['controller'] = INDIController()
     # return app.config['controller']
-    return INDIController(app.static_folder + '/images', bins=app.config['histogram_bins'], log_y=app.config['histogram_logarithmic'])
+    return INDIController(app.static_folder + '/images', bins=app.config['histogram_bins'], log_y=app.config['histogram_logarithmic'], histogram_absolute = app.config['histogram_absolute'])
 
 def logger():
     logger = logging.getLogger('indi-preview')
@@ -67,6 +68,7 @@ def set_property(devicename, property):
 def histogram_settings():
     app.config['histogram_bins'] = int(request.form['bins'])
     app.config['histogram_logarithmic'] = request.form['logarithmic'] == 'true'
+    app.config['histogram_absolute'] = request.form['absolute'] == 'true'
     return ('', 204)
 
 def image_path(file):

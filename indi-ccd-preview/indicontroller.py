@@ -12,12 +12,13 @@ import time
 import pprint
 
 class INDIImage:
-    def __init__(self, workdir, fits_file, extension = 'jpg', log_y = True, bins = 256):
+    def __init__(self, workdir, fits_file, extension = 'jpg', log_y = True, bins = 256, histogram_absolute = False):
         self.fits_file = fits.open('/'.join([workdir, fits_file]))
         self.id = datetime.utcnow().isoformat()
         self.workdir = workdir
         self.extension = extension
         self.bins = bins
+        self.histogram_absolute = histogram_absolute
         self.__histogram()
         self.__save_image()
 
@@ -32,10 +33,10 @@ class INDIImage:
 
     def __histogram(self):
         bins = self.bins
-        # TODO: calculate absolute histogram, or relative to the values?
-        # data_max = math.pow(2, int(self.fits_file[0].header['BITPIX'])) # TODO: this should be a bit more flexible, perhaps
-        # steps = data_max / self.bins
-        # bins = numpy.arange(0, data_max + 1, steps)
+        if self.histogram_absolute:
+            data_max = math.pow(2, int(self.fits_file[0].header['BITPIX'])) # TODO: this should be a bit more flexible, perhaps
+            steps = data_max / self.bins
+            bins = numpy.arange(0, data_max + 1, steps)
         self.hist = numpy.histogram(self.fits_file[0].data.flatten(), bins = bins)
 
     def __save_image(self):
@@ -43,11 +44,12 @@ class INDIImage:
 
 class INDIController:
     __status = {'shooting': False}
-    def __init__(self, workdir, format = 'jpg', bins = 256, log_y = True):
+    def __init__(self, workdir, format = 'jpg', bins = 256, log_y = True, histogram_absolute = False):
         self.client = INDIClient()
         self.format = format
         self.log_y = log_y
         self.bins = bins
+        self.histogram_absolute = histogram_absolute
 
         self.workdir = workdir
         if not os.path.isdir(self.workdir):
@@ -89,7 +91,7 @@ class INDIController:
         imager.set_output(self.workdir, 'IMAGE_PREVIEW')
         imager.shoot(exposure)
         INDIController.__status = {'shooting': False, 'last_exposure': exposure, 'last_ended': time.time() }
-        return INDIImage(self.workdir, 'IMAGE_PREVIEW.fits', bins=self.bins, log_y=self.log_y)
+        return INDIImage(self.workdir, 'IMAGE_PREVIEW.fits', bins=self.bins, log_y=self.log_y, histogram_absolute = self.histogram_absolute)
 
     def clean_cache(self):
         for file in glob(self.workdir + '/*'):

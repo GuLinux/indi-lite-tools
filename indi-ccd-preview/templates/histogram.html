@@ -4,7 +4,14 @@
             <label for="histogram-bins" class="control-label">Bins</label>
             <input type="number" class="form-control" id="histogram-bins" value="256">
         </div>
-        <div class="form-group"> 
+         <div class="form-group">
+            <label for="histogram-mode" class="control-label">Mode</label>
+            <select id="histogram-mode" class="form-control">
+                <option value="relative">Relative</option>
+                <option value="absolute">Absolute</option>
+            </select>
+        </div>
+       <div class="form-group"> 
             <div class="checkbox">
                <label>
                    <input type="checkbox" id="histogram-logarithmic" checked> Logarithmic

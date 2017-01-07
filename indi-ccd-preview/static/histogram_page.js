@@ -1,6 +1,7 @@
 var HistogramPage = function(localsettings, indi) {
     HistogramPage.SETTING_HISTOGRAM_BINS='setting_histogram_bins';
     HistogramPage.SETTING_HISTOGRAM_LOG='setting_histogram_log';
+    HistogramPage.SETTING_HISTOGRAM_MODE='setting_histogram_mode';
 
     this.localsettings = localsettings;
     this.indi = indi;
@@ -8,9 +9,11 @@ var HistogramPage = function(localsettings, indi) {
     this.updateHistogramSettings = function() {
         var bins = parseInt($('#histogram-bins').val());
         var logarithmic = $('#histogram-logarithmic').prop('checked')
+        var mode = $('#histogram-mode').val();
         this.localsettings.set(HistogramPage.SETTING_HISTOGRAM_BINS, bins);
         this.localsettings.set(HistogramPage.SETTING_HISTOGRAM_LOG, logarithmic);
-        $.ajax('/histogram', {method: 'PUT', data: {bins: bins, logarithmic: logarithmic} });
+        this.localsettings.set(HistogramPage.SETTING_HISTOGRAM_MODE, mode);
+        $.ajax('/histogram', {method: 'PUT', data: {bins: bins, logarithmic: logarithmic, absolute: (mode == 'absolute')} });
     };
 
     this.setImage = function(url) {
@@ -67,6 +70,7 @@ var HistogramPage = function(localsettings, indi) {
     });
     */
     $('#histogram-bins').val(this.localsettings.get(HistogramPage.SETTING_HISTOGRAM_BINS, 256));
+    $('#histogram-mode').val(this.localsettings.get(HistogramPage.SETTING_HISTOGRAM_MODE, 'relative'));
     $('#histogram-logarithmic').prop('checked', this.localsettings.get(HistogramPage.SETTING_HISTOGRAM_LOG, 'true') == 'true');
 
     this.updateHistogramSettings();
