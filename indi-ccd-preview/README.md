@@ -38,7 +38,7 @@ Run `./indi-ccd-preview.py --help` to see a list of supported options.
 
 A few interesting examples:
 
- - --host <HOSTNAME>: binds the application to the specified ip address (use 0.0.0.0 to accept connection from every network).
- - --port <PORT>: binds the application to the specified port (default: 5000).
- - --debug: runs the application in debug mode.
+ - `--host <HOSTNAME>`: binds the application to the specified ip address (use 0.0.0.0 to accept connection from every network).
+ - `--port <PORT>`: binds the application to the specified port (default: 5000).
+ - `--debug`: runs the application in debug mode.
 
