@@ -2,7 +2,7 @@
 from flask import Flask, render_template, g, request, session, Response
 from flask.json import jsonify
 from indicontroller import INDIController
-from time import sleep
+from sequences_controller import SequencesController
 import sys
 if sys.version_info[0] == 2:
     import Queue as queue
@@ -22,19 +22,35 @@ app.config['jquery_version']='3.1.1'
 app.config['histogram_bins'] = 256
 app.config['histogram_logarithmic'] = True
 app.config['histogram_absolute'] = False
+app.config['loglevel'] = logging.INFO
 
 subscriptions = []
-
-def controller():
-    # if 'controller' not in app.config:
-    #     app.config['controller'] = INDIController()
-    # return app.config['controller']
-    return INDIController(app.static_folder + '/images', bins=app.config['histogram_bins'], log_y=app.config['histogram_logarithmic'], histogram_absolute = app.config['histogram_absolute'])
+controllers = { 'camera': None, 'sequences': None }
 
 def logger():
     logger = logging.getLogger('indi-preview')
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(app.config['loglevel'])
     return logger
+
+
+def get_controller(name, factory):
+    controller = controllers[name]
+    if not controller:
+        controller = factory()
+        controllers[name] = controller
+        print('Created new instance of controller {0}'.format(name))
+    return controller
+
+def controller():
+    def factory():
+        return INDIController(app.static_folder + '/images', bins=app.config['histogram_bins'], log_y=app.config['histogram_logarithmic'], histogram_absolute = app.config['histogram_absolute'])
+    return factory() # TODO: pass config object instead of single parameters, and use the get_controller function
+
+def sequencesController():
+    def factory():
+        return SequencesController()
+    return get_controller('sequences', factory )
+
 
 def put_event(evt):
     for s in subscriptions:
@@ -157,6 +173,15 @@ def run_command():
     return ('', 204)
 
 
+@app.route('/sequences')
+def sequences():
+    return jsonify({'sequences': [x.to_map() for x in sequencesController().sequences()]})
+
+@app.route('/sequence/<name>/continue', methods=['POST'])
+def continue_sequence(name):
+    sequencesController().continue_sequence(name)
+    return ('', 204)
+
 
 app.secret_key = b'\xcc\xfc\xbe6^\x9a\xbf>\xbc\xaa\x9e\xe8\xa6\n7'
 
@@ -167,6 +192,8 @@ if __name__ == '__main__':
     parser.add_argument('--host', help="Hostname for server listening (default: 127.0.0.1)", default='127.0.0.1')
     parser.add_argument('-p', '--port', help="Port for server listening (default: 5000)", default='5000')
     args = parser.parse_args()
+    if args.debug:
+        app.config['loglevel'] = logging.DEBUG
     app.run(threaded=True, host=args.host, port=int(args.port), debug=args.debug)
 
 
