@@ -11,7 +11,7 @@ var MiscPage = function(localsettings, indi) {
 
     this.reload_script_sequences = function() {
         $.ajax('/sequences', {success: function(d) {
-            $('#script_sequences').empty();
+            $('#script_sequences').empty().val(null);
             d['sequences'].forEach( function(seq) {
                 $('#script_sequences').append($('<option />').val(seq['name']).text(seq['name']) );
             } );

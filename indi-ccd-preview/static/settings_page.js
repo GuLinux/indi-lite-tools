@@ -4,8 +4,8 @@ var SettingsPage = function(localsettings, indi) {
     SettingsPage.SETTING_DEVICE='setting_device';
 
     this.reload_devices = function() {
-        $('#device').empty();
-        $('#setting').empty();
+        $('#device').empty().val(null);
+        $('#setting').empty().val(null);
         $('#setting-value').val(null);
         this.indi.get_devices(this.__on_devices_reloaded.bind(this));
     };
@@ -17,7 +17,7 @@ var SettingsPage = function(localsettings, indi) {
     };
 
     this.reload_settings = function() {
-        $('#setting').empty();
+        $('#setting').empty().val(null);
         $('#setting-value').val(null);
         current_indi_device().reload(this.__on_properties_reloaded.bind(this));
     };
@@ -50,7 +50,7 @@ var SettingsPage = function(localsettings, indi) {
 
 
     this.__on_devices_reloaded = function() {
-        $('#setting').empty();
+        $('#setting').empty().val(null);
         $('#setting-value').val(null);
         this.indi.device_names().forEach( function(name) {
             $('#device').append($('<option />').val(name).text(name));
