@@ -70,7 +70,7 @@ def property(devicename, property):
 
 @app.route('/device/<devicename>/properties/<property>', methods=['PUT'])
 def set_property(devicename, property):
-    return jsonify(indi_controller().set_property(devicename, property, request.form['value']))
+    return jsonify(indi_controller().set_property(devicename, property, request.json['value']))
 
 @app.route('/histogram/settings', methods=['PUT'])
 def set_histogram_settings():
@@ -157,10 +157,10 @@ def clean_cache():
 @app.route('/run_command', methods=['POST'])
 def run_command():
     try:
-        command = request.form['command']
+        command = request.json['command']
         result = subprocess.call(command)
         level = 'success' if result == 0 else 'warning'
-        return notification(level, 'Run command', 'command "{0}" finished with exit code {1}'.format(command, result))
+        notification(level, 'Run command', 'command "{0}" finished with exit code {1}'.format(command, result))
     except Exception as e:
         traceback.print_exc()
         notification('warning', 'Run command error', e.args[0])

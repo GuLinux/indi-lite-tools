@@ -6,7 +6,7 @@ var MiscPage = function(localsettings, indi) {
     this.run_command = function() {
         var command = $('#run-command').val();
         this.localsettings.set(MiscPage.SETTING_RUN_COMMAND, command);
-        $.ajax('/run_command', {method: 'POST', data: {command: command}});
+        json_request('/run_command', {command: command}, {method: 'POST'});
     };
 
     this.reload_script_sequences = function() {
