@@ -32,9 +32,13 @@ var SettingsPage = function(localsettings, indi) {
 
     this.onDisplay = function() {
         if(this.localsettings.getJSON('settings_page_first_run', true) == true ) {
-            notification('info', 'Welcome', 'This is the INDI CCD Preview application.', {on_closed: function(){
+            var firstRunCompleted = function(){
                 this.localsettings.setJSON('settings_page_first_run', false);
-            }.bind(this) });
+            };
+            var showSecondMessage = function() {
+                notification('info', 'Welcome', 'In this page you can change settings on INDI devices. Changing the device in the first combo will also set the currently active device for previews.', {on_closed: firstRunCompleted.bind(this) });
+            };
+            notification('info', 'Welcome', 'This is the INDI CCD Preview application.', {on_closed: showSecondMessage.bind(this) });
         };
     };
 
