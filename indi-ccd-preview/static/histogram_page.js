@@ -65,7 +65,11 @@ var HistogramPage = function(localsettings, indi) {
     };
 
 
+    $('#histogram-update-settings').hide();
     $('#histogram-update-settings').click(this.updateHistogramSettings.bind(this));
+    $('#histogram-bins').on('input', this.updateHistogramSettings.bind(this));
+    $('#histogram-mode').change(this.updateHistogramSettings.bind(this));
+    $('#histogram-logarithmic').change(this.updateHistogramSettings.bind(this));
     /*
     $('#histogram-image').click(function() {
         $('#histogram-image').toggleClass('img-responsive');
