@@ -34,7 +34,7 @@ var MiscPage = function(localsettings, indi) {
     $('#clean-cache').click(function() {
         $.ajax('/clean-cache', {success: function(data){
             level = data['files'] == 0 ? 'success' : 'warning';
-            notification(level, 'Clean cache', 'Cache cleared, files remaining: ' + data['files'], 5);
+            notification(level, 'Clean cache', 'Cache cleared, files remaining: ' + data['files'], {timeout: 5});
         }});
     });
 

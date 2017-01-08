@@ -29,6 +29,15 @@ var SettingsPage = function(localsettings, indi) {
         current_indi_device().set(property, value, this.reload_value.bind(this))
     };
 
+
+    this.onDisplay = function() {
+        if(this.localsettings.getJSON('settings_page_first_run', true) == true ) {
+            notification('info', 'Welcome', 'This is the INDI CCD Preview application.', {on_closed: function(){
+                this.localsettings.setJSON('settings_page_first_run', false);
+            }.bind(this) });
+        };
+    };
+
     this.__on_property_value = function(property, device) {
         $('#setting-value').val(property['value']);
     };

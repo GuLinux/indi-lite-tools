@@ -15,18 +15,38 @@ var previewPage = new PreviewPage(localSettings, indi);
 var histogramPage = new HistogramPage(localSettings, indi);
 var miscPage = new MiscPage(localSettings, indi);
 
-var notification = function(level, title, message, timeout, additional_class) {
+var notification = function(level, title, message, options) {
     var notification_id = 'notification-' + new Date().getTime();
     var notification = $('#notification-template').clone().prop('id', notification_id).addClass('alert-' + level).prop('style', '');
-    if(additional_class !== undefined)
-        notification.addClass(additional_class);
     notification.children('.notification-title').text(title);
     notification.children('.notification-text').text(message);
-    $('.notifications').append(notification);
-    if(timeout > 0) {
-        window.setTimeout(function() { $('#' + notification_id).alert('close'); }, timeout * 1000);
+    if(options !== undefined) {
+        if('additional_class' in options)
+            notification.addClass(options['additional_class']);
+
+        if('timeout' in options && options['timeout'] > 0) {
+            window.setTimeout(function() { $('#' + notification_id).alert('close'); }, options['timeout'] * 1000);
+        }
+        if('on_closed' in options) {
+            notification.on('closed.bs.alert', options['on_closed']);
+        }
     }
+    $('.notifications').append(notification);
 };
+
+
+var tabs = {
+    '#ccd-settings': settingsPage,
+    '#ccd-image': previewPage,
+    '#ccd-histogram': histogramPage,
+    '#misc': miscPage
+};
+var onTabShown = function (hash) {
+    if(hash in tabs && tabs[hash].onDisplay !== undefined)
+        tabs[hash].onDisplay();
+};
+
+$('a[data-toggle="tab"]').on('shown.bs.tab', function(e) { onTabShown(e.target.hash); });
 
 
 var event_handlers = {
@@ -35,10 +55,10 @@ var event_handlers = {
         histogramPage.setImage(event['histogram']);
         histogramPage.setData(event['histogram-data'], event['histogram-bins']);
         $('.image-received-notification').remove();
-        notification('success', 'image received', event['image_id'], 5, 'image-received-notification');
+        notification('success', 'image received', event['image_id'], { timeout: 5, additional_class: 'image-received-notification'});
     },
     notification: function(event) {
-        notification(event['level'], event['title'], event['message'], -1);
+        notification(event['level'], event['title'], event['message']);
     }
 };
 
@@ -68,7 +88,7 @@ var on_server_status = function(status) {
         text = 'server is currently shooting: exposure is ' + Number(status['exposure']).toFixed(1) + 's, elapsed: ' + elapsed + 's, remaining: ' + remaining + 's.';
     }
     $('.server-status-notification').remove();
-    notification('info', 'Server Status', text, 5, 'server-status-notification');
+    notification('info', 'Server Status', text, {timeout: 5, additional_class: 'server-status-notification'});
 };
 
 $('#server-status').click(function() { $.ajax('/status', {success: on_server_status}); });
@@ -77,4 +97,6 @@ $('.navbar-collapse a').click(function(){
 });
 
 $('form').submit(function(e){e.preventDefault()});
+
+onTabShown('#ccd-settings');
 settingsPage.reload_devices();
