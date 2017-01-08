@@ -19,11 +19,8 @@ import traceback
 app = Flask(__name__)
 app.config['bootstrap_version']='3.3.7'
 app.config['jquery_version']='3.1.1'
-app.config['histogram_bins'] = 256
+
 app.config['image_format'] = 'jpg'
-app.config['histogram_logarithmic'] = True
-app.config['histogram_absolute'] = False
-app.config['loglevel'] = logging.INFO
 
 subscriptions = []
 controllers = { 'indi': None, 'sequences': None }
@@ -77,12 +74,12 @@ def set_property(devicename, property):
 
 @app.route('/histogram/settings', methods=['PUT'])
 def set_histogram_settings():
-    indi_controller().set_histogram_settings(request.form)
+    indi_controller().set_histogram_settings(request.json)
     return ('', 204)
 
 @app.route('/histogram/settings')
 def get_histogram_settings():
-    return jsonify(indi_controller().histogram_settings())
+    return jsonify(indi_controller().histogram_options)
 
 def image_path(file):
     return '/'.join([app.static_url_path, 'images', file]) 
@@ -189,8 +186,6 @@ if __name__ == '__main__':
     parser.add_argument('--host', help="Hostname for server listening (default: 127.0.0.1)", default='127.0.0.1')
     parser.add_argument('-p', '--port', help="Port for server listening (default: 5000)", default='5000')
     args = parser.parse_args()
-    if args.debug:
-        app.config['loglevel'] = logging.DEBUG
     app.run(threaded=True, host=args.host, port=int(args.port), debug=args.debug)
 
 
