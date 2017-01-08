@@ -151,16 +151,25 @@ FILTERS="L"
 EXPOSURES[L]="1"
 DARK=AFTER_ALL
 DARK_SEQUENCE=10
+CONTROL_DIR='/tmp/indi_sequence_script'
+mkdir -p "$CONTROL_DIR"
 
 . settings
 # Read a local copy of the indi_helper script
 . indi_helper
 
+cat > "$CONTROL_DIR/${SESSION_NAME}.info" <<EEOF
+SESSION_NAME="$SESSION_NAME"
+SESSION_PID="$$"
+EEOF
+
 confirmation() {
-  echo "Enter 'y' to continue."
+  local confirmation_file="${CONTROL_DIR}/${SESSION_NAME}.confirmation"
+  rm -f "$confirmation_file"
+  echo "Enter 'y' to continue, or create the file '$confirmation_file'."
   local conf_var=""
-  while [[ "$conf_var" != y ]]; do
-    read -n 1 -s conf_var
+  while [[ "$conf_var" != y ]] && ! [[ -r "$confirmation_file" ]]; do
+    read -n 1 -t 1 -s conf_var
   done
 }
 
