@@ -9,6 +9,22 @@ var MiscPage = function(localsettings, indi) {
         $.ajax('/run_command', {method: 'POST', data: {command: command}});
     };
 
+    this.reload_script_sequences = function() {
+        $.ajax('/sequences', {success: function(d) {
+            $('#script_sequences').empty();
+            d['sequences'].forEach( function(seq) {
+                $('#script_sequences').append($('<option />').val(seq['name']).text(seq['name']) );
+            } );
+        }});
+    };
+
+    this.continue_script_sequence = function() {
+        sequence = $('#script_sequences').val();
+        if(! sequence)
+            return
+        $.ajax('/sequence/' + sequence + '/continue', {method: 'POST'});
+    };
+
     $('#shutdown-server').click(function() {
         $.ajax('/shutdown', {success: function(){
             notification('danger', 'Shutdown', 'Server is shutting down...');
@@ -22,6 +38,9 @@ var MiscPage = function(localsettings, indi) {
         }});
     });
 
+    $('#script_sequences_refresh').click(this.reload_script_sequences.bind(this));
+    $('#script_sequence_continue').click(this.continue_script_sequence.bind(this));
     $('#run-command-btn').click(this.run_command.bind(this));
     $('#run-command').val(localsettings.get(MiscPage.SETTING_RUN_COMMAND), '');
+    this.reload_script_sequences();
 };

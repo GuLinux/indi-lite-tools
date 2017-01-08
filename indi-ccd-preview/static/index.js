@@ -66,5 +66,5 @@ $('.navbar-collapse a').click(function(){
     $(".navbar-collapse").collapse('hide');
 });
 
-
+$('form').submit(function(e){e.preventDefault()});
 settingsPage.reload_devices();

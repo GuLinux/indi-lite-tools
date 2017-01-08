@@ -1,24 +1,40 @@
 <div class="container">
-    <form>
+    <form class="form-horizontal">
         <div class="form-group">
-            <label for="run-command">Run command on server</label>
-            <div class="input-group">
-                <input type="text" class="form-control" id="run-command">
-                <div class="input-group-btn">
-                    <button type="button" id="run-command-btn" class="btn btn-default">Run</button>
+            <label class="col-sm-3" for="run-command">Run command on server</label>
+            <div class="col-sm-9">
+                <div class="input-group">
+                    <input type="text" class="form-control" id="run-command">
+                    <div class="input-group-btn">
+                        <button type="button" id="run-command-btn" class="btn btn-default">Run</button>
+                    </div>
                 </div>
+            </div>
+        </div>
+
+         <div class="form-group">
+            <label class="col-sm-3"for="script_sequences" class="col-sm-2">Script Sequences</label>
+            <div class="col-sm-5">
+                <select class="form-control" id="script_sequences"></select>
+            </div>
+            <div class="col-sm-4">
+                <button type="button" class="btn btn-default" id="script_sequences_refresh">Refresh</button>
+                <button type="button" class="btn btn-primary" id="script_sequence_continue">Continue Sequence</button>
             </div>
         </div>
         <hr />
         <div class="form-group">
             <label class='col-sm-3'>Clean images cache</label>
-            <button type="button" id="clean-cache" class="btn btn-warning">Clean cache</button>
+            <div class="col-sm-9">
+                <button type="button" id="clean-cache" class="btn btn-warning">Clean cache</button>
+            </div>
         </div>
-
         <hr />
         <div class="form-group">
             <label class='col-sm-3'>Shutdown INDI Previewer</label>
-            <button type="button" id="shutdown-server" class="btn btn-danger">Shutdown server</button>
+            <div class="col-sm-9">
+                <button type="button" id="shutdown-server" class="btn btn-danger">Shutdown server</button>
+            </div>
         </div>
     </form>
 </div>
