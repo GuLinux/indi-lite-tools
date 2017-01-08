@@ -1,3 +1,13 @@
+var json_request = function(url, data, options) {
+    var request_options = {method: 'PUT', data: JSON.stringify(data), contentType: 'application/json' }
+    if(options !== undefined) {
+        $.extend(request_options, options);
+    }
+    $.ajax(url, request_options);
+};
+
+
+
 var indi = new INDI();
 var localSettings = new LocalSettings()
 var settingsPage = new SettingsPage(localSettings, indi);

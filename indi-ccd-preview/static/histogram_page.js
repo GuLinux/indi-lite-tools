@@ -13,7 +13,7 @@ var HistogramPage = function(localsettings, indi) {
         this.localsettings.set(HistogramPage.SETTING_HISTOGRAM_BINS, bins);
         this.localsettings.set(HistogramPage.SETTING_HISTOGRAM_LOG, logarithmic);
         this.localsettings.set(HistogramPage.SETTING_HISTOGRAM_MODE, mode);
-        $.ajax('/histogram/settings', {method: 'PUT', data: JSON.stringify({bins: bins, logarithmic: logarithmic, absolute: (mode == 'absolute')}), contentType: 'application/json' });
+        json_request('/histogram/settings', {bins: bins, logarithmic: logarithmic, absolute: (mode == 'absolute')});
     };
 
     this.setImage = function(url) {
