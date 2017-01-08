@@ -29,8 +29,8 @@ class Sequence:
 class SequencesController:
 
     SEQ_DIRECTORY = '/tmp/indi_sequence_script'
-    def __init__(self):
-        pass
+    def __init__(self, app):
+        self.app = app
 
     def sequences(self):
         sequences = []

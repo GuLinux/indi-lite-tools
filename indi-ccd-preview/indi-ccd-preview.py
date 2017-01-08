@@ -20,35 +20,30 @@ app = Flask(__name__)
 app.config['bootstrap_version']='3.3.7'
 app.config['jquery_version']='3.1.1'
 app.config['histogram_bins'] = 256
+app.config['image_format'] = 'jpg'
 app.config['histogram_logarithmic'] = True
 app.config['histogram_absolute'] = False
 app.config['loglevel'] = logging.INFO
 
 subscriptions = []
-controllers = { 'camera': None, 'sequences': None }
-
-def logger():
-    logger = logging.getLogger('indi-preview')
-    logger.setLevel(app.config['loglevel'])
-    return logger
-
+controllers = { 'indi': None, 'sequences': None }
 
 def get_controller(name, factory):
     controller = controllers[name]
     if not controller:
         controller = factory()
         controllers[name] = controller
-        print('Created new instance of controller {0}'.format(name))
+        app.logger.debug('Created new instance of controller {0}'.format(name))
     return controller
 
-def controller():
+def indi_controller():
     def factory():
-        return INDIController(app.static_folder + '/images', bins=app.config['histogram_bins'], log_y=app.config['histogram_logarithmic'], histogram_absolute = app.config['histogram_absolute'])
-    return factory() # TODO: pass config object instead of single parameters, and use the get_controller function
+        return INDIController(app)
+    return get_controller('indi', factory)
 
 def sequencesController():
     def factory():
-        return SequencesController()
+        return SequencesController(app)
     return get_controller('sequences', factory )
 
 
@@ -62,23 +57,23 @@ def index():
 
 @app.route('/devices')
 def devices():
-    return jsonify(controller().devices())
+    return jsonify(indi_controller().devices())
 
 @app.route('/device_names')
 def device_names():
-    return jsonify({'devices': controller().device_names()})
+    return jsonify({'devices': indi_controller().device_names()})
 
 @app.route('/device/<devicename>/properties')
 def properties(devicename):
-    return jsonify({'device': devicename, 'properties': controller().properties(devicename)})
+    return jsonify({'device': devicename, 'properties': indi_controller().properties(devicename)})
 
 @app.route('/device/<devicename>/properties/<property>')
 def property(devicename, property):
-    return jsonify(controller().property(devicename, property))
+    return jsonify(indi_controller().property(devicename, property))
 
 @app.route('/device/<devicename>/properties/<property>', methods=['PUT'])
 def set_property(devicename, property):
-    return jsonify(controller().set_property(devicename, property, request.form['value']))
+    return jsonify(indi_controller().set_property(devicename, property, request.form['value']))
 
 @app.route('/histogram', methods=['PUT'])
 def histogram_settings():
@@ -104,15 +99,15 @@ def notification(level, title, message):
 
 @app.route('/status')
 def status():
-    return jsonify(controller().status())
+    return jsonify(indi_controller().status())
 
 @app.route('/device/<devicename>/preview/<exposure>')
 def preview(devicename, exposure):
     def exp():
         try:
-            image_event(controller().preview(devicename, float(exposure) ) )
+            image_event(indi_controller().preview(devicename, float(exposure) ) )
         except Exception as e:
-            traceback.print_exc()
+            app.logger.info('Error on preview', exc_info = e)
             notification('warning', 'Error', e.args[0])
 
     t = threading.Thread(target = exp)
@@ -124,9 +119,9 @@ def framing(devicename, exposure):
     def exp():
         try:
             while(app.config['framing']):
-                image_event( controller().preview(devicename, float(exposure) ) )
+                image_event( indi_controller().preview(devicename, float(exposure) ) )
         except Exception as e:
-            traceback.print_exc()
+            app.logger.info('Error on framing', exc_info = e)
             notification('warning', 'Error', e.args[0])
 
     app.config['framing'] = exposure != 'stop'
@@ -142,7 +137,7 @@ def events():
         subscriptions.append(q)
         while(True):
             data = q.get()
-            print("sending event...")
+            app.logger.debug('Sending event: {0}'.format(data['type']))
             yield("data: {0}\n\n".format(json.dumps(data)))
     return Response(gen(), mimetype="text/event-stream")
 
@@ -157,7 +152,7 @@ def shutdown():
 
 @app.route('/clean-cache')
 def clean_cache():
-    numfiles = controller().clean_cache()
+    numfiles = indi_controller().clean_cache()
     return jsonify({'files': numfiles})
 
 @app.route('/run_command', methods=['POST'])
