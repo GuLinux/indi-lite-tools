@@ -4,6 +4,7 @@
 
 indi-ccd-preview is written in python (server side), and javascript.
 It requires a modern html5 browser supporting Server Side Events. Internet Explorer/Microsoft Edge are not supported.
+It is based on bootstrap and jquery, so it's also mobile ready.
 
 The Server application requires the following python modules:
 
