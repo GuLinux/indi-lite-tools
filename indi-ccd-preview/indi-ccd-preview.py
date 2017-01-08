@@ -75,12 +75,14 @@ def property(devicename, property):
 def set_property(devicename, property):
     return jsonify(indi_controller().set_property(devicename, property, request.form['value']))
 
-@app.route('/histogram', methods=['PUT'])
-def histogram_settings():
-    app.config['histogram_bins'] = int(request.form['bins'])
-    app.config['histogram_logarithmic'] = request.form['logarithmic'] == 'true'
-    app.config['histogram_absolute'] = request.form['absolute'] == 'true'
+@app.route('/histogram/settings', methods=['PUT'])
+def set_histogram_settings():
+    indi_controller().set_histogram_settings(request.form)
     return ('', 204)
+
+@app.route('/histogram/settings')
+def get_histogram_settings():
+    return jsonify(indi_controller().histogram_settings())
 
 def image_path(file):
     return '/'.join([app.static_url_path, 'images', file]) 

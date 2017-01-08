@@ -62,3 +62,16 @@ class INDIController:
         status ={'now': time.time()}
         status.update(INDIController.__status)
         return status
+
+    def histogram_settings(self):
+        return {
+            'bins': self.app.config['histogram_bins'],
+            'logarithmic': self.app.config['histogram_logarithmic'],
+            'absolute': self.app.config['histogram_absolute'],
+        }
+
+    def set_histogram_settings(self, data):
+        self.app.config['histogram_bins'] = int(data['bins'])
+        self.app.config['histogram_logarithmic'] = data['logarithmic'] == 'true'
+        self.app.config['histogram_absolute'] = data['absolute'] == 'true'
+
