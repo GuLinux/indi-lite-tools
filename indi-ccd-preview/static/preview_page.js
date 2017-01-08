@@ -37,6 +37,19 @@ this.PreviewPage = function(localsettings, indi) {
         $('#exposure').val(this.exposure());
     };
 
+    this.onDisplay = function() {
+        if(this.localsettings.getJSON('preview_page_first_run', true) == true ) {
+            var firstRunCompleted = function(){
+                this.localsettings.setJSON('preview_page_first_run', false);
+            };
+            var showSecondMessage = function() {
+                notification('info', 'Welcome', 'The page is responsive. By default image will be zoomed out to fit the page, if bigger. This will help visualization on mobile devices.<br>To view the image on its <strong>full size</strong>, simply click on it.', {on_closed: firstRunCompleted.bind(this) });
+            };
+            notification('info', 'Welcome', 'This is the INDI CCD Preview page.<br>Setting the exposure (in seconds) and clicking "Preview" will trigger an exposure that will be shown in this page.<br>The "Framing" button will continuously shoot, until you click the "Stop Framing" button.', {on_closed: showSecondMessage.bind(this) });
+        };
+    };
+
+
     $('#ccd-preview-image').click(function() {
         $('#ccd-preview-image').toggleClass('img-responsive');
     });

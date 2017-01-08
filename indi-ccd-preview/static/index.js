@@ -18,8 +18,8 @@ var miscPage = new MiscPage(localSettings, indi);
 var notification = function(level, title, message, options) {
     var notification_id = 'notification-' + new Date().getTime();
     var notification = $('#notification-template').clone().prop('id', notification_id).addClass('alert-' + level).prop('style', '');
-    notification.children('.notification-title').text(title);
-    notification.children('.notification-text').text(message);
+    notification.children('.notification-title').html(title);
+    notification.children('.notification-text').html(message);
     if(options !== undefined) {
         if('additional_class' in options)
             notification.addClass(options['additional_class']);

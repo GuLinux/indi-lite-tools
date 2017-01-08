@@ -38,6 +38,22 @@ var MiscPage = function(localsettings, indi) {
         }});
     });
 
+    this.onDisplay = function() {
+        if(this.localsettings.getJSON('misc_page_first_run', true) == true ) {
+            var firstRunCompleted = function(){
+                this.localsettings.setJSON('misc_page_first_run', false);
+            };
+            notification('info', 'Welcome', 'In this page you can find various utilities.' +
+            '<ul><li><strong>Run command on server</strong>: executes any script or application on the server</li>' +
+            '<li><strong>Script Sequences</strong>: this controls the INDI sequences bash script by writing the "confirmation" file needed to continue the shooting.</li>' +
+            '<li><strong>Clean images cache</strong>: after each shot, images are still saved on server. Clicking this button will save all the space used for images cache.</li>' +
+            '<li><strong>Shutdown INDI Previewer</strong>: shuts down this web server</li></ul>'
+            , {on_closed: firstRunCompleted.bind(this) } );
+        };
+    };
+
+
+
     $('#script_sequences_refresh').click(this.reload_script_sequences.bind(this));
     $('#script_sequence_continue').click(this.continue_script_sequence.bind(this));
     $('#run-command-btn').click(this.run_command.bind(this));

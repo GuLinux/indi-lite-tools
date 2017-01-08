@@ -49,6 +49,20 @@ var HistogramPage = function(localsettings, indi) {
         });
     };
 
+    this.onDisplay = function() {
+        if(this.localsettings.getJSON('histogram_page_first_run', true) == true ) {
+            var firstRunCompleted = function(){
+                this.localsettings.setJSON('histogram_page_first_run', false);
+            };
+            notification('info', 'Welcome', 'This is the Histogram page.<br>When an image is taken in the "Preview" page, an histogram will be plotted here, according to the configured settings.<br>' +
+            'Current settings are: ' +
+            '<ul><li><strong>Bins</strong>: how many bins to use when plotting the histogram</li>' +
+            '<li><strong>Mode</strong>: histogram calculation mode. <i>Relative</i> will use the minimum and maximum pixel value, while <i>Absolute</i> will use the bit depth reported by the camera.</li>' +
+            '<li><strong>Logarithmic</strong>: plot histogram using logarithmic scale for the y axis.</li></ul>' +
+            'Settings will be used after the next image is shot.'
+            , {on_closed: firstRunCompleted.bind(this) } );
+        };
+    };
 
 
     $('#histogram-update-settings').click(this.updateHistogramSettings.bind(this));

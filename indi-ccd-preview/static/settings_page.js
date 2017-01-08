@@ -36,7 +36,7 @@ var SettingsPage = function(localsettings, indi) {
                 this.localsettings.setJSON('settings_page_first_run', false);
             };
             var showSecondMessage = function() {
-                notification('info', 'Welcome', 'In this page you can change settings on INDI devices. Changing the device in the first combo will also set the currently active device for previews.', {on_closed: firstRunCompleted.bind(this) });
+                notification('info', 'Welcome', 'In this page you can change settings on INDI devices.<br>Changing the device in the first combo will also set the currently active device for previews.<br>The refresh buttons will allow you to reload devices, properties, and values, directly from the running INDI server.', {on_closed: firstRunCompleted.bind(this) });
             };
             notification('info', 'Welcome', 'This is the INDI CCD Preview application.', {on_closed: showSecondMessage.bind(this) });
         };
