@@ -1,0 +1,48 @@
+#!/bin/bash
+
+ledctl() {
+  led="$1"; shift
+  case "$1" in
+    off)
+      echo none > /sys/class/leds/$led/trigger
+      ;;
+    blink)
+      echo timer > /sys/class/leds/$led/trigger
+      sleep 0.5
+      echo ${2:-100} > /sys/class/leds/$led/delay_on
+      echo ${3:-100} > /sys/class/leds/$led/delay_off
+      ;;
+    trigger)
+      echo $2 > /sys/class/leds/$led/trigger
+      ;;
+    triggers)
+      cat /sys/class/leds/$led/trigger
+      ;;
+  esac
+}
+
+
+global_prepare() {
+  true
+}
+
+# To override: $1=filter(sequence) name
+sequence_prepare() {
+  ledctl led0 blink
+  confirmation
+  ledctl led0 off
+}
+
+
+# To override: $1=filter(sequence) name, $2=sequence length (shots), $3: exposure
+sequence_starting() {
+  ledctl led1 blink
+}
+
+# This will be executed after each sequence finishes
+# To override: $1=filter(sequence) name, $2=sequence length (shots), $3: exposure
+sequence_finished() {
+  ledctl led1 on
+}
+
+
