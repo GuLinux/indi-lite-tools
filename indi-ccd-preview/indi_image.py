@@ -5,13 +5,16 @@ import numpy
 import math
 
 class INDIImage:
-    def __init__(self, workdir, fits_file, extension = 'jpg', log_y = True, bins = 256, histogram_absolute = False):
+    HIST_BINS = 'bins'
+    HIST_LOGARITHMIC = 'logarithmic'
+    HIST_ABSOLUTE = 'absolute'
+
+    def __init__(self, workdir, fits_file, histogram_options, extension = 'jpg'):
         self.fits_file = fits.open('/'.join([workdir, fits_file]))
         self.id = datetime.utcnow().isoformat()
         self.workdir = workdir
         self.extension = extension
-        self.bins = bins
-        self.histogram_absolute = histogram_absolute
+        self.histogram_options = histogram_options
         self.__histogram()
         self.__save_image()
 
@@ -25,10 +28,10 @@ class INDIImage:
         return '{0}/{1}'.format(self.workdir, self.__filename(name))
 
     def __histogram(self):
-        bins = self.bins
-        if self.histogram_absolute:
+        bins = self.histogram_options[INDIImage.HIST_BINS]
+        if self.histogram_options[INDIImage.HIST_ABSOLUTE]:
             data_max = math.pow(2, int(self.fits_file[0].header['BITPIX'])) # TODO: this should be a bit more flexible, perhaps
-            steps = data_max / self.bins
+            steps = data_max / bins
             bins = numpy.arange(0, data_max + 1, steps)
         self.hist = numpy.histogram(self.fits_file[0].data.flatten(), bins = bins)
 

@@ -11,7 +11,7 @@ class INDIController:
         self.app = app
         self.client = INDIClient()
         self.workdir = app.static_folder + '/images'
-        self.histogram_options = { 'bins': 256, 'logarithmic': True, 'absolute': False } 
+        self.histogram_options = { INDIImage.HIST_BINS: 256, INDIImage.HIST_LOGARITHMIC: True, INDIImage.HIST_ABSOLUTE: False } 
         if not os.path.isdir(self.workdir):
             os.makedirs(self.workdir)
 
@@ -51,7 +51,7 @@ class INDIController:
         imager.set_output(self.workdir, 'IMAGE_PREVIEW')
         imager.shoot(exposure)
         INDIController.__status = {'shooting': False, 'last_exposure': exposure, 'last_ended': time.time() }
-        return INDIImage(self.workdir, 'IMAGE_PREVIEW.fits', extension=self.app.config['image_format'], bins=self.histogram_options['bins'], log_y=self.histogram_options['logarithmic'], histogram_absolute = self.histogram_options['absolute'])
+        return INDIImage(self.workdir, 'IMAGE_PREVIEW.fits', self.histogram_options, extension=self.app.config['image_format'])
 
     def clean_cache(self):
         for file in glob(self.workdir + '/*'):
