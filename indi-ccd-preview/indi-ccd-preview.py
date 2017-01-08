@@ -107,7 +107,7 @@ def preview(devicename, exposure):
         try:
             image_event(indi_controller().preview(devicename, float(exposure) ) )
         except Exception as e:
-            app.logger.info('Error on preview', exc_info = e)
+            app.logger.error('Error on preview', exc_info = e)
             notification('warning', 'Error', e.args[0])
 
     t = threading.Thread(target = exp)
@@ -121,7 +121,7 @@ def framing(devicename, exposure):
             while(app.config['framing']):
                 image_event( indi_controller().preview(devicename, float(exposure) ) )
         except Exception as e:
-            app.logger.info('Error on framing', exc_info = e)
+            app.logger.error('Error on framing', exc_info = e)
             notification('warning', 'Error', e.args[0])
 
     app.config['framing'] = exposure != 'stop'
