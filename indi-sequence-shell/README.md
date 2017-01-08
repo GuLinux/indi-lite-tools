@@ -49,8 +49,10 @@ This is an example settings file:
 The default behaviour of the sequence is to wait for user confirmation after each filter is completed.
 If you want a different behaviour, copy the `customizations.sample` file to `customizations`, edit it, and change or implement the desired functions according to the documentation.
 For instance, if you have an autofocuser and an automatic filter wheel, you can add manually the commands to operate them, instead of waiting for user input.
+In the "examples" directory you can get a better idea about how to extend the script.
 
 As a final option, you can also modify the `start_sequence` shell script itself if you need a greater flexibility.
+
 
 ### Filters and Exposures
 
