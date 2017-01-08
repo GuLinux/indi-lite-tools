@@ -25,6 +25,8 @@ You can remove the '3' from python3 and pip3 to use python2 (not recommended).
 
 ## Usage
 
+First you must make sure that you have already started indiserver with the correct drivers. Please refer to INDI documentation for this.
+
 Just run the indi-ccd-preview.py script directly from this directory:
 
     ./indi-ccd-preview.py
