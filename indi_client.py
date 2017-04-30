@@ -1,0 +1,3 @@
+class INDIClient:
+    pass
+
