@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, render_template
 from controller import Controller
 app = Flask(__name__)
 
@@ -11,7 +11,7 @@ def c():
 
 @app.route("/")
 def hello():
-    return "Hello World!"
+    return render_template('index.html')
 
 @app.route('/sessions')
 def get_sessions():
