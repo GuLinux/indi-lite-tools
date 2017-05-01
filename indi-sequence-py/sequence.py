@@ -31,8 +31,9 @@ class Sequence:
         for sequence in range(0, self.count):
             self.callbacks.run('on_each_started', self, sequence)
             self.camera.shoot()
-            self.callbacks.run('on_each_finished', self, sequence)
             self.finished+=1
+            self.callbacks.run('on_each_finished', self, sequence)
+
 
         self.callbacks.run('on_finished', self)
 
