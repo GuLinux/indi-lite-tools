@@ -4,6 +4,8 @@ from auto_dark import *
 from camera import Camera
 from indiclient import INDIClient 
 from filter_wheel import FilterWheel, FilterWheelStep
+from shell_command_step import ShellCommandStep
+from user_input_step import UserInputStep
 import os
 import time
 
@@ -51,6 +53,14 @@ class SequenceBuilder:
         self.sequences.append(FilterWheelStep(self.filter_wheel, filter_name = filter_name, filter_number = filter_number))
         return self
 
+    def add_user_confirmation_prompt(self, message = UserInputStep.DEFAULT_PROMPT):
+        self.sequences.append(UserInputStep(message))
+        return self
+
+    def add_shell_command(self, command, shell = False, abort_on_failure = False):
+        self.sequences.append(ShellCommandStep(command, shell, abort_on_failure))
+        return self
+
     def add_auto_datk(self, count = 10):
         self.sequences.append(AutoDarkSequence(self.camera, self.auto_dark_calculator, self.upload_path, count)) 
         return self
@@ -63,13 +73,16 @@ class SequenceBuilder:
         sequence_runner.start()
 
     def help(self):
-        print('\n'.join(['constructor: SequenceRunner(name, [camera_name, upload_path, indi_host, indi_port).',
-               'devices(): returns a list of INDI device names.',
-               'set_camera(camera_name): sets default camera to "camera_name".',
-               'set_filter_wheel(filter_wheel_name): sets default filter wheel to "filter_wheel_name".',
-               'add_sequence(sequence_name, exposure, count): adds a sequence with <count> exposures of <exposure> seconds.',
-               'add_filter_wheel_step(filter_name or filter_number): Turn the filter wheel to the selected filter.',
-               'add_auto_dark(<count = 10>): adds a sequence shooting dark frames for all exposures captured until now, <count> dark frames for each exposure.',
+        print('\n'.join([
+                'constructor: SequenceRunner(name, [camera_name, upload_path, indi_host, indi_port).',
+                'devices(): returns a list of INDI device names.',
+                'set_camera(camera_name): sets default camera to "camera_name".',
+                'set_filter_wheel(filter_wheel_name): sets default filter wheel to "filter_wheel_name".',
+                'add_sequence(sequence_name, exposure, count): adds a sequence with <count> exposures of <exposure> seconds.',
+                'add_filter_wheel_step(filter_name or filter_number): Turn the filter wheel to the selected filter.',
+                'add_auto_dark(<count = 10>): adds a sequence shooting dark frames for all exposures captured until now, <count> dark frames for each exposure.',
+                'add_user_confirmation_prompt([prompt_message]): ask the user to press Enter before continuing the sequence (to change manual filter wheel, or cover the lens for dark frames',
+                'add_shell_command(command, [shell, abort_on_failure]): runs a command as a sequence step (for arguments, look at python docs for "subprocess". If abort_on_failure is true, the sequence will abort if the command will return an exit code != 0',
                'start(): starts capturing']))
 
     def __str__(self):

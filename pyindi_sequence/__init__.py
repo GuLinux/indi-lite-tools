@@ -5,5 +5,7 @@ from sequence import Sequence
 from camera import Camera
 from indiclient import INDIClient 
 from filter_wheel import FilterWheel, FilterWheelStep
+from user_input_step import UserInputStep
+from shell_command_step import ShellCommandStep
 
 
