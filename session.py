@@ -13,7 +13,8 @@ class Session:
     def to_map(self):
         return {
                 'name': self.name,
-                'path': self.path
+                'path': self.path,
+                'sequence_groups': [x.to_map() for x in self.sequence_groups]
                 }
 
 

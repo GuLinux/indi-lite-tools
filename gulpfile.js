@@ -14,7 +14,7 @@ gulp.task('transform', function () {
     }
     catch(e) {
     }
-    var src = './react/index.jsx';
+    var src = './react/index.js';
     return gulp.src(src)
         .pipe(webpack(require('./webpack.config.js')))
         .on('error', function(e) { console.log('!!!!! ERROR on WebPack !!!!!'); console.log(e); })

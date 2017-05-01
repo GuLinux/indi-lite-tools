@@ -1,0 +1,21 @@
+{
+  "name": "indi-lite",
+  "description": "",
+  "main": "index.js",
+  "authors": [
+    "Marco Gulino <marco@gulinux.net>"
+  ],
+  "license": "GPL-3.0",
+  "homepage": "https://github.com/GuLinux/indi-lite-tools",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "./static/bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "^3.3.7"
+  }
+}
