@@ -18,12 +18,12 @@ class SequenceRunner:
         sequence.run()
 
     def __log_sequence_started(self, sequence):
-        print('++++ Sequence {0} started: exposure time: {1}'.format(sequence.name, sequence.total_seconds()))
+        print('++++ Sequence {0} started: exposure time: {1}s'.format(sequence.name, sequence.total_seconds()))
 
     def __log_sequence_finished(self, sequence):
-        print('++++ Sequence {0} finished: exposure time: {1}'.format(sequence.name, sequence.total_seconds()))
+        print('++++ Sequence {0} finished: exposure time: {1}s'.format(sequence.name, sequence.total_seconds()))
 
     def __log_sequence_each_finished(self, sequence, number):
-        print('****** Sequence {0}: {1} of {2} finished, elapsed: {3}, remaining: {4} (total: {5})'.format(
+        print('****** Sequence {0}: {1} of {2} finished, elapsed: {3}s, remaining: {4}s (total: {5}s)'.format(
             sequence.name, number+1, sequence.count, sequence.shot_seconds(), sequence.remaining_seconds(), sequence.total_seconds()
         ))
