@@ -1,4 +1,4 @@
-from sequence import Sequence
+from sequence import Sequence, SequenceCallbacks
 
 class AutoDarkCalculator:
     def __init__(self):
@@ -11,12 +11,16 @@ class AutoDarkCalculator:
         self.exposures = set()
 
 class AutoDarkSequence:
-    def __init__(self, camera, auto_dark_calculator, count = 10):
+    def __init__(self, camera, auto_dark_calculator, count = 10, **kwargs):
         self.camera = camera
         self.auto_dark_calculator = auto_dark_calculator
         self.count = count
+        self.callbacks = SequenceCallbacks(**kwargs)
 
     def run(self):
         for exposure in self.auto_dark_calculator.exposures:
-            Sequence(self.camera, "Dark", exposure, self.count).run()
+            sequence = Sequence(self.camera, "Dark", exposure, self.count)
+            sequence.callbacks = self.callbacks
+            sequence.run()
         self.auto_dark_calculator.reset() 
+
