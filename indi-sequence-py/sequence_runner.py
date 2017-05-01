@@ -11,9 +11,10 @@ class SequenceRunner:
             self.__run_sequence(sequence)
 
     def __run_sequence(self, sequence):
-        sequence.callbacks.add('on_started', self.__log_sequence_started)
-        sequence.callbacks.add('on_finished', self.__log_sequence_finished)
-        sequence.callbacks.add('on_each_finished', self.__log_sequence_each_finished)
+        if hasattr(sequence, 'callbacks'):
+            sequence.callbacks.add('on_started', self.__log_sequence_started)
+            sequence.callbacks.add('on_finished', self.__log_sequence_finished)
+            sequence.callbacks.add('on_each_finished', self.__log_sequence_each_finished)
         sequence.run()
 
     def __log_sequence_started(self, sequence):

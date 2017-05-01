@@ -18,7 +18,7 @@ class Device:
         self.set_switch('CONNECTION', ['CONNECT'])
 
     def set_switch(self, name, on_switches = [], off_switches = [], sync = True):
-        c = self.__getControl(name, 'switch')
+        c = self.getControl(name, 'switch')
         if c.r == PyIndi.ISR_ATMOST1 or c.r == PyIndi.ISR_1OFMANY:
             on_switches = on_switches[0:1]
             off_switches = [s.name for s in c if s.name not in on_switches]
@@ -32,7 +32,7 @@ class Device:
         return c
         
     def set_number(self, name, values, sync = True):
-        c = self.__getControl(name, 'number')
+        c = self.getControl(name, 'number')
         for control_name, index in self.__map_indexes(c, values.keys()).items():
             c[index].value = values[control_name]
         self.indi_client.sendNewNumber(c)
@@ -42,7 +42,7 @@ class Device:
         return c
 
     def set_text(self, control_name, values, sync = True):
-        c = self.__getControl(control_name, 'text')
+        c = self.getControl(control_name, 'text')
         for control_name, index in self.__map_indexes(c, values.keys()).items():
             c[index].text = values[control_name]
         self.indi_client.sendNewText(c)
@@ -65,7 +65,7 @@ class Device:
         return result
 
 
-    def __getControl(self, name, ctl_type):
+    def getControl(self, name, ctl_type):
         ctl = None
         attr = {
             'number': 'getNumber',

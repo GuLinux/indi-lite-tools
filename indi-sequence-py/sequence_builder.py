@@ -3,6 +3,7 @@ from sequence import Sequence
 from auto_dark import *
 from camera import Camera
 from indiclient import INDIClient 
+from filter_wheel import FilterWheel, FilterWheelStep
 import os
 import time
 
@@ -31,8 +32,23 @@ class SequenceBuilder:
             return
         self.camera = Camera(camera_name, self.indi_client)
 
+    def set_filter_wheel(self, filter_wheel_name):
+        self.filter_wheel = FilterWheel(filter_wheel_name, self.indi_client)
+
     def add_sequence(self, sequence_name, exposure, count):
-        self.sequences.append(Sequence(self.camera, sequence_name, exposure=exposure, count=count, upload_path=self.upload_path, on_finished=[self.auto_dark_calculator.sequence_finished]))
+        self.sequences.append(
+            Sequence(
+                self.camera,
+                sequence_name,
+                exposure=exposure,
+                count=count,
+                upload_path=self.upload_path,
+                on_finished=[self.auto_dark_calculator.sequence_finished]
+        ))
+        return self
+
+    def add_filter_wheel_step(self, filter_name = None, filter_number = None):
+        self.sequences.append(FilterWheelStep(self.filter_wheel, filter_name = filter_name, filter_number = filter_number))
         return self
 
     def add_auto_datk(self, count = 10):
@@ -50,7 +66,9 @@ class SequenceBuilder:
         print('\n'.join(['constructor: SequenceRunner(name, [camera_name, upload_path, indi_host, indi_port).',
                'devices(): returns a list of INDI device names.',
                'set_camera(camera_name): sets default camera to "camera_name".',
+               'set_filter_wheel(filter_wheel_name): sets default filter wheel to "filter_wheel_name".',
                'add_sequence(sequence_name, exposure, count): adds a sequence with <count> exposures of <exposure> seconds.',
+               'add_filter_wheel_step(filter_name or filter_number): Turn the filter wheel to the selected filter.',
                'add_auto_dark(<count = 10>): adds a sequence shooting dark frames for all exposures captured until now, <count> dark frames for each exposure.',
                'start(): starts capturing']))
 
