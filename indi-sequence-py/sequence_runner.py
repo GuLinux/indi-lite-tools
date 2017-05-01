@@ -1,8 +1,7 @@
 import itertools
 
 class SequenceRunner:
-    def __init__(self, indiclient, sequence_def):
-        self.indiclient = indiclient
+    def __init__(self, sequence_def):
         self.sequence_def = sequence_def
 
     def start(self):

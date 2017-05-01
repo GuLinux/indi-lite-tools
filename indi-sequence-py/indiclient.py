@@ -1,8 +1,14 @@
 import PyIndi
+
     
 class INDIClient(PyIndi.BaseClient):
-    def __init__(self, address = 'localhost', port = 7624):
+    DEFAULT_HOST = 'localhost'
+    DEFAULT_PORT = 7624
+
+    def __init__(self, address = DEFAULT_HOST, port = DEFAULT_PORT):
         super(INDIClient, self).__init__()
+        self.host = address
+        self.port = port
         self.setServer(address, port)
         self.connectServer()
 
@@ -20,9 +26,6 @@ class INDIClient(PyIndi.BaseClient):
         pass
 
     def newBLOB(self, bp):
-        global blobEvent
-        print("new BLOB ", bp.name)
-        blobEvent.set()
         pass
 
     def newSwitch(self, svp):
@@ -46,4 +49,9 @@ class INDIClient(PyIndi.BaseClient):
     def serverDisconnected(self, code):
         pass
 
+    def __str__(self):
+        return 'INDI client connected to {0}:{1}'.format(self.host, self.port)
+
+    def __repr__(self):
+        return self.__str__()
 

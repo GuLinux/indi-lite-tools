@@ -50,4 +50,8 @@ class Sequence:
     def remaining_seconds(self):
         return (self.count - self.finished) * self.exposure
 
+    def __str__(self):
+        return 'Sequence {0}: {1} {2}s exposure (total exp time: {3}s)'.format(self.name, self.count, self.exposure, self.total_seconds())
 
+    def __repr__(self):
+        return self.__str__()

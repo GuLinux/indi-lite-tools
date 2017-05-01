@@ -19,4 +19,8 @@ class Camera(Device):
         upload_to = {'local': 'UPLOAD_LOCAL', 'client': 'UPLOAD_CLIENT', 'both': 'UPLOAD_BOTH'}[upload_to]
         self.set_switch('UPLOAD_MODE', [upload_to] )
 
+    def __str__(self):
+        return 'INDI Camera "{0}"'.format(self.name)
 
+    def __repr__(self):
+        return self.__str__()

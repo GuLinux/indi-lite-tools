@@ -25,3 +25,8 @@ class AutoDarkSequence:
             sequence.run()
         self.auto_dark_calculator.reset() 
 
+    def __str__(self):
+        return 'AutoDarkSequence (exposures: {0})'.format(', '.join(self.auto_dark_calculator.exposures))
+
+    def __repr__(self):
+        return self.__str__()
