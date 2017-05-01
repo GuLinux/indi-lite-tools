@@ -25,12 +25,13 @@ class Device:
         for index in range(0, len(c)):
             c[index].s = PyIndi.ISS_ON if c[index].name in on_switches else PyIndi.ISS_OFF
         self.indi_client.sendNewSwitch(c)
+        return c
         
     def set_number(self, name, value, index = 0):
         c = self.__getControl(name, 'number')
         c[index].value = value
         self.indi_client.sendNewNumber(c)
-
+        return c
 
     def __getControl(self, name, ctl_type):
         ctl = None
