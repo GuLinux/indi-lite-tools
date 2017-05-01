@@ -13,15 +13,26 @@ class Device:
             self.device = self.indi_client.getDevice(self.name)
 
     def connect(self):
-        connect_property = self.__getControl('switch', 'CONNECTION')
         if self.device.isConnected():
             return
-        connect_property[0].s=PyIndi.ISS_ON  # the "CONNECT" switch
-        connect_property[1].s=PyIndi.ISS_OFF # the "DISCONNECT" switch
-        self.indi_client.sendNewSwitch(connect_property) # send this new value to the device
+        self.set_switch('CONNECTION', ['CONNECT'])
+
+    def set_switch(self, name, on_switches = [], off_switches = []):
+        c = self.__getControl(name, 'switch')
+        if c.r == PyIndi.ISR_ATMOST1 or c.r == PyIndi.ISR_1OFMANY:
+            on_switches = on_switches[0:1]
+            off_switches = [s.name for s in c if s.name not in on_switches]
+        for index in range(0, len(c)):
+            c[index].s = PyIndi.ISS_ON if c[index].name in on_switches else PyIndi.ISS_OFF
+        self.indi_client.sendNewSwitch(c)
+        
+    def set_number(self, name, value, index = 0):
+        c = self.__getControl(name, 'number')
+        c[index].value = value
+        self.indi_client.sendNewNumber(c)
 
 
-    def __getControl(self, ctl_type, name):
+    def __getControl(self, name, ctl_type):
         ctl = None
         attr = {
             'number': 'getNumber',
@@ -32,4 +43,5 @@ class Device:
         while not(ctl):
             ctl = getattr(self.device, attr)(name)
             time.sleep(0.1)
+        return ctl
 
