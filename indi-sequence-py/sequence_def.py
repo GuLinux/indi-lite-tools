@@ -1,15 +1,11 @@
 from sequence_runner import SequenceRunner 
 from sequence import Sequence
 from auto_dark import *
+from camera import Camera
+from indiclient import IndiClient
 
-class CameraMock:
-    def shoot(self, exposure):
-        pass
-
-    def set_output(self, out):
-        self.output = out
-
-camera = CameraMock()
+indiclient = IndiClient()
+camera = Camera('', indiclient)
 auto_dark_calculator = AutoDarkCalculator()
 
 def new_sequence(name, exposure, count):

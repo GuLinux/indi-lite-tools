@@ -1,9 +1,14 @@
 import PyIndi
     
-class IndiClient(PyIndi.BaseClient):
+class INDIClient(PyIndi.BaseClient):
     def __init__(self, address = 'localhost', port = 7624):
-        super(IndiClient, self).__init__()
+        super(INDIClient, self).__init__()
         self.setServer(address, port)
+        self.connectServer()
+
+    def listDeviceNames(self):
+        return [d.getDeviceName() for d in self.getDevices()]
+            
 
     def newDevice(self, d):
         pass

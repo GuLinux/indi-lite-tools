@@ -1,3 +1,5 @@
+import PyIndi
+
 class Device:
     def __init__(self, name, indi_client):
         self.name = name
@@ -7,7 +9,7 @@ class Device:
     def __find_device(self):
         self.device = None
         while not self.device:
-            self.device = indi_client.getDevice(self.name)
+            self.device = self.indi_client.getDevice(self.name)
 
     def connect(self):
         connect_property = None

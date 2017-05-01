@@ -15,7 +15,7 @@ class Camera(Device):
 
     def __find_exposure_ctl(self):
         self.ccd_exposure = None
-        while not(ccd_exposure):
+        while not(self.ccd_exposure):
             time.sleep(0.5)
             self.ccd_exposure=self.device.getNumber("CCD_EXPOSURE")
 
