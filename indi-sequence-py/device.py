@@ -11,6 +11,7 @@ class Device:
         self.device = None
         while not self.device:
             self.device = self.indi_client.getDevice(self.name)
+            print('device {0} not found, retrying')
 
     def connect(self):
         if self.device.isConnected():

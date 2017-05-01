@@ -1,3 +1,4 @@
+import os
 
 class SequenceCallbacks:
     def __init__(self, **kwargs):
@@ -15,16 +16,20 @@ class SequenceCallbacks:
             callback(*args, **kwargs)
 
 class Sequence:
-    def __init__(self, camera, name, exposure, count, **kwargs):
+    def __init__(self, camera, name, exposure, count, upload_path, **kwargs):
         self.camera = camera
         self.name = name
         self.count = count
         self.exposure = exposure
+        self.upload_path = upload_path
         self.callbacks = SequenceCallbacks(**kwargs)
         self.finished = 0
+        if not os.path.isdir(upload_path):
+            os.makedirs(upload_path)
 
     def run(self):
-        self.camera.set_output('{0}_{1}'.format(self.name, self.exposure))
+        self.camera.set_upload_to('local')
+        self.camera.set_upload_path(self.upload_path, '{0}_{1}s_XXX'.format(self.name, self.exposure))
         self.callbacks.run('on_started', self)
 
         for sequence in range(0, self.count):
