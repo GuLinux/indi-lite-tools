@@ -24,13 +24,12 @@ class Sequence:
         self.finished = 0
 
     def run(self):
-        self.camera.set_exposure(self.exposure)
         self.camera.set_output('{0}_{1}'.format(self.name, self.exposure))
         self.callbacks.run('on_started', self)
 
         for sequence in range(0, self.count):
             self.callbacks.run('on_each_started', self, sequence)
-            self.camera.shoot()
+            self.camera.shoot(self.exposure)
             self.finished+=1
             self.callbacks.run('on_each_finished', self, sequence)
 

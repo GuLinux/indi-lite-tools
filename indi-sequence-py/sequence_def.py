@@ -3,10 +3,7 @@ from sequence import Sequence
 from auto_dark import *
 
 class CameraMock:
-    def set_exposure(self, exp):
-        pass
-
-    def shoot(self):
+    def shoot(self, exposure):
         pass
 
     def set_output(self, out):
