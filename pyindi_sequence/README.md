@@ -28,5 +28,19 @@ Remember that an INDI server must be already up and running when creating the `S
  * `add_auto_dark(count)`: this particular step collects all the exposures previously used, and takes `count` (defaults to 10) dark frame for each different exposure value. You can add multiple auto dark commands: each time you add it, the exposures list will reset.
  * `start()`: starts taking frames.
 
+The `SequenceBuilder` object will also store a few useful attributes for directly manipulating INDI devices, such as `camera`, `filter_wheel`, `indi_client`, `upload_path`.
+
+Please see the other files for a more advanced use of this API.
+
+## Extending PyINDI-Sequence
+
+the `Device` class in device.py contains a few primitives for interact with INDI devices, particularly to get and set values.
+You can look at the `Camera` and `FilterWheel` classes for a few examples.
+
+You can also add new steps, both for controlling new INDI device types, and other various usages (like the User Confirmation prompt and the Run Command).
+
+All the steps need to do is to implement the `run()` method.
+
+You can then add them directly to the `sequences` attribute of the `SequenceBuilder` object.
 
 
