@@ -38,6 +38,7 @@ Remember that an INDI server must be already up and running when creating the `S
  * `add_user_confirmation_prompt(message, on_input)`: displays a message to the user, and waits for input (pressing enter on the keyboard). Useful if you don't have an electric filter wheel, and you need to manually change filters, or if you need to cover the lenses before taking dark frames. The (optional) `on_input` callback function will be called with the text entered by the user (see examples/flat_dark_bias.py)
  * `add_message_step(message, sleep_time)`: displays a message, and if `sleep_time` is specified, will also sleep for `sleep_time` seconds. `message` can also be a function returning a string.
  * `add_shell_command(command, shell, abort_on_failure)`: runs the specified command in the sequence. `command` and `shell` are set as per python documentation for the `subprocess.call()` method. `abort_on_failure` defaults to False, if set to True throws an exception when the command returns a non zero exit status
+ * `add_function(function)`: runs a native python function inside the sequence
  * `add_auto_dark(count)`: this particular step collects all the exposures previously used, and takes `count` (defaults to 10) dark frame for each different exposure value. You can add multiple auto dark commands: each time you add it, the exposures list will reset.
  * `start()`: starts taking frames.
 

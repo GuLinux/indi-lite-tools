@@ -8,5 +8,5 @@ from pyindi_sequence.filter_wheel import FilterWheel, FilterWheelStep
 from pyindi_sequence.user_input_step import UserInputStep
 from pyindi_sequence.shell_command_step import ShellCommandStep
 from pyindi_sequence.message_step import MessageStep
-
+from pyindi_sequence.run_function_step import RunFunctionStep
 
