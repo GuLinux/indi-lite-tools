@@ -1,4 +1,4 @@
-from device import Device
+from pyindi_sequence.device import Device
 import PyIndi
 
 class FilterWheelStep:

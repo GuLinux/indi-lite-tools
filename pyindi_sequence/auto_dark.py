@@ -1,4 +1,4 @@
-from sequence import Sequence, SequenceCallbacks
+from pyindi_sequence.sequence import Sequence, SequenceCallbacks
 
 class AutoDarkCalculator:
     def __init__(self):

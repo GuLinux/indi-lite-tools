@@ -5,7 +5,8 @@ class SequenceRunner:
         self.sequence_def = sequence_def
 
     def start(self):
-        total_seconds = reduce( lambda acc, seq: acc + seq.total_seconds() if hasattr(seq, 'total_seconds') else acc, self.sequence_def['sequences'], 0)
+        total_seconds = sum([s.total_seconds() for s in self.sequence_def['sequences'] if hasattr(s, 'total_seconds')])
+
         print('== Starting sequences: total exposure time={0} seconds'.format(total_seconds))
         for sequence in self.sequence_def['sequences']:
             self.__run_sequence(sequence)
