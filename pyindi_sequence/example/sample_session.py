@@ -15,7 +15,7 @@ sb.add_sequence('Green', exposure=5, count=2)
 sb.add_filter_wheel_step('Blue')
 sb.add_sequence('Blue', exposure=6, count=2)
 sb.add_user_confirmation_prompt('Please cover your camera lens for Dark Frames. Press Enter to continue')
-sb.add_auto_datk()
+sb.add_auto_dark()
 sb.add_shell_command('gzip -9 /tmp/M42/*.fits', shell=True)
 
 # The following line shows what happens when you run a shell command returning error

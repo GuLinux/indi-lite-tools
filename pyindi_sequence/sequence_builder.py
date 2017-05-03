@@ -61,7 +61,7 @@ class SequenceBuilder:
         self.sequences.append(ShellCommandStep(command, shell, abort_on_failure))
         return self
 
-    def add_auto_datk(self, count = 10):
+    def add_auto_dark(self, count = 10):
         self.sequences.append(AutoDarkSequence(self.camera, self.auto_dark_calculator, self.upload_path, count)) 
         return self
 
