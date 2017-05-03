@@ -2,14 +2,19 @@ import sys
 
 class UserInputStep:
     DEFAULT_PROMPT = 'Press Enter to continue'
-    def __init__(self, prompt = DEFAULT_PROMPT):
+    # the on_input callback, if specified, will be called with the user entered input
+    def __init__(self, prompt = DEFAULT_PROMPT, on_input = None):
         self.prompt = prompt
+        self.on_input = on_input
 
     def run(self):
+        user_input = None
         if sys.version_info[0] < 3:
-            raw_input(self.prompt)
+            user_input = raw_input(self.prompt)
         else:
-            input(self.prompt)
+            user_input = input(self.prompt)
+        if self.on_input:
+            self.on_input(user_input)
     
     def __str__(self):
         return 'Wait for user confirmation'

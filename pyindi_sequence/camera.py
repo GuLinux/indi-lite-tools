@@ -19,6 +19,14 @@ class Camera(Device):
         upload_to = {'local': 'UPLOAD_LOCAL', 'client': 'UPLOAD_CLIENT', 'both': 'UPLOAD_BOTH'}[upload_to]
         self.set_switch('UPLOAD_MODE', [upload_to] )
 
+    def exposure_range(self):
+        ctl = self.getControl('CCD_EXPOSURE', 'number')[0]
+        return {
+            'minimum': ctl.min,
+            'maximum': ctl.max,
+            'step': ctl.step
+        }
+
     def __str__(self):
         return 'INDI Camera "{0}"'.format(self.name)
 
