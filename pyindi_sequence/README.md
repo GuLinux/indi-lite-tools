@@ -57,3 +57,23 @@ All the steps need to do is to implement the `run()` method.
 You can then add them directly to the `sequences` attribute of the `SequenceBuilder` object.
 
 
+## User notes
+ 
+This script was created mainly to satisfy my personal requirements: having a very simple batch processor capable to handle frames capturing without user input.
+I capture using a small mount (SkyWatcher Star Adventurer), an ASI1600mm and a Raspberry Pi. I need the Pi to capture indipendently, without having to have a notebook always connected to it for imag
+e viewing/saving.
+
+My typical usage scenario is:
+    
+ * Start INDI server on the Pi (using INDI Web manager, for instance).
+ * Open KStars on my laptop, start Ekos
+ * connect it to the Pi (which has a builtin wifi access point configuration)
+ * Use Ekos preview to select the field of view
+ * Use Ekos focusing tool
+ * Calculate the proper exposure times using Ekos preview for each filter (LRGB)
+ * Use SequenceBuilder on a shell session on the Pi (use screen or tmux to have an indipendent session), entering the shooting times calculated.
+ * Start the sequence, and do something else while the Pi is capturing by itself :)
+
+I also did setup some hooks to control the leds on my Raspberry Pi: slowly blinking when capture is in progress, fast blinking if it has finished, or there is an error, or anything requiring user in    teraction.
+
+
