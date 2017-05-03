@@ -4,6 +4,18 @@ This python module allows you to create sequences and interacting with your devi
 
 A few examples of how to use this module are in the "example" directory.
 
+## Installation
+
+At the moment only manual installation is supported.
+
+### Get the sources:
+```
+git clone git@github.com:GuLinux/indi-lite-tools.git
+```
+
+Copy one of the examples from the `pyindi_sequence/examples/` directory, change the path on the second one to the path containing the `pyindi_sequence` directory.
+
+
 ## SequenceBuilder
 
 The easiest way to use this module is to import the SequenceBuilder object
