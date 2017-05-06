@@ -29,7 +29,7 @@ class CameraChangeSettingsStep:
                 self.camera.set_number(control_name, control_values)
         if self.switches:
             for control_name, control_values in self.switches.items():
-                self.camera.set_switch(control_name, control_values['on'], control_values['off'])
+                self.camera.set_switch(control_name, control_values['on'] if 'on' in control_values else [], control_values['off'] if 'off' in control_values else [])
 
     def __str__(self):
         values = [['roi', self.roi], ['bin', self.binning], ['compression_format', self.compression_format], ['frame_type', self.frame_type], ['controls', self.controls], ['numbers', self.numbers], ['switches', self.switches]]
