@@ -71,7 +71,7 @@ class SequenceBuilder:
         self.sequences.append(AutoDarkSequence(self.camera, self.auto_dark_calculator, self.upload_path, count)) 
         return self
 
-    def change_camera_settings(self, roi = None, binning = None, compression_format = None, frame_type = None, controls = None, Numbers = None, switches = None):
+    def change_camera_settings(self, roi = None, binning = None, compression_format = None, frame_type = None, controls = None, numbers = None, switches = None):
         self.sequences.append(CameraChangeSettingsStep(self.camera, roi, binning, compression_format, frame_type, controls, numbers, switches))
         return self
 
