@@ -38,7 +38,7 @@ sb.change_camera_settings(
     roi = {'X': 0, 'Y': 0, 'WIDTH': 4656, 'HEIGHT': 3519}, # workaround for ASI 1600: when using bin 3x3, you need to reduce ROI
     compression_format = 'CCD_RAW',
     binning = 1,
-    frame_type = 'FRAAME_LIGHT',
+    frame_type = 'FRAME_LIGHT',
     controls = {'HighSpeedMode': 1, 'HardwareBin': 0},
     switches = {'CCD_VIDEO_FORMAT': {'on': ['ASI_IMG_RAW16']}, 'CCD_CONTROLS_MODE': {'on': ['AUTO_BandWidth'], 'off': ['AUTO_Gain']} }
 )
