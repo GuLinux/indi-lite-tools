@@ -17,6 +17,12 @@ class Device:
             return
         self.set_switch('CONNECTION', ['CONNECT'])
 
+    def values(self, ctl_name, ctl_type):
+        return dict(map(lambda c: (c.name, c.value), self.getControl(ctl_name, ctl_type)))
+
+    def switch_values(self, switch_name):
+        return dict(map(lambda sw: (sw.name, sw.s == PyIndi.ISS_ON), self.getControl(switch_name, 'switch')))
+
     def set_switch(self, name, on_switches = [], off_switches = [], sync = True):
         c = self.getControl(name, 'switch')
         if c.r == PyIndi.ISR_ATMOST1 or c.r == PyIndi.ISR_1OFMANY:

@@ -1,7 +1,7 @@
 from pyindi_sequence.sequence_runner import SequenceRunner 
 from pyindi_sequence.sequence import Sequence
 from pyindi_sequence.auto_dark import *
-from pyindi_sequence.camera import Camera
+from pyindi_sequence.camera import Camera, CameraChangeSettingsStep
 from pyindi_sequence.indiclient import INDIClient 
 from pyindi_sequence.filter_wheel import FilterWheel, FilterWheelStep
 from pyindi_sequence.shell_command_step import ShellCommandStep
@@ -71,6 +71,10 @@ class SequenceBuilder:
         self.sequences.append(AutoDarkSequence(self.camera, self.auto_dark_calculator, self.upload_path, count)) 
         return self
 
+    def change_camera_settings(self, roi = None, binning = None, compression_format = None, frame_type = None, controls = None, Numbers = None, switches = None):
+        self.sequences.append(CameraChangeSettingsStep(self.camera, roi, binning, compression_format, frame_type, controls, numbers, switches))
+        return self
+
     def add_function(self, function):
         self.sequences.append(RunFunctionStep(function))
         return self
@@ -94,6 +98,7 @@ class SequenceBuilder:
                 'add_user_confirmation_prompt([prompt_message, on_input]): ask the user to press Enter before continuing the sequence (to change manual filter wheel, or cover the lens for dark frames. The on_input callback, if specified, will be called with the text entered by the user',
                 'add_message_step(message, [sleep_time]): will show the user a message (can be a function returning a string), and optionally sleep for sleep_time seconds',
                 'add_shell_command(command, [shell, abort_on_failure]): runs a command as a sequence step (for arguments, look at python docs for "subprocess". If abort_on_failure is true, the sequence will abort if the command will return an exit code != 0',
+                'change_camera_settings([roi, binning, compression_format, frame_type, controls, numbers, switches]): changes camera settings according to the parameters. See the example scripts for usage',
                 'add_function(function): add a native python function to the sequence stack',
                'start(): starts capturing']))
 

@@ -19,11 +19,13 @@ class AutoDarkSequence:
         self.callbacks = SequenceCallbacks(**kwargs)
 
     def run(self):
+        self.camera.set_frame_type('FRAME_DARK')
         for exposure in self.auto_dark_calculator.exposures:
             sequence = Sequence(self.camera, "Dark", exposure, self.count, self.upload_path)
             sequence.callbacks = self.callbacks
             sequence.run()
         self.auto_dark_calculator.reset() 
+        self.camera.set_frame_type('FRAME_LIGHT')
 
     def __str__(self):
         return 'AutoDarkSequence (exposures: {0})'.format(', '.join(self.auto_dark_calculator.exposures))
