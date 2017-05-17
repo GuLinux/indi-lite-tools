@@ -23,7 +23,7 @@ class Device:
     def switch_values(self, switch_name):
         return dict(map(lambda sw: (sw.name, sw.s == PyIndi.ISS_ON), self.getControl(switch_name, 'switch')))
 
-    def set_switch(self, name, on_switches = [], off_switches = [], sync = True):
+    def set_switch(self, name, on_switches = [], off_switches = [], sync = True, timeout = 10):
         c = self.getControl(name, 'switch')
         if c.r == PyIndi.ISR_ATMOST1 or c.r == PyIndi.ISR_1OFMANY:
             on_switches = on_switches[0:1]
@@ -33,33 +33,36 @@ class Device:
         self.indi_client.sendNewSwitch(c)
 
         if sync:
-            self.__wait_for_ctl_status(c)
+            self.__wait_for_ctl_status(c, timeout)
 
         return c
         
-    def set_number(self, name, values, sync = True):
+    def set_number(self, name, values, sync = True, timeout = 10):
         c = self.getControl(name, 'number')
         for control_name, index in self.__map_indexes(c, values.keys()).items():
             c[index].value = values[control_name]
         self.indi_client.sendNewNumber(c)
 
         if sync:
-            self.__wait_for_ctl_status(c)
+            self.__wait_for_ctl_status(c, timeout)
         return c
 
-    def set_text(self, control_name, values, sync = True):
+    def set_text(self, control_name, values, sync = True, timeout = 10):
         c = self.getControl(control_name, 'text')
         for control_name, index in self.__map_indexes(c, values.keys()).items():
             c[index].text = values[control_name]
         self.indi_client.sendNewText(c)
 
         if sync:
-            self.__wait_for_ctl_status(c)
+            self.__wait_for_ctl_status(c, timeout)
 
         return c
                 
-    def __wait_for_ctl_status(self, ctl, status = PyIndi.IPS_OK):
+    def __wait_for_ctl_status(self, ctl, status = PyIndi.IPS_OK, timeout = 10):
+        started = time.time()
         while ctl.s != status:
+            if time.time() - started > timeout:
+                raise RuntimeError('Timeout error while changing property {}'.format(ctl.name))
             time.sleep(0.5)
 
 
