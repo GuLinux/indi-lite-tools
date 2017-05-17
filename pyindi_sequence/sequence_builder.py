@@ -67,8 +67,8 @@ class SequenceBuilder:
         self.sequences.append(ShellCommandStep(command, shell, abort_on_failure))
         return self
 
-    def add_auto_dark(self, count = 10):
-        self.sequences.append(AutoDarkSequence(self.camera, self.auto_dark_calculator, self.upload_path, count)) 
+    def add_auto_dark(self, name = 'Dark', count = 10):
+        self.sequences.append(AutoDarkSequence(self.camera, self.auto_dark_calculator, self.upload_path, name, count)) 
         return self
 
     def change_camera_settings(self, roi = None, binning = None, compression_format = None, frame_type = None, controls = None, numbers = None, switches = None):

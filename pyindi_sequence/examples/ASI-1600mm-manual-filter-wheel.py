@@ -11,8 +11,8 @@ ASI_BIAS_EXPOSURE=0.00032
 SESSION_NAME=os.path.splitext(os.path.basename(__file__))[0].replace(' ', '_')
 
 LIGHT = {'exp': 1, 'count': 1}
-LIGHT_DARK_COUNT = LIGHT['count']
-LIGHT_BIAS_COUNT = LIGHT_DARK_COUNT
+LIGHT_DARK_COUNT = 15
+LIGHT_BIAS_COUNT = 15
 RED = {'exp': 1, 'count': 1}
 GREEN = RED
 BLUE = RED
