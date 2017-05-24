@@ -17,26 +17,81 @@
       <script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
       <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
+  <style>
+    .list-row {
+      margin-top: 25px;
+      text-align: right;
+    }
+
+    #shutdown-alert {
+      display: none;
+      position: fixed;
+      top: 0px;
+      right: 0px;
+      left: 0px;  
+    }
+    
+  </style>
   </head>
   <body>
     <div class='container'>
       <h1>Control Panel</h1>
-      <div class='row'>
-          <div class='col-md-10'>
+      <div class='row list-row'>
+          <div class='col-md-5'>
               <p>Sync GPS coordinates from your devices to this server</p>
               <div class="checkbox">
                 <label>
-                    <input type="checkbox" id="update_datetime" checked onchange="setUpdateDateTime($('#update_datetime').prop('checked'))"> Also sync date/type</input>
+                    <input type="checkbox" id="update_datetime" checked onchange="setUpdateDateTime($('#update_datetime').prop('checked'))"><small>Also sync date/type</small></input>
                 </label>
               </div>
           </div>
-          <button onclick="getCoordinates(sendCoordinates)" class="col-md-2 btn btn-default">Sync</button>
+          <button onclick="getCoordinates(sendCoordinates)" class="col-md-2 btn btn-success">Sync</button>
       </div>
-      <ul class="nav nav-pills">
-        <li><a href="#" onclick="openINDIControlPanel()">INDI control panel</a></li>
-        <li><a href="#" onclick="openShellinabox()">Shellinabox</a></li>
-      </ul>
+      
+      <div class='row list-row'>
+          <div class='col-md-5'>
+              <p>Open INDI control panel in a new window</p>
+          </div>
+          <button class="col-md-2 btn btn-info" onclick="openINDIControlPanel()">INDI control panel</button>
+      </div>
+
+      <div class='row list-row'>
+          <div class='col-md-5'>
+              <p>Open Shellinabox in a new windows for commands execution</p>
+          </div>
+          <button class="col-md-2 btn btn-info" onclick="openShellinabox()">Shellinabox</button>
+      </div>
+ 
+      <div class='row list-row'>
+          <div class='col-md-5'>
+              <p>Turn off this computer</p>
+          </div>
+          <button class="col-md-2 btn btn-danger" data-toggle="modal" data-target="#shutdown-modal">Shutdown</button>
+      </div>
+
     </div>
+
+
+    <div class="modal fade" id="shutdown-modal" tabindex="-1" role="dialog">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="myModalLabel">Shutdown system?</h4>
+          </div>
+          <div class="modal-body">
+            Do you really want to power off this system?
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            <button type="button" class="btn btn-danger" onclick="shutdown()" data-dismiss="modal">Shutdown</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="shutdown-alert" class="alert alert-danger"><strong>Shutdown</strong> the system is shutting down.</div>
+
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="static/components/jquery/dist/jquery.min.js"></script>
     <!-- Include all compiled plugins (below), or include individual files as needed -->

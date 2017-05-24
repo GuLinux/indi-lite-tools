@@ -51,6 +51,11 @@ var openShellinabox = function() {
     window.open(newPortURL(4200),'_blank');
 }
 
-
+var shutdown = function() {
+    jQuery.ajax('/shutdown', {
+        method: 'POST',
+        success: function() { $('#shutdown-alert').show() }
+    });
+}
 
 $('#update_datetime').prop('checked', updateDateTime());

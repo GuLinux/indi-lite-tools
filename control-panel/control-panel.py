@@ -20,6 +20,13 @@ def set_coordinates():
     return '', 200
 
 
+@app.route('/shutdown', methods=['POST'])
+def shutdown():
+    os.system('sudo systemctl poweroff')
+    return '', 200
+
+
+
 def update_datetime(timestamp):
     # very hacky workaround.. and need sudoer permissions
     date_cmd = 'sudo date -s "@{0}"'.format(timestamp)
@@ -31,6 +38,8 @@ def update_gps(coords):
     with open('/tmp/gps_coords.json', 'w') as outfile:
         json.dump(coords, outfile)
     print(coords)
+
+
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
