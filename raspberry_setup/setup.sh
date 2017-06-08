@@ -4,7 +4,7 @@ if [[ "$EUID" != 0 ]]; then
     exit 1
 fi
 
-if [[ "$PWD" != /home/pi/indi-lite-tools ]]; then
+if [[ "$PWD" != /home/pi/indi-lite-tools/raspberry_setup ]]; then
     echo "This scripts need to be installed and executed from indi-lite-tools"
     exit 1
 fi
