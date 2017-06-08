@@ -1,0 +1,3 @@
+SUBSYSTEM=="leds", ACTION=="add", RUN+="/bin/chgrp -R users /sys%p", RUN+="/bin/chmod -R g=u /sys%p"
+SUBSYSTEM=="leds", ACTION=="change", ENV{TRIGGER}!="none", RUN+="/bin/chgrp -R users /sys%p", RUN+="/bin/chmod -R g=u /sys%p"
+

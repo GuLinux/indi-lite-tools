@@ -1,0 +1,2 @@
+export PATH="$HOME/bin:$PATH"
+export PYTHONPATH="$HOME/python_modules:$HOME/indi-lite-tools:$PYTHONPATH"
