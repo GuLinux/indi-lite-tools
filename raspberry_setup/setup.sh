@@ -10,7 +10,7 @@ if [[ "$PWD" != /home/pi/indi-lite-tools/raspberry_setup ]]; then
 fi
 
 install_prerequisites() {
-    apt-get update && apt-get install -y cdbs libcfitsio3-dev libnova-dev libusb-1.0-0-dev libjpeg-dev libusb-dev libtiff5-dev libftdi-dev fxload libkrb5-dev libcurl4-gnutls-dev libraw-dev libgphoto2-dev libgsl0-dev dkms libboost-regex-dev libgps-dev libdc1394-22-dev vim curl wget nginx python3-virtualenv python3-pip ipython3 git hostapd
+    apt-get update && apt-get install -y cdbs libcfitsio3-dev libnova-dev libusb-1.0-0-dev libjpeg-dev libusb-dev libtiff5-dev libftdi-dev fxload libkrb5-dev libcurl4-gnutls-dev libraw-dev libgphoto2-dev libgsl0-dev dkms libboost-regex-dev libgps-dev libdc1394-22-dev vim curl wget nginx python3-virtualenv python3-pip ipython3 git hostapd tmux
 }
 
 install_indi() {
@@ -18,7 +18,7 @@ install_indi() {
     cd /tmp/indi_install
     wget "indilib.org/jdownloads/Raspberry PI/libindi_1.4.1_rpi.tar.gz"
     tar xf "libindi_1.4.1_rpi.tar.gz"
-    dpkg -i *.deb
+    dpkg -i libindi*/*.deb
     cd -
     rm -rf /tmp/indi_install
 }
@@ -34,7 +34,7 @@ disable_audio() {
 
 setup_home() {
     bashrc_local_file="$(readlink -f home-settings/bashrc)"
-    sudo -u pi <<EOF
+    sudo -u pi bash <<EOF
     cd /home/pi
     mkdir -p bin python_modules
     grep "$bashrc_local_file" .bashrc -q || echo "source \"$bashrc_local_file\"" >> .bashrc
