@@ -10,7 +10,7 @@ if [[ "$PWD" != /home/pi/indi-lite-tools/raspberry_setup ]]; then
 fi
 
 install_prerequisites() {
-    apt-get update && apt-get install -y cdbs libcfitsio3-dev libnova-dev libusb-1.0-0-dev libjpeg-dev libusb-dev libtiff5-dev libftdi-dev fxload libkrb5-dev libcurl4-gnutls-dev libraw-dev libgphoto2-dev libgsl0-dev dkms libboost-regex-dev libgps-dev libdc1394-22-dev vim curl wget nginx python3-virtualenv python3-pip ipython3 git hostapd tmux dnsmasq
+    apt-get update && apt-get install -y cdbs libcfitsio3-dev libnova-dev libusb-1.0-0-dev libjpeg-dev libusb-dev libtiff5-dev libftdi-dev fxload libkrb5-dev libcurl4-gnutls-dev libraw-dev libgphoto2-dev libgsl0-dev dkms libboost-regex-dev libgps-dev libdc1394-22-dev vim curl wget nginx python3-virtualenv python3-pip ipython3 git hostapd tmux dnsmasq swig
 }
 
 install_indi() {
@@ -41,6 +41,11 @@ setup_home() {
 EOF
 }
 
+setup_python() {
+    pip3 install -U pip setuptools
+    pip3 install flask pyindi-client 
+}
+
 setup_nginx() {
     rm /etc/nginx/sites-enabled/*
     cp -av nginx/indi_proxy /etc/nginx/sites-available
@@ -64,9 +69,22 @@ setup_wifi_ap() {
     echo "To activate and deactivate wifi access point (only for wlan0), just run ap-mode enable/disable"
 }
 
+setup_control_panel() {
+    cp ../control-panel/raspberry-control-panel.service /etc/systemd/system/
+    systemctl daemon-reload
+    systemctl enable raspberry-control-panel
+    systemctl start rasberry-control-panel
+}
+
+setup_shellinabox() {
+    cp shellinabox/shellinabox /etc/default
+    cp shellinabox/indi-tmux /usr/local/bin
+    systemctl enable shellinabox
+    systemctl start shellinabox
+}
 
 ask_step() {
-    read -p "$1 [Y/n]" -n 1 -e confirm
+read -p "$1 [Y/n] " -n 1 -e confirm
     shift
     if [[ "$confirm" == "n" ]]; then
         return
@@ -81,3 +99,6 @@ ask_step "Disable audio?" disable_audio
 ask_step "Setup home directory layout/bashrc?" setup_home
 ask_step "Setup nginx?" setup_nginx
 ask_step "Setup wifi access point?" setup_wifi_ap
+ask_step "Setup python modules?" setup_python
+ask_step "Setup Raspberry control panel?" setup_control_panel
+ask_step "Setup Shellinabox?" setup_shellinabox
