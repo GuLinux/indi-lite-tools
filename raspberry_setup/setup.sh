@@ -52,8 +52,8 @@ setup_nginx() {
 
 setup_wifi_ap() {
     # TODO: read from existing config if found    
-    read -p "Enter your wifi access point ESSID" -e AP_ESSID
-    read -p "Enter your wifi access point secret" -e AP_SECRET
+    read -p "Enter your wifi access point ESSID: " -e AP_ESSID
+    read -p "Enter your wifi access point secret: " -e AP_SECRET
     cp wifi-ap/ap-mode /usr/local/bin/
     cp wifi-ap/dhcpcd.conf-ap-* wifi-ap/dnsmasq.conf /etc/
     cp wifi-ap/interfaces-ap-* /etc/network/
