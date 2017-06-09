@@ -80,3 +80,4 @@ ask_step "Enable SPI interface?" enable_spi
 ask_step "Disable audio?" disable_audio
 ask_step "Setup home directory layout/bashrc?" setup_home
 ask_step "Setup nginx?" setup_nginx
+ask_step "Setup wifi access point?" setup_wifi_ap
