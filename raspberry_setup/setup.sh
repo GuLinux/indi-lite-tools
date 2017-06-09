@@ -10,7 +10,7 @@ if [[ "$PWD" != /home/pi/indi-lite-tools/raspberry_setup ]]; then
 fi
 
 install_prerequisites() {
-    apt-get update && apt-get install -y cdbs libcfitsio3-dev libnova-dev libusb-1.0-0-dev libjpeg-dev libusb-dev libtiff5-dev libftdi-dev fxload libkrb5-dev libcurl4-gnutls-dev libraw-dev libgphoto2-dev libgsl0-dev dkms libboost-regex-dev libgps-dev libdc1394-22-dev vim curl wget nginx python3-virtualenv python3-pip ipython3 git hostapd tmux
+    apt-get update && apt-get install -y cdbs libcfitsio3-dev libnova-dev libusb-1.0-0-dev libjpeg-dev libusb-dev libtiff5-dev libftdi-dev fxload libkrb5-dev libcurl4-gnutls-dev libraw-dev libgphoto2-dev libgsl0-dev dkms libboost-regex-dev libgps-dev libdc1394-22-dev vim curl wget nginx python3-virtualenv python3-pip ipython3 git hostapd tmux dnsmasq
 }
 
 install_indi() {
