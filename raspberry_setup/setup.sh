@@ -51,9 +51,19 @@ setup_nginx() {
 }
 
 setup_wifi_ap() {
-    #systemctl enable hostapd
-    true
+    # TODO: read from existing config if found    
+    read -p "Enter your wifi access point ESSID" -e AP_ESSID
+    read -p "Enter your wifi access point secret" -e AP_SECRET
+    cp wifi-ap/ap-mode /usr/local/bin/
+    cp wifi-ap/dhcpcd.conf-ap-* wifi-ap/dnsmasq.conf /etc/
+    cp wifi-ap/interfaces-ap-* /etc/network/
+    cp wifi-ap/hostapd.conf /etc/hostapd/
+    cp wifi-ap/hostapd /etc/default/
+    [[ -n "$AP_ESSID" ]] && sed -i "s^___WPA_PASSPHRASE___^$AP_SECRET^g" /etc/hostapd/hostapd.conf
+    [[ -n "$AP_SECRET" ]] && sed -i "s^___ESSID___^$AP_ESSID^g" /etc/hostapd/hostapd.conf
+    echo "To activate and deactivate wifi access point (only for wlan0), just run ap-mode enable/disable"
 }
+
 
 ask_step() {
     read -p "$1 [Y/n]" -n 1 -e confirm

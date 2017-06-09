@@ -1,0 +1,4 @@
+#!/bin/bash
+if ! tmux attach -t INDI; then
+    tmux new-session -s INDI
+fi
