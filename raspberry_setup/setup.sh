@@ -46,7 +46,7 @@ EOF
 
 setup_python() {
     pip3 install -U pip setuptools
-    pip3 install flask pyindi-client 
+    pip3 install flask pyindi-client requests psutil bottle 
 }
 
 setup_nginx() {
@@ -86,6 +86,25 @@ setup_shellinabox() {
     systemctl start shellinabox
 }
 
+setup_indi_control_panel() {
+
+    sudo -u pi bash <<EOF
+    cd /home/pi
+    if [[ -d indiwebmanager ]]; then
+        git clone https://github.com/knro/indiwebmanager.git
+    else
+        cd indiwebmanager && git pull
+    fi
+EOF
+    cp /home/pi/indiwebmanager/indiwebmanager.service /etc/systemd/system
+    sed -i 's|/home/pi/servermanager|/home/pi/indiwebmanager/servermanager|g' /etc/systemd/system/indiwebmanager.service
+    sed -i 's|python |python3 |g' /etc/systemd/system/indiwebmanager.service
+
+    systemctl daemon-reload
+    systemctl enable indiwebmanager
+    systemctl start indiwebmanager
+}
+
 ask_step() {
 read -p "$1 [Y/n] " -n 1 -e confirm
     shift
@@ -105,3 +124,5 @@ ask_step "Setup wifi access point?" setup_wifi_ap
 ask_step "Setup python modules?" setup_python
 ask_step "Setup Raspberry control panel?" setup_control_panel
 ask_step "Setup Shellinabox?" setup_shellinabox
+ask_step "Setup INDI Control Panel?" setup_shellinabox
+
