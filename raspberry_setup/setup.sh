@@ -10,7 +10,10 @@ if [[ "$PWD" != /home/pi/indi-lite-tools/raspberry_setup ]]; then
 fi
 
 install_prerequisites() {
-    apt-get update && apt-get install -y cdbs libcfitsio3-dev libnova-dev libusb-1.0-0-dev libjpeg-dev libusb-dev libtiff5-dev libftdi-dev fxload libkrb5-dev libcurl4-gnutls-dev libraw-dev libgphoto2-dev libgsl0-dev dkms libboost-regex-dev libgps-dev libdc1394-22-dev vim curl wget nginx python3-virtualenv python3-pip ipython3 git hostapd tmux dnsmasq swig
+    apt-get update && apt-get install -y cdbs libcfitsio3-dev libnova-dev libusb-1.0-0-dev libjpeg-dev \
+        libusb-dev libtiff5-dev libftdi-dev fxload libkrb5-dev libcurl4-gnutls-dev libraw-dev libgphoto2-dev \
+        libgsl0-dev dkms libboost-regex-dev libgps-dev libdc1394-22-dev vim curl wget nginx python3-virtualenv \
+        python3-pip ipython3 git hostapd tmux dnsmasq swig shellinabox
 }
 
 install_indi() {
@@ -73,7 +76,7 @@ setup_control_panel() {
     cp ../control-panel/raspberry-control-panel.service /etc/systemd/system/
     systemctl daemon-reload
     systemctl enable raspberry-control-panel
-    systemctl start rasberry-control-panel
+    systemctl start raspberry-control-panel
 }
 
 setup_shellinabox() {
