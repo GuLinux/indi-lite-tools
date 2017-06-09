@@ -91,9 +91,10 @@ setup_indi_control_panel() {
     sudo -u pi bash <<EOF
     cd /home/pi
     if [[ -d indiwebmanager ]]; then
-        git clone https://github.com/knro/indiwebmanager.git
-    else
         cd indiwebmanager && git pull
+
+    else
+        git clone https://github.com/knro/indiwebmanager.git
     fi
 EOF
     cp /home/pi/indiwebmanager/indiwebmanager.service /etc/systemd/system
