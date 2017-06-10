@@ -35,6 +35,10 @@ disable_audio() {
     sed -i 's/dtparam=audio=on/dtparam=audio=off/g' /boot/config.txt
 }
 
+enable_ssh() {
+    touch /boot/ssh
+}
+
 setup_home() {
     bashrc_local_file="$(readlink -f home-settings/bashrc)"
     sudo -u pi bash <<EOF
@@ -46,7 +50,7 @@ EOF
 
 setup_python() {
     pip2 install -U pip setuptools
-    pip2 install flask pyindi-client requests psutil bottle 
+    pip2 install flask pyindi-client requests psutil bottle max7219
 }
 
 setup_nginx() {
@@ -114,6 +118,7 @@ read -p "$1 [Y/n] " -n 1 -e confirm
     "$@"
 }
 
+ask_step "Enable ssh on boot?" enable_ssh
 ask_step "Install dependencies?" install_prerequisites
 ask_step "Install latest INDI?" install_indi
 ask_step "Enable SPI interface?" enable_spi
