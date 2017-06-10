@@ -12,8 +12,8 @@ fi
 install_prerequisites() {
     apt-get update && apt-get install -y cdbs libcfitsio3-dev libnova-dev libusb-1.0-0-dev libjpeg-dev \
         libusb-dev libtiff5-dev libftdi-dev fxload libkrb5-dev libcurl4-gnutls-dev libraw-dev libgphoto2-dev \
-        libgsl0-dev dkms libboost-regex-dev libgps-dev libdc1394-22-dev vim curl wget nginx python3-virtualenv \
-        python3-pip ipython3 git hostapd tmux dnsmasq swig shellinabox
+        libgsl0-dev dkms libboost-regex-dev libgps-dev libdc1394-22-dev vim curl wget nginx \
+        python-pip ipython git hostapd tmux dnsmasq swig shellinabox
 }
 
 install_indi() {
@@ -45,8 +45,8 @@ EOF
 }
 
 setup_python() {
-    pip3 install -U pip setuptools
-    pip3 install flask pyindi-client requests psutil bottle 
+    pip install -U pip setuptools
+    pip install flask pyindi-client requests install psutil bottle 
 }
 
 setup_nginx() {
@@ -99,7 +99,6 @@ setup_indi_control_panel() {
 EOF
     cp /home/pi/indiwebmanager/indiwebmanager.service /etc/systemd/system
     sed -i 's|/home/pi/servermanager|/home/pi/indiwebmanager/servermanager|g' /etc/systemd/system/indiwebmanager.service
-    sed -i 's|python |python3 |g' /etc/systemd/system/indiwebmanager.service
 
     systemctl daemon-reload
     systemctl enable indiwebmanager
