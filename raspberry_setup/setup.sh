@@ -13,7 +13,7 @@ install_prerequisites() {
     apt-get update && apt-get install -y cdbs libcfitsio3-dev libnova-dev libusb-1.0-0-dev libjpeg-dev \
         libusb-dev libtiff5-dev libftdi-dev fxload libkrb5-dev libcurl4-gnutls-dev libraw-dev libgphoto2-dev \
         libgsl0-dev dkms libboost-regex-dev libgps-dev libdc1394-22-dev vim curl wget nginx \
-        python-pip ipython git hostapd tmux dnsmasq swig shellinabox
+        python-pip ipython python-dev git hostapd tmux dnsmasq swig shellinabox
 }
 
 install_indi() {
