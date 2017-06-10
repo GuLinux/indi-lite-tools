@@ -51,7 +51,7 @@ class SequenceBuilder:
         ))
 
     def add_filter_wheel_step(self, filter_name = None, filter_number = None):
-        return self.append(FilterWheelStep(self.filter_wheel, filter_name = filter_name, filter_number = filter_number))
+        return self.__append(FilterWheelStep(self.filter_wheel, filter_name = filter_name, filter_number = filter_number))
 
     def add_user_confirmation_prompt(self, message = UserInputStep.DEFAULT_PROMPT, on_input = None):
         return self.__append(UserInputStep(message, on_input))
