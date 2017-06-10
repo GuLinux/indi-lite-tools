@@ -33,7 +33,7 @@ class Device:
         self.indi_client.sendNewSwitch(c)
 
         if sync:
-            self.__wait_for_ctl_status(c, timeout)
+            self.__wait_for_ctl_status(c, timeout=timeout)
 
         return c
         
@@ -44,7 +44,7 @@ class Device:
         self.indi_client.sendNewNumber(c)
 
         if sync:
-            self.__wait_for_ctl_status(c, timeout)
+            self.__wait_for_ctl_status(c, timeout=timeout)
         return c
 
     def set_text(self, control_name, values, sync = True, timeout = 10):
@@ -54,7 +54,7 @@ class Device:
         self.indi_client.sendNewText(c)
 
         if sync:
-            self.__wait_for_ctl_status(c, timeout)
+            self.__wait_for_ctl_status(c, timeout=timeout)
 
         return c
                 
