@@ -45,8 +45,8 @@ EOF
 }
 
 setup_python() {
-    pip install -U pip setuptools
-    pip install flask pyindi-client requests install psutil bottle 
+    pip2 install -U pip setuptools
+    pip2 install flask pyindi-client requests install psutil bottle 
 }
 
 setup_nginx() {
