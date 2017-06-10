@@ -40,7 +40,7 @@ class SequenceBuilder:
         self.filter_wheel = FilterWheel(filter_wheel_name, self.indi_client)
 
     def add_sequence(self, sequence_name, exposure, count, auto_dark = True):
-        self.sequences.append(
+        return self.__append(
             Sequence(
                 self.camera,
                 sequence_name,
@@ -49,35 +49,27 @@ class SequenceBuilder:
                 upload_path=self.upload_path,
                 on_finished=[self.auto_dark_calculator.sequence_finished] if auto_dark else []
         ))
-        return self
 
     def add_filter_wheel_step(self, filter_name = None, filter_number = None):
-        self.sequences.append(FilterWheelStep(self.filter_wheel, filter_name = filter_name, filter_number = filter_number))
-        return self
+        return self.append(FilterWheelStep(self.filter_wheel, filter_name = filter_name, filter_number = filter_number))
 
     def add_user_confirmation_prompt(self, message = UserInputStep.DEFAULT_PROMPT, on_input = None):
-        self.sequences.append(UserInputStep(message, on_input))
-        return self
+        return self.__append(UserInputStep(message, on_input))
 
     def add_message_step(self, message, sleep_time = 0):
-        self.sequences.append(MessageStep(message, sleep_time))
-        return self
+        return self.__append(MessageStep(message, sleep_time))
 
     def add_shell_command(self, command, shell = False, abort_on_failure = False):
-        self.sequences.append(ShellCommandStep(command, shell, abort_on_failure))
-        return self
+        return self.__append(ShellCommandStep(command, shell, abort_on_failure))
 
     def add_auto_dark(self, name = 'Dark', count = 10):
-        self.sequences.append(AutoDarkSequence(self.camera, self.auto_dark_calculator, self.upload_path, name, count)) 
-        return self
+        return self.__append(AutoDarkSequence(self.camera, self.auto_dark_calculator, self.upload_path, name, count)) 
 
     def change_camera_settings(self, roi = None, binning = None, compression_format = None, frame_type = None, controls = None, numbers = None, switches = None):
-        self.sequences.append(CameraChangeSettingsStep(self.camera, roi, binning, compression_format, frame_type, controls, numbers, switches))
-        return self
+        return self.__append(CameraChangeSettingsStep(self.camera, roi, binning, compression_format, frame_type, controls, numbers, switches))
 
     def add_function(self, function):
-        self.sequences.append(RunFunctionStep(function))
-        return self
+        return self.__append(RunFunctionStep(function))
 
     def start(self):
         sequence_def = {
@@ -114,3 +106,8 @@ class SequenceBuilder:
 
     def __repr__(self):
         return self.__str__()
+
+    def __append(self, item):
+        self.sequences.append(item)
+        return item
+
