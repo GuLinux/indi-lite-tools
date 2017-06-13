@@ -5,6 +5,7 @@ import argparse
 
 app = Flask(__name__)
 app_config = {}
+events = []
 
 try:
     import config
@@ -41,13 +42,26 @@ def temp_humidity():
 
 @app.route('/led_text', methods=['PUT'])
 def set_led_text():
+    if not request.json:
+        return 'Bad json request', 400
     if not 'led_display' in app_config:
         return 'led display not configured', 404
+
     if 'brightness' in request.json:
         app_config['led_display'].set_brightness(int(request.json['brightness']))
     app_config['led_display'].set_text(str(request.json['text']))
     return 'Ok', 200
 
+@app.route('/events', methods=['GET'])
+def get_events():
+    return jsonify(events)
+
+@app.route('/events', methods=['PUT'])
+def add_event():
+    if not request.json:
+        return 'Bad json request', 400
+    events.append(request.json)
+    return 'event added', 200
 
 def update_datetime(timestamp):
     # very hacky workaround.. and need sudoer permissions
@@ -60,6 +74,7 @@ def update_gps(coords):
     with open('/tmp/gps_coords.json', 'w') as outfile:
         json.dump(coords, outfile)
     print(coords)
+
 
 
 
