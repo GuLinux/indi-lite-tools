@@ -2,10 +2,12 @@ from flask import Flask, render_template, jsonify, request
 import json
 import os
 import argparse
+import time
 
 app = Flask(__name__)
 app_config = {}
 events = []
+cached_objects = {}
 
 try:
     import config
@@ -38,7 +40,11 @@ def shutdown():
 def temp_humidity():
     if not 'temp_humidity' in app_config:
         return 'temp/humidity reader not configured', 404
-    return jsonify(app_config['temp_humidity'].read())
+    if 'temp_humidity' in cached_objects and time.time() - cached_objects['temp_humidity']['time'] > 2:
+        temp_humidity = app_config['temp_humidity'].read()
+        temp_humidity['time'] = time.time()
+        cached_objects['temp_humidity'] = temp_humidity
+    return jsonify(cached_objects['temp_humidity'])
 
 @app.route('/led_text', methods=['PUT'])
 def set_led_text():
@@ -54,13 +60,16 @@ def set_led_text():
 
 @app.route('/events', methods=['GET'])
 def get_events():
-    return jsonify(events)
+    start = int(request.args.get('start', 0))
+    return jsonify([e for e in events if e['index'] >= start])
 
 @app.route('/events', methods=['PUT'])
 def add_event():
     if not request.json:
         return 'Bad json request', 400
-    events.append(request.json)
+    event = request.json
+    event['index'] = len(events)
+    events.append(event)
     return 'event added', 200
 
 def update_datetime(timestamp):
