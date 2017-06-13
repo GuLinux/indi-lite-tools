@@ -2,7 +2,15 @@ from flask import Flask, render_template, jsonify, request
 import json
 import os
 import argparse
+
 app = Flask(__name__)
+app_config = {}
+
+try:
+    import config
+    config.setup(app_config)
+except:
+    pass
 
 @app.route("/")
 def index():
@@ -25,6 +33,11 @@ def shutdown():
     os.system('sudo systemctl poweroff')
     return '', 200
 
+@app.route('/temp_humidity', methods=['GET'])
+def temp_humidity():
+    if not 'temp_humidity' in app_config:
+        return 'temp/humidity reader not configured', 404
+    return jsonify(app_config['temp_humidity'].read())
 
 
 def update_datetime(timestamp):
