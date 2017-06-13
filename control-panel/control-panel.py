@@ -39,6 +39,15 @@ def temp_humidity():
         return 'temp/humidity reader not configured', 404
     return jsonify(app_config['temp_humidity'].read())
 
+@app.route('/led_text', methods=['PUT'])
+def set_led_text():
+    if not 'led_display' in app_config:
+        return 'led display not configured', 404
+    if 'brightness' in request.json:
+        app_config['led_display'].set_brightness(int(request.json['brightness']))
+    app_config['led_display'].set_text(str(request.json['text']))
+    return 'Ok', 200
+
 
 def update_datetime(timestamp):
     # very hacky workaround.. and need sudoer permissions
