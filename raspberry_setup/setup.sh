@@ -90,6 +90,16 @@ setup_shellinabox() {
     systemctl start shellinabox
 }
 
+setup_AdafruitDHT() {
+    prevdir="$PWD"
+    cd /tmp
+    git clone https://github.com/adafruit/Adafruit_Python_DHT.git
+    cd Adafruit_Python_DHT
+    sudo python setup.py install
+    cd "$prevdir"
+    rm -rf /tmp/Adafruit_Python_DHT
+}
+
 setup_indi_control_panel() {
 
     sudo -u pi bash <<EOF
@@ -127,6 +137,7 @@ ask_step "Setup home directory layout/bashrc?" setup_home
 ask_step "Setup nginx?" setup_nginx
 ask_step "Setup wifi access point?" setup_wifi_ap
 ask_step "Setup python modules?" setup_python
+ask_step "Setup Adafruit DHT modules?" setup_AdafruitDHT
 ask_step "Setup Raspberry control panel?" setup_control_panel
 ask_step "Setup Shellinabox?" setup_shellinabox
 ask_step "Setup INDI Control Panel?" setup_indi_control_panel
