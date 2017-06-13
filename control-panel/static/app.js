@@ -17,16 +17,9 @@ var setUpdateDateTime = function(update) {
     localStorage.setItem("update_datetime", update ? "true" : "false");
 }
 
-var updateDateTime = function() {
-    if("update_datetime" in localStorage) {
-        return localStorage.update_datetime == "true";
-    }
-    return true;
-}
-
 var sendCoordinates = function(position) {
     send_json({
-        "update_datetime": updateDateTime(),
+        "update_datetime": true,
         "timestamp": position.timestamp / 1000.,
         "coords": {
             "accuracy": position.coords.accuracy,
@@ -58,4 +51,20 @@ var shutdown = function() {
     });
 }
 
-$('#update_datetime').prop('checked', updateDateTime());
+var fetchTemp = function() {
+    jQuery.ajax('/temp_humidity', {
+        method: 'GET',
+        success: function(e) {
+            $('#temp_humidity').show();
+            $('#temperature_value').text(e.temperature.toFixed(2));
+            $('#humidity_value').text(e.humidity.toFixed(2));
+        },
+        error: function(e) {
+            if(e.status == 404) {
+                window.clearInterval(temp_timer);
+            }
+        }
+    });
+}
+
+var temp_timer = window.setInterval(fetchTemp, 2000);
