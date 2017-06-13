@@ -1,7 +1,8 @@
 # Temp/Humidity sensor, comment if you don't have it
-from adafruit_temp_humidity import AdafruitTempHumidity
+from adafruit_temp_humidity import AdafruitTempHumidity, Adafruit_DHT
+
 
 def setup(config):
     # Comment the config entries you don't have/need
-    config['temp_humidity'] = AdafruitTempHumidity('2302', '4')
+    config['temp_humidity'] = AdafruitTempHumidity(Adafruit_DHT.AM2302, '4')
 

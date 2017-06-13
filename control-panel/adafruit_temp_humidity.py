@@ -1,4 +1,5 @@
 import Adafruit_DHT
+import time
 
 # constructor argument as per https://github.com/adafruit/Adafruit_Python_DHT/blob/master/examples/AdafruitDHT.py
 class AdafruitTempHumidity:
@@ -8,4 +9,4 @@ class AdafruitTempHumidity:
 
     def read(self):
         humidity, temperature = Adafruit_DHT.read_retry(self.sensor, self.pin)
-        return { 'humidity': humidity, 'temperature': temperature }
+        return { 'humidity': humidity, 'temperature': temperature, 'time': time.time() }
