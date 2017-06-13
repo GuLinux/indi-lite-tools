@@ -40,7 +40,7 @@ def shutdown():
 def temp_humidity():
     if not 'temp_humidity' in app_config:
         return 'temp/humidity reader not configured', 404
-    if 'temp_humidity' in cached_objects and time.time() - cached_objects['temp_humidity']['time'] > 2:
+    if 'temp_humidity' not in cached_objects or time.time() - cached_objects['temp_humidity']['time'] > 2:
         temp_humidity = app_config['temp_humidity'].read()
         temp_humidity['time'] = time.time()
         cached_objects['temp_humidity'] = temp_humidity
