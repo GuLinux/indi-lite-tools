@@ -4,6 +4,7 @@ import inspect
 from pyindi_sequence import SequenceBuilder, ShellCommandStep
 import requests
 import functools
+import json
 #import urllib3
 
 #urllib3.disable_warnings()
@@ -38,13 +39,21 @@ def add_prompt_step(message, led_text = 'USER'):
     sb.add_user_confirmation_prompt(message)
     sb.add_function(functools.partial(set_led_text, ''))
 
+def __save_coordinates():
+    c = requests.get('http://localhost:5100/coordinates')
+    if c.status_code == 200:
+      with open(os.path.join(sb.upload_path, 'coordinates.json'), 'w') as j:
+        json.dump(c.json(), j)
+
 def start_sequence():
     #sb.add_shell_command('gzip -1 {0}/*.fits'.format(sb.upload_path), shell=True)
     sb.add_shell_command('sync', shell=True)
 
     add_prompt_step('Finished. Press Enter to quit')
     try:
+        __save_coordinates()
         sb.start()
+        __save_coordinates()
     except:
         set_led_text('ERROR')
         send_event('Error', str(sys.exc_info()[1]))
