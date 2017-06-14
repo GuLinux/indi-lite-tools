@@ -61,10 +61,38 @@ var fetchTemp = function() {
         },
         error: function(e) {
             if(e.status == 404) {
-                window.clearInterval(temp_timer);
+                window.clearInterval(tempTimer);
             }
         }
     });
 }
 
-var temp_timer = window.setInterval(fetchTemp, 2000);
+var appendEvent = function(event) {
+    lastEventIndex = event.index
+    console.log(event);
+    $('#events_placeholder').after('<tr><td><small>' +
+        event.index + 
+        '</small></td><td><small>' +
+        new Date(event.time * 1000).toLocaleString() +
+        '</small></td><td><small>' +
+        event.type +
+        '</small></td><td><small>' +
+        event.text +
+        '</small></td></tr>');
+}
+
+appendEvents = function(events) {
+    events.sort(function(a, b) { return a.index - b.index });
+    events.forEach(appendEvent);
+}
+
+fetchEvents = function() {
+    jQuery.ajax('/events?start=' + (lastEventIndex+1), {
+        method: 'GET',
+        success: appendEvents
+    });
+}
+
+var eventsTimer = window.setInterval(fetchEvents, 500);
+var tempTimer = window.setInterval(fetchTemp, 2000);
+var lastEventIndex = -1;

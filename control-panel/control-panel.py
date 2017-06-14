@@ -75,6 +75,7 @@ def add_event():
         return 'Bad json request', 400
     event = request.json
     event['index'] = len(events)
+    event['time'] = time.time()
     events.append(event)
     return 'event added', 200
 
