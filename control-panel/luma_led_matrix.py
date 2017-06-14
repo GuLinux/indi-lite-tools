@@ -10,7 +10,9 @@
 # seg = sevensegment(device)
 # led = LumaLedMatrix(seg)
 
-class LumaLedMatrix:
+from led_display import LedDisplay
+
+class LumaLedMatrix(LedDisplay):
     def __init__(self, led):
         self.led = led
 

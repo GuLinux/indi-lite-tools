@@ -10,6 +10,7 @@ app_config = {}
 events = []
 cached_objects = {}
 temp_humidity_saver = { 'saving': False }
+
 try:
     import config
     config.setup(app_config)
@@ -83,6 +84,23 @@ def set_led_text():
         app_config['led_display'].set_brightness(int(request.json['brightness']))
     app_config['led_display'].set_text(str(request.json['text']))
     return 'Ok', 200
+
+@app.route('/led/text/<key>', methods=['PUT'])
+def add_led_text(key):
+    if not request.json:
+        return 'Bad json request', 400
+    if not 'led_display' in app_config:
+        return 'led display not configured', 404
+
+    led_messages[key] = request.json
+    return 'Message added', 200
+
+
+@app.route('/led/text/<key>', methods=['DELETE'])
+def remove_led_text(key):
+    led_messages.pop(key)
+    return 'Message removed', 200
+
 
 @app.route('/events', methods=['GET'])
 def get_events():
