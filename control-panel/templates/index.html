@@ -31,7 +31,7 @@
       left: 0px;  
     }
     
-    #temp_humidity {
+    #temp_humidity, #save_temp_humidity_btn, #stop_save_temp_humidity_btn {
       display: none;
     }
     
@@ -65,6 +65,8 @@
         <div class="alert alert-info" role="alert" id="temp_humidity">
           <strong>Temperature: </strong><span id="temperature_value"></span> &#8451;
           <strong>Humidity: </strong><span id="humidity_value"></span> %
+          <button id="save_temp_humidity_btn" class="btn btn-primary btn-sm" onclick="saveTempHumidity()">Record to CSV</button>
+          <button id="stop_save_temp_humidity_btn" class="btn btn-warning btn-sm" onclick="stopSaveTempHumidity()">Stop Recording to CSV</button>
         </div>
         <table class="table table-condensed table-responsive">
             <thead>

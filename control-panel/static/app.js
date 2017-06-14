@@ -58,6 +58,13 @@ var fetchTemp = function() {
             $('#temp_humidity').show();
             $('#temperature_value').text(e.temperature.toFixed(2));
             $('#humidity_value').text(e.humidity.toFixed(2));
+            if(e.saving) {
+                $('#save_temp_humidity_btn').hide();
+                $('#stop_save_temp_humidity_btn').show();
+            } else {
+                $('#save_temp_humidity_btn').show();
+                $('#stop_save_temp_humidity_btn').hide();
+            }
         },
         error: function(e) {
             if(e.status == 404) {
@@ -98,6 +105,21 @@ fetchEvents = function() {
         success: appendEvents
     });
 }
+
+saveTempHumidity = function() {
+    $('#save_temp_humidity_btn').hide();
+    jQuery.ajax('/save_temp_humidity', {
+        method: 'PUT',
+    });
+}
+
+stopSaveTempHumidity = function() {
+    $('#stop_save_temp_humidity_btn').hide();
+    jQuery.ajax('/save_temp_humidity', {
+        method: 'DELETE',
+    });
+}
+
 
 var eventsTimer = window.setInterval(fetchEvents, 1000);
 var tempTimer = window.setInterval(fetchTemp, 2000);
