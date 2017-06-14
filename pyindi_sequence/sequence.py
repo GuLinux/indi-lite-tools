@@ -48,7 +48,7 @@ class Sequence:
         return self.finished * self.exposure
 
     def remaining_seconds(self):
-        return self.remaining_shots * self.exposure
+        return self.remaining_shots() * self.exposure
     
     def remaining_shots(self):
         return self.count - self.finished
