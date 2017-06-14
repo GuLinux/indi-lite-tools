@@ -35,7 +35,7 @@ def set_coordinates():
 def get_coordinates():
     if 'gps' not in cached_objects:
         return 'No coordinates set', 404
-    return cached_objects['gps']
+    return jsonify(cached_objects['gps'])
 
 @app.route('/shutdown', methods=['POST'])
 def shutdown():
