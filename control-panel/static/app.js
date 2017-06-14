@@ -68,18 +68,23 @@ var fetchTemp = function() {
 }
 
 var appendEvent = function(event) {
-    if(! lastEventIndex < event.index)
-        return; // TODO: allow to modify existing events, instead?  
-    lastEventIndex = event.index
-    $('#events_placeholder').after('<tr><td><small>' +
-        event.index + 
-        '</small></td><td><small>' +
-        new Date(event.time * 1000).toLocaleString() +
-        '</small></td><td><small>' +
-        event.type +
-        '</small></td><td><small>' +
-        event.text +
-        '</small></td></tr>');
+    if(lastEventIndex < event.index)
+        lastEventIndex = event.index
+        html_event_id = 'event_id_' + event.index
+    event_html = '<tr id="' + html_event_id + '"><td><small>' +
+    event.index + 
+    '</small></td><td><small>' +
+    new Date(event.time * 1000).toLocaleString() +
+    '</small></td><td><small>' +
+    event.type +
+    '</small></td><td><small>' +
+    event.text +
+    '</small></td></tr>';
+    if( $('#' + html_event_id).length > 0) {
+      $('#' + html_event_id).replaceWith(event_html);
+    } else {
+      $('#events_placeholder').after(event_html);
+    }
 }
 
 appendEvents = function(events) {
