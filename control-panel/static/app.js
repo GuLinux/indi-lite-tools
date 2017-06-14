@@ -68,8 +68,9 @@ var fetchTemp = function() {
 }
 
 var appendEvent = function(event) {
+    if(! lastEventIndex < event.index)
+        return; // TODO: allow to modify existing events, instead?  
     lastEventIndex = event.index
-    console.log(event);
     $('#events_placeholder').after('<tr><td><small>' +
         event.index + 
         '</small></td><td><small>' +
@@ -93,6 +94,6 @@ fetchEvents = function() {
     });
 }
 
-var eventsTimer = window.setInterval(fetchEvents, 500);
+var eventsTimer = window.setInterval(fetchEvents, 1000);
 var tempTimer = window.setInterval(fetchTemp, 2000);
 var lastEventIndex = -1;
