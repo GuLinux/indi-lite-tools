@@ -31,7 +31,7 @@ def set_coordinates():
     update_gps(data['coords'])
     return '', 200
 
-@app.route('coordinates', methods=['GET'])
+@app.route('/coordinates', methods=['GET'])
 def get_coordinates():
     if 'gps' not in cached_objects:
         return 'No coordinates set', 404
