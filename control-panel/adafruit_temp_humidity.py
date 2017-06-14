@@ -9,3 +9,4 @@ class AdafruitTempHumidity:
     def read(self):
         humidity, temperature = Adafruit_DHT.read_retry(self.sensor, self.pin)
         return { 'humidity': humidity, 'temperature': temperature }
+

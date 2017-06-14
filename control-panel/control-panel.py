@@ -3,12 +3,13 @@ import json
 import os
 import argparse
 import time
+import threading
 
 app = Flask(__name__)
 app_config = {}
 events = []
 cached_objects = {}
-
+temp_humidity_saver = { 'saving': False }
 try:
     import config
     config.setup(app_config)
@@ -46,11 +47,30 @@ def shutdown():
 def temp_humidity():
     if not 'temp_humidity' in app_config:
         return 'temp/humidity reader not configured', 404
-    if 'temp_humidity' not in cached_objects or time.time() - cached_objects['temp_humidity']['time'] > 2:
-        temp_humidity = app_config['temp_humidity'].read()
-        temp_humidity['time'] = time.time()
-        cached_objects['temp_humidity'] = temp_humidity
-    return jsonify(cached_objects['temp_humidity'])
+    temp_humidity_values = __cache_temp_humidity().copy()
+    temp_humidity_values['saving'] = temp_humidity_saver['saving']
+    return jsonify(temp_humidity_values)
+
+@app.route('/save_temp_humidity', methods=['PUT'])
+def save_temp_humidity():
+    if not 'temp_humidity' in app_config:
+        return 'temp/humidity reader not configured', 404
+    if temp_humidity_saver['saving']:
+        return 'save_temp_humidity already active', 400
+    temp_humidity_saver['saving'] = True
+    temp_humidity_saver['thread'] = threading.Thread(target=__temp_humidity_saver_thread)
+    temp_humidity_saver['thread'].start()
+    return 'Thread created', 201
+
+@app.route('/save_temp_humidity', methods=['DELETE'])
+def stop_save_temp_humidity():
+    if not 'temp_humidity' in app_config:
+        return 'temp/humidity reader not configured', 404
+    if not temp_humidity_saver['saving']:
+        return 'save_temp_humidity already stopped', 400
+    temp_humidity_saver['saving'] = False
+    # temp_humidity_saver['thread'].join()
+    return 'Thread removed', 200
 
 @app.route('/led_text', methods=['PUT'])
 def set_led_text():
@@ -92,7 +112,25 @@ def update_gps(coords):
     print(coords)
 
 
+def __cache_temp_humidity():
+    if 'temp_humidity' not in cached_objects or time.time() - cached_objects['temp_humidity']['time'] > 2:
+        temp_humidity = app_config['temp_humidity'].read()
+        temp_humidity['time'] = time.time()
+        cached_objects['temp_humidity'] = temp_humidity
+    return cached_objects['temp_humidity']
 
+
+def __temp_humidity_saver_thread():
+    outfile = app_config['temp_humidity_save_file']
+    interval = app_config['temp_humidity_save_interval']
+    if not os.path.isfile(outfile):
+        with open(outfile, 'a') as f:
+            f.write('time, temperature, humidity\n')
+    while temp_humidity_saver['saving']:
+        temp = __cache_temp_humidity()
+        with open(outfile, 'a') as f:
+            f.write('{}, {}, {}\n'.format(temp['time'], temp['temperature'], temp['humidity']))
+        time.sleep(interval)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()

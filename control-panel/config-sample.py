@@ -11,6 +11,8 @@ from luma_led_matrix import LumaLedMatrix
 def setup(config):
     # Comment the config entries you don't have/need
     config['temp_humidity'] = AdafruitTempHumidity(Adafruit_DHT.AM2302, '4')
+    config['temp_humidity_save_file'] = '/home/pi/temp_humidity.csv'
+    config['temp_humidity_save_interval'] = 30
 
     serial = spi(port=0, device=0, gpio=noop())
     device = max7219(serial)
