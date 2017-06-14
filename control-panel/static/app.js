@@ -28,7 +28,7 @@ var sendCoordinates = function(position) {
             "latitude": position.coords.latitude,
             "longitude": position.coords.longitude,
         }
-    }, '/set_coordinates', 'PUT');
+    }, '/coordinates', 'PUT');
 }
 
 

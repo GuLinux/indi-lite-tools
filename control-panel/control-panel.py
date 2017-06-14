@@ -20,16 +20,22 @@ def index():
     print(request)
     return render_template('index.html')
 
-@app.route("/set_coordinates", methods=["PUT"])
+@app.route("/coordinates", methods=["PUT"])
 def set_coordinates():
     data = request.get_json()
     if not data:
         return '', 400
     if data['update_datetime']:
         update_datetime(data['timestamp'])
+    cached_objects['gps'] = data['coords']
     update_gps(data['coords'])
     return '', 200
 
+@app.route('coordinates', methods=['GET'])
+def get_coordinates():
+    if 'gps' not in cached_objects:
+        return 'No coordinates set', 404
+    return cached_objects['gps']
 
 @app.route('/shutdown', methods=['POST'])
 def shutdown():
