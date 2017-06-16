@@ -31,7 +31,10 @@ sb.set_filter_wheel('EFW')
 
 
 def set_led_text(text):
-    requests.put('http://localhost:5100/led/text/sequence', json={'text': text, 'duration': 2})
+    if text:
+        requests.put('http://localhost:5100/led/text/sequence', json={'text': text, 'duration': 2})
+    else:
+        requests.delete('http://localhost:5100/led/text/sequence')
 
 def send_event(event_type, event_text):
   requests.put('http://localhost:5100/events', json={'type': event_type, 'text': event_text})
@@ -40,7 +43,7 @@ def add_prompt_step(message, led_text = 'USER'):
     sb.add_function(functools.partial(set_led_text, led_text))
     sb.add_function(functools.partial(send_event, 'User confirmation', message))
     sb.add_user_confirmation_prompt(message)
-    sb.add_function(functools.partial(set_led_text, ''))
+    sb.add_function(functools.partial(set_led_text, None))
 
 def __save_coordinates():
     c = requests.get('http://localhost:5100/coordinates')

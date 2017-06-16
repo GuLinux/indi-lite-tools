@@ -81,7 +81,7 @@ def set_led_brightness():
         return 'led display not configured', 404
 
     if 'brightness' in request.json:
-        app_config['led_display'].set_brightness(int(request.json['brightness']))
+        app_config['led_display'].driver.set_brightness(int(request.json['brightness']))
     return 'Ok', 200
 
 @app.route('/led/text/<key>', methods=['PUT'])
