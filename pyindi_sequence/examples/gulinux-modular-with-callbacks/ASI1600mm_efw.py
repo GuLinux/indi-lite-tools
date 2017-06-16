@@ -69,7 +69,6 @@ def __on_sequence_starting(sequence):
 
 def __on_sequence_ended(sequence):
   send_event('Sequence finished', str(sequence))
-  set_led_text('')
 
 def __on_sequence_item_starting(sequence, item):
   send_event('Shoot', 'Shoot started {}/{}, exposure: {}s, remaining: {}, {}s'
@@ -78,7 +77,6 @@ def __on_sequence_item_starting(sequence, item):
 def __on_sequence_item_ended(sequence, item):
   send_event('Shoot', 'Shoot finished {}/{}, exposure: {}s, remaining: {}, {}s'
              .format(item+1, sequence.count, sequence.exposure, sequence.remaining_shots(), sequence.remaining_seconds()))
-  set_led_text('')
 
 
   code = 'u'
