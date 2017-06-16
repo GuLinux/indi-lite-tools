@@ -73,8 +73,8 @@ def stop_save_temp_humidity():
     # temp_humidity_saver['thread'].join()
     return 'Thread removed', 200
 
-@app.route('/led_text', methods=['PUT'])
-def set_led_text():
+@app.route('/led_brightness', methods=['PUT'])
+def set_led_brightness():
     if not request.json:
         return 'Bad json request', 400
     if not 'led_display' in app_config:
@@ -82,23 +82,24 @@ def set_led_text():
 
     if 'brightness' in request.json:
         app_config['led_display'].set_brightness(int(request.json['brightness']))
-    app_config['led_display'].set_text(str(request.json['text']))
     return 'Ok', 200
 
 @app.route('/led/text/<key>', methods=['PUT'])
 def add_led_text(key):
+    print(app_config)
     if not request.json:
         return 'Bad json request', 400
     if not 'led_display' in app_config:
         return 'led display not configured', 404
-
-    led_messages[key] = request.json
+    app_config['led_display'].add_message(key, request.json)
     return 'Message added', 200
 
 
 @app.route('/led/text/<key>', methods=['DELETE'])
 def remove_led_text(key):
-    led_messages.pop(key)
+    if not 'led_display' in app_config:
+        return 'led display not configured', 404
+    app_config['led_display'].remove_message(key)
     return 'Message removed', 200
 
 

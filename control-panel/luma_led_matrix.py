@@ -14,6 +14,7 @@ from led_display import LedDisplay
 
 class LumaLedMatrix(LedDisplay):
     def __init__(self, led):
+        LedDisplay.__init__(self)
         self.led = led
 
     def set_text(self, text):

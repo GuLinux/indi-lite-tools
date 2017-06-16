@@ -24,14 +24,17 @@ SESSION_NAME=os.path.splitext(os.path.basename(_module.__file__))[0].replace(' '
 
 print('Session name: {}'.format(SESSION_NAME))
 
+requests.put('http://localhost:5100/led_brightness', json={'brightness': 0})
+
 sb = SequenceBuilder(SESSION_NAME, camera_name='ZWO CCD ASI1600MM')
 sb.set_filter_wheel('EFW')
 
+
 def set_led_text(text):
-  requests.put('http://localhost:5100/led_text', json={'text': text, 'brightness': 0}, verify=False)
+    requests.put('http://localhost:5100/led/text/sequence', json={'text': text, 'duration': 2})
 
 def send_event(event_type, event_text):
-  requests.put('http://localhost:5100/events', json={'type': event_type, 'text': event_text}, verify=False)
+  requests.put('http://localhost:5100/events', json={'type': event_type, 'text': event_text})
 
 def add_prompt_step(message, led_text = 'USER'):
     sb.add_function(functools.partial(set_led_text, led_text))
