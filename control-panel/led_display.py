@@ -31,6 +31,5 @@ class LedDisplay:
         print('__EXITING THREAD')
 
     def __del__(self):
-        print('**** DEL()')
         self.__thread_running = False
         self.messaging_thread.join()
