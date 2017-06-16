@@ -23,12 +23,10 @@ class LedDisplay:
                 self.driver.set_text('')
                 time.sleep(0.5)
             else:
-                print('{}: {}'.format(self.__last_index, self.messages))
                 self.__last_index = self.__last_index + 1 if self.__last_index < len(self.messages)-1 else 0
                 message = [self.messages[m] for m in self.messages][self.__last_index]
                 self.driver.set_text(message['text'])
                 time.sleep(message['duration'] if 'duration' in message else 2)
-        print('__EXITING THREAD')
 
     def __del__(self):
         self.__thread_running = False

@@ -19,7 +19,6 @@ except:
 
 @app.route("/")
 def index():
-    print(request)
     return render_template('index.html')
 
 @app.route("/coordinates", methods=["PUT"])
@@ -86,7 +85,6 @@ def set_led_brightness():
 
 @app.route('/led/text/<key>', methods=['PUT'])
 def add_led_text(key):
-    print(app_config)
     if not request.json:
         return 'Bad json request', 400
     if not 'led_display' in app_config:
@@ -121,14 +119,12 @@ def add_event():
 def update_datetime(timestamp):
     # very hacky workaround.. and need sudoer permissions
     date_cmd = 'sudo date -s "@{0}"'.format(timestamp)
-    print(date_cmd)
     os.system(date_cmd)
 
 def update_gps(coords):
     # TODO read file path from config?
     with open('/tmp/gps_coords.json', 'w') as outfile:
         json.dump(coords, outfile)
-    print(coords)
 
 
 def __cache_temp_humidity():
