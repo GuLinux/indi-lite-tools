@@ -4,6 +4,8 @@ import os
 import argparse
 import time
 import threading
+from functools import wraps
+
 
 app = Flask(__name__)
 app_config = {}
@@ -17,15 +19,35 @@ try:
 except:
     pass
 
+
+def with_config(config_name):
+    def with_config_decorator(func):
+        @wraps(func)
+        def func_wrapper(*args, **kwargs):
+            if config_name not in app_config:
+                return '{} not configured'.format(config_name), 404
+            return func(*args, **kwargs)
+        return func_wrapper
+    return with_config_decorator
+
+
+def with_json_request(func):
+    @wraps(func)
+    def dec():
+        if not request.json:
+            return 'Bad json request', 400
+        return func()
+    return dec
+
+
 @app.route("/")
 def index():
     return render_template('index.html')
 
 @app.route("/coordinates", methods=["PUT"])
+@with_json_request
 def set_coordinates():
-    data = request.get_json()
-    if not data:
-        return '', 400
+    data = request.json
     if data['update_datetime']:
         update_datetime(data['timestamp'])
     cached_objects['gps'] = data['coords']
@@ -43,18 +65,17 @@ def shutdown():
     os.system('sudo systemctl poweroff')
     return '', 200
 
+
 @app.route('/temp_humidity', methods=['GET'])
+@with_config('temp_humidity')
 def temp_humidity():
-    if not 'temp_humidity' in app_config:
-        return 'temp/humidity reader not configured', 404
     temp_humidity_values = __cache_temp_humidity().copy()
     temp_humidity_values['saving'] = temp_humidity_saver['saving']
     return jsonify(temp_humidity_values)
 
 @app.route('/save_temp_humidity', methods=['PUT'])
+@with_config('temp_humidity')
 def save_temp_humidity():
-    if not 'temp_humidity' in app_config:
-        return 'temp/humidity reader not configured', 404
     if temp_humidity_saver['saving']:
         return 'save_temp_humidity already active', 400
     temp_humidity_saver['saving'] = True
@@ -63,43 +84,40 @@ def save_temp_humidity():
     return 'Thread created', 201
 
 @app.route('/save_temp_humidity', methods=['DELETE'])
+@with_config('temp_humidity')
 def stop_save_temp_humidity():
-    if not 'temp_humidity' in app_config:
-        return 'temp/humidity reader not configured', 404
     if not temp_humidity_saver['saving']:
         return 'save_temp_humidity already stopped', 400
     temp_humidity_saver['saving'] = False
     # temp_humidity_saver['thread'].join()
     return 'Thread removed', 200
 
-@app.route('/led_brightness', methods=['PUT'])
-def set_led_brightness():
-    if not request.json:
-        return 'Bad json request', 400
-    if not 'led_display' in app_config:
-        return 'led display not configured', 404
-
-    if 'brightness' in request.json:
-        app_config['led_display'].driver.set_brightness(int(request.json['brightness']))
-    return 'Ok', 200
-
-@app.route('/led/text/<key>', methods=['PUT'])
-def add_led_text(key):
-    if not request.json:
-        return 'Bad json request', 400
-    if not 'led_display' in app_config:
-        return 'led display not configured', 404
-    app_config['led_display'].add_message(key, request.json)
+@app.route('/led', methods=['PUT'])
+@with_config('led_display')
+@with_json_request
+def replace_led_text():
+    app_config['led_display'].set_message(request.json)
     return 'Message added', 200
 
-
-@app.route('/led/text/<key>', methods=['DELETE'])
-def remove_led_text(key):
-    if not 'led_display' in app_config:
-        return 'led display not configured', 404
-    app_config['led_display'].remove_message(key)
+@app.route('/led', methods=['DELETE'])
+@with_config('led_display')
+def remove_led_text():
+    app_config['led_display'].remove_message()
     return 'Message removed', 200
 
+@app.route('/led', methods=['GET'])
+@with_config('led_display')
+def get_led_text():
+    return jsonify({ 'text': app_config['led_display'].get_message() } )
+
+@app.route('/led', methods=['POST'])
+@with_config('led_display')
+@with_json_request
+def set_led_text():
+    if app_config['led_display'].get_message():
+        return 'Message already present', 409
+    app_config['led_display'].set_message(request.json)
+    return 'Message added', 200
 
 @app.route('/events', methods=['GET'])
 def get_events():
@@ -107,9 +125,8 @@ def get_events():
     return jsonify([e for e in events if e['index'] >= start])
 
 @app.route('/events', methods=['PUT'])
+@with_json_request
 def add_event():
-    if not request.json:
-        return 'Bad json request', 400
     event = request.json
     event['index'] = len(events)
     event['time'] = time.time()

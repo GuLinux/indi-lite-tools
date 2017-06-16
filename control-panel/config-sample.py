@@ -7,7 +7,6 @@ from luma.core.render import canvas
 from luma.core.virtual import sevensegment
 from luma.led_matrix.device import max7219
 from luma_led_matrix import LumaLedMatrix
-from led_display import LedDisplay
 
 
 def setup(config):
@@ -19,6 +18,6 @@ def setup(config):
     serial = spi(port=0, device=0, gpio=noop())
     device = max7219(serial)
     seg = sevensegment(device)
-    config['led_display'] = LedDisplay(LumaLedMatrix(seg))
+    config['led_display'] = LumaLedMatrix(seg)
 
 

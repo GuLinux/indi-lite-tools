@@ -14,8 +14,17 @@ class LumaLedMatrix():
     def __init__(self, led):
         self.led = led
 
-    def set_text(self, text):
-        self.led.text = str(text)
+    def set_message(self, message):
+        self.led.text = str(message['text'])
+        if 'brightness' in message:
+            self.set_brightness(message['brightness'])
+
+    def remove_message(self):
+        self.led.text = ''
+
+    def get_message(self):
+        return self.led.text
+
 
     def set_brightness(self, brightness):
         self.led.device.contrast(brightness * 16)
