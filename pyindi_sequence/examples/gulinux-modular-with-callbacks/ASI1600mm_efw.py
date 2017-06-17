@@ -30,7 +30,7 @@ sb.set_filter_wheel('EFW')
 
 def set_led_text(text):
     if text:
-        requests.put('http://localhost:5100/led', json={'text': text, 'brightness': 0})
+        requests.put('http://localhost:5100/led', json={'text': text, 'brightness': 0, 'id': 'sequence'})
     else:
         requests.delete('http://localhost:5100/led')
 

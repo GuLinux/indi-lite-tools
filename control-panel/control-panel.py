@@ -26,17 +26,17 @@ def with_config(config_name):
         def func_wrapper(*args, **kwargs):
             if config_name not in app_config:
                 return '{} not configured'.format(config_name), 404
-            return func(*args, **kwargs)
+            return func(app_config[config_name], *args, **kwargs)
         return func_wrapper
     return with_config_decorator
 
 
 def with_json_request(func):
     @wraps(func)
-    def dec():
+    def dec(*args, **kwargs):
         if not request.json:
             return 'Bad json request', 400
-        return func()
+        return func(*args, **kwargs)
     return dec
 
 
@@ -68,14 +68,14 @@ def shutdown():
 
 @app.route('/temp_humidity', methods=['GET'])
 @with_config('temp_humidity')
-def temp_humidity():
+def temp_humidity(_):
     temp_humidity_values = __cache_temp_humidity().copy()
     temp_humidity_values['saving'] = temp_humidity_saver['saving']
     return jsonify(temp_humidity_values)
 
 @app.route('/save_temp_humidity', methods=['PUT'])
 @with_config('temp_humidity')
-def save_temp_humidity():
+def save_temp_humidity(_):
     if temp_humidity_saver['saving']:
         return 'save_temp_humidity already active', 400
     temp_humidity_saver['saving'] = True
@@ -85,7 +85,7 @@ def save_temp_humidity():
 
 @app.route('/save_temp_humidity', methods=['DELETE'])
 @with_config('temp_humidity')
-def stop_save_temp_humidity():
+def stop_save_temp_humidity(_):
     if not temp_humidity_saver['saving']:
         return 'save_temp_humidity already stopped', 400
     temp_humidity_saver['saving'] = False
@@ -95,29 +95,24 @@ def stop_save_temp_humidity():
 @app.route('/led', methods=['PUT'])
 @with_config('led_display')
 @with_json_request
-def replace_led_text():
-    app_config['led_display'].set_message(request.json)
+def replace_led_text(led_display):
+    data = {'id': 'default', 'overwrite': True}
+    data.update(request.json)
+    if not data['overwrite'] and led_display.get_message() and data['id'] != led_display.get_message()['id']:
+        return 'led message already present', 409
+    led_display.set_message(data)
     return 'Message added', 200
 
 @app.route('/led', methods=['DELETE'])
 @with_config('led_display')
-def remove_led_text():
-    app_config['led_display'].remove_message()
+def remove_led_text(led_display):
+    led_display.remove_message()
     return 'Message removed', 200
 
 @app.route('/led', methods=['GET'])
 @with_config('led_display')
-def get_led_text():
-    return jsonify({ 'text': app_config['led_display'].get_message() } )
-
-@app.route('/led', methods=['POST'])
-@with_config('led_display')
-@with_json_request
-def set_led_text():
-    if app_config['led_display'].get_message():
-        return 'Message already present', 409
-    app_config['led_display'].set_message(request.json)
-    return 'Message added', 200
+def get_led_text(led_display):
+    return jsonify({ 'text': led_display.get_message() } )
 
 @app.route('/events', methods=['GET'])
 def get_events():
