@@ -53,7 +53,7 @@ def start_sequence():
     #sb.add_shell_command('gzip -1 {0}/*.fits'.format(sb.upload_path), shell=True)
     sb.add_shell_command('sync', shell=True)
 
-    add_prompt_step('Finished. Press Enter to quit')
+    add_prompt_step('Finished. Press Enter to quit', 'finished')
     try:
         __save_coordinates()
         sb.start()
@@ -70,15 +70,7 @@ def __on_sequence_starting(sequence):
 def __on_sequence_ended(sequence):
   send_event('Sequence finished', str(sequence))
 
-def __on_sequence_item_starting(sequence, item):
-  send_event('Shoot', 'Shoot started {}/{}, exposure: {}s, remaining: {}, {}s'
-             .format(item+1, sequence.count, sequence.exposure, sequence.remaining_shots(), sequence.remaining_seconds()))
-
-def __on_sequence_item_ended(sequence, item):
-  send_event('Shoot', 'Shoot finished {}/{}, exposure: {}s, remaining: {}, {}s'
-             .format(item+1, sequence.count, sequence.exposure, sequence.remaining_shots(), sequence.remaining_seconds()))
-
-
+def __send_sequence_item_led(sequence, item):
   code = 'u'
   filter_codes = { 'light': 'L' ,'luminance': 'L', 'red': 'r', 'green': 'G', 'blue': 'b', 'dark': 'd', 'bias': 'o', 'offset': 'o'}
   for pattern in filter_codes:
@@ -88,9 +80,21 @@ def __on_sequence_item_ended(sequence, item):
   remaining_seconds = remaining_seconds[0:5] if '.' in remaining_seconds else remaining_seconds[0:4]
   set_led_text('{}.{}.{}'.format(code, str(sequence.remaining_shots()).zfill(3), remaining_seconds.zfill(4)))
 
+def __on_sequence_item_starting(sequence, item):
+  send_event('Shoot', 'Shoot started {}/{}, exposure: {}s, remaining: {}, {}s'
+             .format(item+1, sequence.count, sequence.exposure, sequence.remaining_shots(), sequence.remaining_seconds()))
+  __send_sequence_item_led(sequence, item)
+
+def __on_sequence_item_ended(sequence, item):
+  send_event('Shoot', 'Shoot finished {}/{}, exposure: {}s, remaining: {}, {}s'
+             .format(item+1, sequence.count, sequence.exposure, sequence.remaining_shots(), sequence.remaining_seconds()))
+  __send_sequence_item_led(sequence, item)
+
 def add_sequence(*args, **kwargs):
     seq = sb.add_sequence(*args, **kwargs)
     seq.callbacks.add('on_started', __on_sequence_starting)
     seq.callbacks.add('on_each_started', __on_sequence_item_starting)
     seq.callbacks.add('on_each_finished', __on_sequence_item_ended)
     seq.callbacks.add('on_finished', __on_sequence_ended)
+
+
