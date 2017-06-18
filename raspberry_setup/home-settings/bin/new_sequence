@@ -1,0 +1,13 @@
+#!/bin/bash
+cd ~/Shots
+if [[ -z "$1" ]]; then
+	echo "Usage: $0 sequence_name" >&2
+	exit 1
+fi
+seq_name="$( tr ' ' '_' <<<"$@" | tr '.' '_' | tr '-' '_' )"
+echo "#!$( which python)" > "${seq_name}.py"
+cat sequence_template.py >> "${seq_name}.py"
+chmod a+x "${seq_name}.py"
+
+vim ${seq_name}.py
+
