@@ -69,7 +69,7 @@ def start_sequence():
     add_prompt_step('Finished. Press Enter to quit', 'finished')
     try:
         __save_coordinates()
-        __write_temperature_file('timestamp, datetime temperature, sequence, shot_number', mode='w')
+        __write_temperature_file('timestamp, datetime, temperature, sequence, shot_number', mode='w')
         sb.start()
         __save_coordinates()
     except:
