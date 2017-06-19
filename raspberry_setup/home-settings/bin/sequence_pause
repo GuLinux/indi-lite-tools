@@ -1,0 +1,20 @@
+#!/bin/bash
+
+path="$1"
+
+if ! [[ -d "$path" ]]; then
+    echo "Usage: $0 sequence_directory [pause-p/resume-r]" >&2
+    exit 1
+fi
+
+case "$2" in
+    r|resume)
+        rm "$path/pause"
+        echo "Sequence unpaused"
+        ;;
+    *)
+        touch "$path/pause"
+        echo "Sequence paused"
+        ;;
+esac
+
