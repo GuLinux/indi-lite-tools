@@ -43,7 +43,7 @@ def dark_bias(name, count, exposure, binning=1):
         frame_name = 'Bias'
         frame_type = 'FRAME_BIAS'
 
-    sb.add_message_step('Taking {} {} frames for sequence {}'.format(dark_count, frame_name.lower(), name))
+    sb.add_message_step('Taking {} {} frames for sequence {}'.format(count, frame_name.lower(), name))
     sb.add_filter_wheel_step(filter_number=FILTER_DARK)
     sb.change_camera_settings(binning=binning, frame_type = frame_type)
     add_sequence('{0}-{1}-{2}x{2}'.format(frame_name, name, binning), exposure, count=count, auto_dark = False)
