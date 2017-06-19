@@ -47,6 +47,7 @@ setup_home() {
     grep "$bashrc_local_file" .bashrc -q || echo "source \"$bashrc_local_file\"" >> .bashrc
 EOF
     cp home-settings/bin/* ~pi/bin
+    cp home-settings/python_modules ~pi/python_modules
     chown pi:pi ~pi/bin/*
 }
 
