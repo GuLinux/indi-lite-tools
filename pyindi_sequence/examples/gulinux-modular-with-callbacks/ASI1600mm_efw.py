@@ -51,6 +51,16 @@ def __save_coordinates():
       with open(os.path.join(sb.upload_path, 'coordinates.json'), 'w') as j:
         json.dump(c.json(), j)
 
+def __write_temperature_file(line, mode='a'):
+  with open(os.path.join(sb.upload_path, 'ccd_temp.csv'), mode) as temp_file:
+    temp_file.write('{}\n'.format(line))
+
+
+def __save_temperature(sequence, item_number):
+  temp = sb.camera.values('CCD_TEMPERATURE', 'number')['CCD_TEMPERATURE_VALUE']
+  __write_temperature_file('{}, {}, {}, {}'.format(time.time(), temp, sequence.name, item_number+1))
+
+
 def start_sequence():
     #sb.add_shell_command('gzip -1 {0}/*.fits'.format(sb.upload_path), shell=True)
     sb.add_shell_command('sync', shell=True)
@@ -58,6 +68,7 @@ def start_sequence():
     add_prompt_step('Finished. Press Enter to quit', 'finished')
     try:
         __save_coordinates()
+        __write_temperature_file('timestamp, temperature, sequence, shot_number', mode='w')
         sb.start()
         __save_coordinates()
     except:
@@ -65,11 +76,6 @@ def start_sequence():
         send_event('Error', str(sys.exc_info()[1]))
         print("Unexpected error:", sys.exc_info()[0])
         raise
-
-def __save_temp(sequence, item_number):
-  temp = sb.camera.values('CCD_TEMPERATURE', 'number')['CCD_TEMPERATURE_VALUE']
-  with open(os.path.join(sb.upload_path, 'ccd_temp.csv'), 'a') as temp_file:
-    temp_file.write('{}, {}, {}, {}\n'.format(time.time(), temp, sequence.name, item_number) )
 
 def __on_sequence_starting(sequence):
   send_event('Sequence starting', str(sequence))
@@ -96,7 +102,7 @@ def __on_sequence_item_ended(sequence, item):
   send_event('Shoot', 'Shoot finished {}/{}, exposure: {}s, remaining: {}, {}s'
              .format(item+1, sequence.count, sequence.exposure, sequence.remaining_shots(), sequence.remaining_seconds()))
   __send_sequence_item_led(sequence, item)
-  __save_temp(sequence, item)
+  __save_temperature(sequence, item)
 
 def add_sequence(*args, **kwargs):
     seq = sb.add_sequence(*args, **kwargs)
