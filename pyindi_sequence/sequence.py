@@ -1,4 +1,4 @@
-import os
+import os, time
 
 class SequenceCallbacks:
     def __init__(self, **kwargs):
@@ -34,6 +34,9 @@ class Sequence:
 
         for sequence in range(0, self.count):
             self.callbacks.run('on_each_started', self, sequence)
+            # Check for 'pause' file
+            while os.path.isfile(os.path.join(self.upload_path, 'pause')):
+                time.sleep(0.5)
             self.camera.shoot(self.exposure)
             self.finished+=1
             self.callbacks.run('on_each_finished', self, sequence)

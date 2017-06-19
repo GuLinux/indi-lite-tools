@@ -77,4 +77,5 @@ My typical usage scenario is:
 
 I also did setup some hooks to control the leds on my Raspberry Pi: slowly blinking when capture is in progress, fast blinking if it has finished, or there is an error, or anything requiring user in    teraction.
 
+You can pause sequences by creating an empty file named ```pause``` in the sequence upload directory. This will pause the next shooting, until the file is deleted.
 
