@@ -35,18 +35,18 @@ def change_settings(binning=1, frame_type='FRAME_LIGHT'):
         switches = {'CCD_VIDEO_FORMAT': {'on': ['ASI_IMG_RAW16']}, 'CCD_CONTROLS_MODE': {'on': ['AUTO_BandWidth'], 'off': ['AUTO_Gain']} }
     )
 
-def dark_bias(name, dark_count, bias_count, dark_exposure = None, binning=1, auto_dark=False, skip_bias=False):
-    sb.add_message_step('Taking dark/bias frames - changing filter wheel to the Dark filter position')
-    sb.add_filter_wheel_step(filter_number=FILTER_DARK)
-    if not skip_bias:
-        change_settings(binning=binning, frame_type='FRAME_BIAS')
-        add_sequence('Bias-{0}-{1}x{1}'.format(name, binning), ASI_BIAS_EXPOSURE, count=bias_count, auto_dark = False)
-    if auto_dark or not dark_exposure:
-        sb.add_auto_dark(count = LIGHT_DARK_COUNT, name='Dark-{0}-{1}x{1}'.format(name, binning))
-    else:
-        sb.change_camera_settings(frame_type = 'FRAME_DARK')
-        add_sequence('Dark-{0}-{1}x{1}'.format(name, binning), dark_exposure, count=dark_count, auto_dark = False)
+def dark_bias(name, count, exposure, binning=1):
+    frame_name = 'Dark'
+    frame_type = 'FRAME_DARK'
+    if exposure == 0:
+        exposure = ASI_BIAS_EXPOSURE
+        frame_name = 'Bias'
+        frame_type = 'FRAME_BIAS'
 
+    sb.add_message_step('Taking {} {} frames for sequence {}'.format(dark_count, frame_name.lower(), name))
+    sb.add_filter_wheel_step(filter_number=FILTER_DARK)
+    sb.change_camera_settings(binning=binning, frame_type = frame_type)
+    add_sequence('{0}-{1}-{2}x{2}'.format(frame_name, name, binning), exposure, count=count, auto_dark = False)
 
 add_prompt_step('Changing camera settings to RAW 16bit, bin 1x1, press Enter to confirm')
 change_settings(binning=1)
@@ -54,8 +54,7 @@ sb.add_message_step('Changing filter wheel to Luminance')
 sb.add_filter_wheel_step(filter_number=FILTER_LUMINANCE)
 add_sequence('Light', exposure=LIGHT['exp'], count=LIGHT['count'])
 
-# Bias/Dark in between light and RGB - comment this to take darks/bias all at the end
-dark_bias('Light', LIGHT_DARK_COUNT, LIGHT_BIAS_COUNT, binning=1, auto_dark=True)
+dark_bias('Light', LIGHT_DARK_COUNT, LIGHT['exp'], binning=1)
 
 change_settings(binning=RGB_BINNING)
 sb.add_message_step('Changing filter wheel to the Red filter position')
@@ -72,15 +71,18 @@ add_sequence('Blue', exposure=BLUE['exp'], count=BLUE['count'])
 
 
 # Bias/Dark with auto mode - comment this, and uncomment the lines below, to take all darks, including Luminance, after all sequences are done 
-dark_bias('RGB', RGB_DARK_COUNT, RGB_BIAS_COUNT, binning=RGB_BINNING, auto_dark=True)
+dark_bias('RGB', RGB_DARK_COUNT, RED['exp'], binning=RGB_BINNING)
+
+# Separate dark settings for different r/g/b exposures
+
+#dark_bias('R', RGB_DARK_COUNT, RED['exp'], binning=RGB_BINNING)
+#dark_bias('G', RGB_DARK_COUNT, GREEN['exp'], binning=RGB_BINNING)
+#dark_bias('B', RGB_DARK_COUNT, BLUE['exp'], binning=RGB_BINNING)
 
 
-#dark_bias('Light', LIGHT_DARK_COUNT, LIGHT_BIAS_COUNT, binning=1, dark_exposure=LIGHT['exp'])
-#dark_bias('RGB', RGB_DARK_COUNT, RGB_BIAS_COUNT, binning=RGB_BINNING, dark_exposure=RED['exp'])
-##The followings are for different dark exposures between R, G, B
-##dark_bias('R', RGB_DARK_COUNT, RGB_BIAS_COUNT, binning=RGB_BINNING, dark_exposure=RED['exp'])
-##dark_bias('G', RGB_DARK_COUNT, RGB_BIAS_COUNT, binning=RGB_BINNING, dark_exposure=GREEN['exp'], skip_bias=True)
-##dark_bias('B', RGB_DARK_COUNT, RGB_BIAS_COUNT, binning=RGB_BINNING, dark_exposure=BLUE['exp'], skip_bias=True)
+# Bias frames
+dark_bias('Light', LIGHT_BIAS_COUNT, 0, binning=1)
+dark_bias('RGB', RGB_BIAS_COUNT, 0, binning=RGB_BINNING)
 
 print(sb)
 start_sequence()
