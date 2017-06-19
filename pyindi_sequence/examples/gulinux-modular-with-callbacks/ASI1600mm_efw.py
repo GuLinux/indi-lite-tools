@@ -5,7 +5,7 @@ from pyindi_sequence import SequenceBuilder, ShellCommandStep
 import requests
 import functools
 import json
-import time
+import time, datetime
 
 #import urllib3
 
@@ -58,7 +58,8 @@ def __write_temperature_file(line, mode='a'):
 
 def __save_temperature(sequence, item_number):
   temp = sb.camera.values('CCD_TEMPERATURE', 'number')['CCD_TEMPERATURE_VALUE']
-  __write_temperature_file('{}, {}, {}, {}'.format(time.time(), temp, sequence.name, item_number+1))
+  t = time.time()
+  __write_temperature_file('{}, {}, {}, {}, {}'.format(t, datetime.datetime.fromtimestamp(t).isoformat(), temp, sequence.name, item_number+1))
 
 
 def start_sequence():
@@ -68,7 +69,7 @@ def start_sequence():
     add_prompt_step('Finished. Press Enter to quit', 'finished')
     try:
         __save_coordinates()
-        __write_temperature_file('timestamp, temperature, sequence, shot_number', mode='w')
+        __write_temperature_file('timestamp, datetime temperature, sequence, shot_number', mode='w')
         sb.start()
         __save_coordinates()
     except:
