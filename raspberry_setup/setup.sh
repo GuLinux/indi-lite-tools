@@ -34,14 +34,8 @@ enable_spi() {
 enable_hwclock() {
     sed -i 's/dtparam=i2c_arm=.*//g' /boot/config.txt
     echo dtparam=i2c_arm=on >> /boot/config.txt
-    [[ -r /etc/init.d/hwclock.sh.backup ]] || cp /etc/init.d/hwclock.sh /etc/init.d/hwclock.sh.backup
-    cp hwclock.sh /etc/init.d/
-    apt-get remove -y fake-hwclock
-    [ -r /etc/cron.hourly/fake-hwclock ] && rm /etc/cron.hourly/fake-hwclock
-    update-rc.d -f fake-hwclock remove
-    [ -r /etc/init.d/fake-hwclock ] && rm /etc/init.d/fake-hwclock
-
-    update-rc.d hwclock.sh enable
+    sed -i 's/dtoverlay=i2c-rtc.*//g' /boot/config.txt
+    echo 'dtoverlay=i2c-rtc,ds3231' >> /boot/config.txt
 }
 
 disable_audio() {
