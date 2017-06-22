@@ -148,7 +148,7 @@ ask_step "Enable ssh on boot?" enable_ssh
 ask_step "Install dependencies?" install_prerequisites
 ask_step "Install latest INDI?" install_indi
 ask_step "Enable SPI interface?" enable_spi
-ask_step "Enable GPIO/I2C hwclock support?" enable_spi
+ask_step "Enable GPIO/I2C hwclock support?" enable_hwclock
 ask_step "Disable audio?" disable_audio
 ask_step "Setup home directory layout/bashrc?" setup_home
 ask_step "Setup nginx?" setup_nginx
