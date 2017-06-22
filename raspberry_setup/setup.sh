@@ -46,9 +46,9 @@ setup_home() {
     mkdir -p bin python_modules
     grep "$bashrc_local_file" .bashrc -q || echo "source \"$bashrc_local_file\"" >> .bashrc
 EOF
-    cp home-settings/bin/* ~pi/bin
-    cp home-settings/python_modules ~pi/python_modules
-    chown pi:pi ~pi/bin/*
+    cp -av home-settings/python_modules home-settings/bin ~pi
+    chown -R pi:pi ~pi/bin
+    chown -R pi:pi ~pi/python_modules
 }
 
 setup_python() {
