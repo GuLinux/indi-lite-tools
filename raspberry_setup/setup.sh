@@ -35,7 +35,8 @@ enable_hwclock() {
     sed -i 's/dtparam=i2c_arm=.*//g' /boot/config.txt
     echo dtparam=i2c_arm=on >> /boot/config.txt
     sed -i 's/dtoverlay=i2c-rtc.*//g' /boot/config.txt
-    echo 'dtoverlay=i2c-rtc,ds3231' >> /boot/config.txt
+    read -e -i "ds3231" -p "Enter RTC module to be used: " rtc_module
+    echo "dtoverlay=i2c-rtc,$rtc_module" >> /boot/config.txt
 }
 
 disable_audio() {
