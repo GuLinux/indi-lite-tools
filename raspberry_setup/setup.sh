@@ -31,6 +31,19 @@ enable_spi() {
     echo dtparam=spi=on >> /boot/config.txt
 }
 
+enable_hwclock() {
+    sed -i 's/dtparam=i2c_arm=.*//g' /boot/config.txt
+    echo dtparam=i2c_arm=on >> /boot/config.txt
+    [[ -r /etc/init.d/hwclock.sh.backup ]] || cp /etc/init.d/hwclock.sh /etc/init.d/hwclock.sh.backup
+    cp hwclock.sh /etc/init.d/
+    apt-get remove fake-hwclock
+    [ -r /etc/cron.hourly/fake-hwclock ] && rm /etc/cron.hourly/fake-hwclock
+    update-rc.d -f fake-hwclock remove
+    [ -r /etc/init.d/fake-hwclock ] && rm /etc/init.d/fake-hwclock
+
+    update-rc.d hwclock.sh enable
+}
+
 disable_audio() {
     sed -i 's/dtparam=audio=on/dtparam=audio=off/g' /boot/config.txt
 }
@@ -135,6 +148,7 @@ ask_step "Enable ssh on boot?" enable_ssh
 ask_step "Install dependencies?" install_prerequisites
 ask_step "Install latest INDI?" install_indi
 ask_step "Enable SPI interface?" enable_spi
+ask_step "Enable GPIO/I2C hwclock support?" enable_spi
 ask_step "Disable audio?" disable_audio
 ask_step "Setup home directory layout/bashrc?" setup_home
 ask_step "Setup nginx?" setup_nginx
