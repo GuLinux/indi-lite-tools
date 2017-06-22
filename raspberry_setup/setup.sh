@@ -36,7 +36,7 @@ enable_hwclock() {
     echo dtparam=i2c_arm=on >> /boot/config.txt
     [[ -r /etc/init.d/hwclock.sh.backup ]] || cp /etc/init.d/hwclock.sh /etc/init.d/hwclock.sh.backup
     cp hwclock.sh /etc/init.d/
-    apt-get remove fake-hwclock
+    apt-get remove -y fake-hwclock
     [ -r /etc/cron.hourly/fake-hwclock ] && rm /etc/cron.hourly/fake-hwclock
     update-rc.d -f fake-hwclock remove
     [ -r /etc/init.d/fake-hwclock ] && rm /etc/init.d/fake-hwclock
