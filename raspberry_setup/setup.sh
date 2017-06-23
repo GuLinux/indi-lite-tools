@@ -43,6 +43,8 @@ enable_hwclock() {
     echo "dtoverlay=i2c-rtc,$rtc_module" >> /boot/config.txt
     apt-get purge -y fake-hwclock
     grep -q i2c-dev /etc/modules || echo 'i2c-dev' >> /etc/modules
+    cp hwclock/hwclock.service /etc/systemd/system/
+    systemctl enable hwclock && systemctl start hwclock 
 }
 
 disable_audio() {
