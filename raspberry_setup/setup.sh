@@ -9,6 +9,10 @@ if [[ "$PWD" != /home/pi/indi-lite-tools/raspberry_setup ]]; then
     exit 1
 fi
 
+full_upgrade() {
+	apt-get update && apt-get dist-upgrade
+}
+
 install_prerequisites() {
     apt-get update && apt-get install -y cdbs libcfitsio3-dev libnova-dev libusb-1.0-0-dev libjpeg-dev \
         libusb-dev libtiff5-dev libftdi-dev fxload libkrb5-dev libcurl4-gnutls-dev libraw-dev libgphoto2-dev \
@@ -139,6 +143,7 @@ read -p "$1 [Y/n] " -n 1 -e confirm
     "$@"
 }
 
+ask_step "Upgrade packages?" full_upgrade
 ask_step "Enable ssh on boot?" enable_ssh
 ask_step "Install dependencies?" install_prerequisites
 ask_step "Install latest INDI?" install_indi
