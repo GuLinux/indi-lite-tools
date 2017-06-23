@@ -42,6 +42,7 @@ enable_hwclock() {
     read -e -i "ds3231" -p "Enter RTC module to be used: " rtc_module
     echo "dtoverlay=i2c-rtc,$rtc_module" >> /boot/config.txt
     apt-get purge -y fake-hwclock
+    grep -q i2c-dev /etc/modules || echo 'i2c-dev' >> /etc/modules
 }
 
 disable_audio() {
