@@ -10,7 +10,7 @@ if [[ "$PWD" != /home/pi/indi-lite-tools/raspberry_setup ]]; then
 fi
 
 full_upgrade() {
-	apt-get update && apt-get dist-upgrade
+	apt-get update && apt-get dist-upgrade -y
 }
 
 install_prerequisites() {
@@ -41,6 +41,7 @@ enable_hwclock() {
     sed -i 's/dtoverlay=i2c-rtc.*//g' /boot/config.txt
     read -e -i "ds3231" -p "Enter RTC module to be used: " rtc_module
     echo "dtoverlay=i2c-rtc,$rtc_module" >> /boot/config.txt
+    apt-get purge -y fake-hwclock
 }
 
 disable_audio() {
