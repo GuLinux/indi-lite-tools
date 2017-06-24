@@ -1,5 +1,6 @@
 import os, time
 from astropy.io import fits
+import shutil
 
 class SequenceCallbacks:
     def __init__(self, **kwargs):
@@ -48,7 +49,7 @@ class Sequence:
             temp_after = self.ccd_temperature()
 
             file_name = os.path.join(self.upload_path, '{0}{1:03}.fits'.format(sequence_prefix, sequence+1))
-            os.replace(tmp_file, file_name)
+            shutil.move(tmp_file, file_name)
 
             if temp_before is not None and temp_after is not None:
                 temp_avg = (temp_before + temp_after) / 2
