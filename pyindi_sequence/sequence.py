@@ -1,4 +1,5 @@
 import os, time
+from astropy.io import fits
 
 class SequenceCallbacks:
     def __init__(self, **kwargs):
@@ -41,16 +42,33 @@ class Sequence:
             # Check for 'pause' file
             while os.path.isfile(os.path.join(self.upload_path, 'pause')):
                 time.sleep(0.5)
+
+            temp_before = self.ccd_temperature()
             self.camera.shoot(self.exposure)
+            temp_after = self.ccd_temperature()
 
             file_name = os.path.join(self.upload_path, '{0}{1:03}.fits'.format(sequence_prefix, sequence+1))
             os.replace(tmp_file, file_name)
+
+            if temp_before is not None and temp_after is not None:
+                temp_avg = (temp_before + temp_after) / 2
+                fits_file = fits.open(file_name, mode='append')
+                if not 'CCD-TEMP' in fits_file[0].header:
+                    fits_file[0].header['CCD-TEMP'] = (temp_avg, 'CCD Temperature (Celsius)')
+                    fits_file.writeto(file_name, overwrite=True)
+                fits_file.close()
 
             self.finished+=1
             self.callbacks.run('on_each_finished', self, sequence, file_name)
 
 
         self.callbacks.run('on_finished', self)
+
+    def ccd_temperature(self):
+        if self.camera.has_control('CCD_TEMPERATURE', 'number'):
+            return self.camera.values('CCD_TEMPERATURE', 'number')['CCD_TEMPERATURE_VALUE']
+        return None
+        
 
     def total_seconds(self):
         return self.exposure * self.count
