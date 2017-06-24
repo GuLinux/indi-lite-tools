@@ -75,9 +75,10 @@ var fetchTemp = function() {
 }
 
 var appendEvent = function(event) {
-    if(lastEventIndex < event.index)
+    if(lastEventIndex < event.index) {
         lastEventIndex = event.index
-        html_event_id = 'event_id_' + event.index
+    }
+    html_event_id = 'event_id_' + event.index
     event_html = '<tr id="' + html_event_id + '"><td><small>' +
     event.index + 
     '</small></td><td><small>' +
@@ -91,6 +92,31 @@ var appendEvent = function(event) {
       $('#' + html_event_id).replaceWith(event_html);
     } else {
       $('#events_placeholder').after(event_html);
+    }
+    if('notify' in event && event.notify && Notification.permission == 'granted') {
+        notify(event);
+
+    }
+}
+
+notify = function(event) {
+    shouldNotify = true;
+    if('last_notified_ts' in localStorage) {
+        shouldNotify &= localStorage['last_notified_ts'] < event.time;
+    }
+    if('last_notified_index' in localStorage) {
+        shouldNotify &= localStorage['last_notified_index'] < event.index;
+    }
+    if(shouldNotify) {
+        localStorage.setItem('last_notified_ts', event.time);
+        localStorage.setItem('last_notified_index', event.index);
+        new Notification(event.type, {
+            body: event.text,
+            requireInteraction: true,
+            vibration: [500, 300, 100, 100, 100, 100, 500, 300, 100, 100, 100, 100],
+            icon: '/static/control_panel_icon.png',
+            tag: 'controlpanel_' + event.time
+        });
     }
 }
 
@@ -120,6 +146,9 @@ stopSaveTempHumidity = function() {
     });
 }
 
+if(Notification.permission == 'default') {
+    Notification.requestPermission();
+}
 
 var eventsTimer = window.setInterval(fetchEvents, 1000);
 var tempTimer = window.setInterval(fetchTemp, 2000);
