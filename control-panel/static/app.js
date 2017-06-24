@@ -108,12 +108,8 @@ notify = function(event) {
     if('last_notified_ts' in localStorage) {
         shouldNotify &= localStorage['last_notified_ts'] < event.time;
     }
-    if('last_notified_index' in localStorage) {
-        shouldNotify &= localStorage['last_notified_index'] < event.index;
-    }
     if(shouldNotify) {
         localStorage.setItem('last_notified_ts', event.time);
-        localStorage.setItem('last_notified_index', event.index);
         new Notification(event.type, {
             body: event.text,
             requireInteraction: true,
