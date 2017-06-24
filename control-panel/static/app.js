@@ -56,8 +56,12 @@ var fetchTemp = function() {
         method: 'GET',
         success: function(e) {
             $('#temp_humidity').show();
-            $('#temperature_value').text(e.temperature.toFixed(2));
-            $('#humidity_value').text(e.humidity.toFixed(2));
+            if(e.temperature) {
+                $('#temperature_value').text(e.temperature.toFixed(2));
+            }
+            if(e.humidity) {
+                $('#humidity_value').text(e.humidity.toFixed(2));
+            }
             if(e.saving) {
                 $('#save_temp_humidity_btn').hide();
                 $('#stop_save_temp_humidity_btn').show();
