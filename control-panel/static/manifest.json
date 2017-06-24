@@ -1,0 +1,12 @@
+{
+  "name": "INDI Sequence Dashboard",
+  "short_name": "PySequence-Dashboard",
+  "display": "standalone",
+  "background_color": "#002b36",
+  "description": "A dashboard for your python indi embedded server",
+  "icons": [{
+    "src": "/static/control_panel_icon.png",
+    "sizes": "128x128",
+    "type": "image/png"
+  }]
+}
