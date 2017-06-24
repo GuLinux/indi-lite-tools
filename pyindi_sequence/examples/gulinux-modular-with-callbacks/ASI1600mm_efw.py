@@ -63,7 +63,7 @@ def start_sequence():
         __save_coordinates()
     except:
         set_led_text('ERROR')
-        send_event('Error', str(sys.exc_info()[1]))
+        send_event('Error', str(sys.exc_info()[1]), notify=True)
         print("Unexpected error:", sys.exc_info()[0])
         raise
 
