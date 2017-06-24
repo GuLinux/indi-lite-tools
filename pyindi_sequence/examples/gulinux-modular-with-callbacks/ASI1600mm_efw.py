@@ -36,12 +36,12 @@ def set_led_text(text):
     else:
         requests.delete('http://localhost:5100/led')
 
-def send_event(event_type, event_text):
-  requests.put('http://localhost:5100/events', json={'type': event_type, 'text': event_text})
+def send_event(event_type, event_text, notify=False):
+    requests.put('http://localhost:5100/events', json={'type': event_type, 'text': event_text, 'notify': notify})
 
 def add_prompt_step(message, led_text = 'USER'):
     sb.add_function(functools.partial(set_led_text, led_text))
-    sb.add_function(functools.partial(send_event, 'User confirmation', message))
+    sb.add_function(functools.partial(send_event, 'User confirmation', message, notify=True))
     sb.add_user_confirmation_prompt(message)
     sb.add_function(functools.partial(set_led_text, None))
 
@@ -71,7 +71,7 @@ def __on_sequence_starting(sequence):
   send_event('Sequence starting', str(sequence))
 
 def __on_sequence_ended(sequence):
-  send_event('Sequence finished', str(sequence))
+  send_event('Sequence finished', str(sequence), notify=True)
 
 def __send_sequence_item_led(sequence, item):
   code = 'u'
