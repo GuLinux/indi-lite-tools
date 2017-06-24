@@ -29,7 +29,11 @@ class Sequence:
 
     def run(self):
         self.camera.set_upload_to('local')
-        self.camera.set_upload_path(self.upload_path, '{0}_{1}s_XXX'.format(self.name, self.exposure))
+        sequence_prefix='{0}_{1}s_'.format(self.name, self.exposure)
+        tmp_prefix = sequence_prefix + 'TMP'
+        tmp_file = os.path.join(self.upload_path, tmp_prefix + '.fits')
+
+        self.camera.set_upload_path(self.upload_path, tmp_prefix)
         self.callbacks.run('on_started', self)
 
         for sequence in range(0, self.count):
@@ -38,8 +42,12 @@ class Sequence:
             while os.path.isfile(os.path.join(self.upload_path, 'pause')):
                 time.sleep(0.5)
             self.camera.shoot(self.exposure)
+
+            file_name = os.path.join(self.upload_path, '{0}{1:03}.fits'.format(sequence_prefix, sequence+1))
+            os.replace(tmp_file, file_name)
+
             self.finished+=1
-            self.callbacks.run('on_each_finished', self, sequence)
+            self.callbacks.run('on_each_finished', self, sequence, file_name)
 
 
         self.callbacks.run('on_finished', self)

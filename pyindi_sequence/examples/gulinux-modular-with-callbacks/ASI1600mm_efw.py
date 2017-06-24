@@ -99,11 +99,11 @@ def __on_sequence_item_starting(sequence, item):
              .format(item+1, sequence.count, sequence.exposure, sequence.remaining_shots(), sequence.remaining_seconds()))
   __send_sequence_item_led(sequence, item)
 
-def __on_sequence_item_ended(sequence, item):
-  send_event('Shoot', 'Shoot finished {}/{}, exposure: {}s, remaining: {}, {}s'
-             .format(item+1, sequence.count, sequence.exposure, sequence.remaining_shots(), sequence.remaining_seconds()))
-  __send_sequence_item_led(sequence, item)
-  __save_temperature(sequence, item)
+def __on_sequence_item_ended(sequence, item, file_name):
+    send_event('Shoot', 'Shoot finished {}/{}, filename: {}, exposure: {}s, remaining: {}, {}s'
+             .format(item+1, sequence.count, file_name, sequence.exposure, sequence.remaining_shots(), sequence.remaining_seconds()))
+    __send_sequence_item_led(sequence, item)
+    __save_temperature(sequence, item)
 
 def add_sequence(*args, **kwargs):
     seq = sb.add_sequence(*args, **kwargs)
