@@ -69,7 +69,7 @@ EOF
 
 setup_python() {
     pip2 install -U pip setuptools
-    pip2 install flask pyindi-client requests psutil bottle max7219 luma.led_matrix
+    pip2 install flask pyindi-client requests psutil bottle max7219 luma.led_matrix astropy
 }
 
 setup_nginx() {
