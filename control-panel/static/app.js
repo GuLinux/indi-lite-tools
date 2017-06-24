@@ -114,7 +114,7 @@ notify = function(event) {
             body: event.text,
             requireInteraction: true,
             vibration: [500, 300, 100, 100, 100, 100, 500, 300, 100, 100, 100, 100],
-            icon: '/static/control_panel_icon.png',
+            icon: '/static/icons/icon_128.png',
             tag: 'controlpanel_' + event.time
         });
     }
