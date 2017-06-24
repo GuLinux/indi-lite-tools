@@ -1,0 +1,14 @@
+[Unit]
+Description=Time Synchronization from RTC Source
+After=systemd-modules-load.service
+RequiresMountsFor=/dev/rtc
+Conflicts=shutdown.target
+
+[Service]
+Type=oneshot
+ExecStart=/sbin/hwclock -s
+TimeoutSec=0
+
+[Install]
+WantedBy=multi-user.target
+
