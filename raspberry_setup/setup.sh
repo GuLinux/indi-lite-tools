@@ -95,11 +95,11 @@ setup_wifi_ap() {
     echo "To activate and deactivate wifi access point (only for wlan0), just run ap-mode enable/disable"
 }
 
-setup_control_panel() {
-    cp ../control-panel/raspberry-control-panel.service /etc/systemd/system/
+setup_dashboard() {
+    cp ../indi-dashboard/indi-dashboard.service /etc/systemd/system/
     systemctl daemon-reload
-    systemctl enable raspberry-control-panel
-    systemctl start raspberry-control-panel
+    systemctl enable indi-dashboard
+    systemctl start indi-dashboard
 }
 
 setup_shellinabox() {
@@ -159,7 +159,7 @@ ask_step "Setup nginx?" setup_nginx
 ask_step "Setup wifi access point?" setup_wifi_ap
 ask_step "Setup python modules?" setup_python
 ask_step "Setup Adafruit DHT modules?" setup_AdafruitDHT
-ask_step "Setup Raspberry control panel?" setup_control_panel
+ask_step "Setup INDI Dashboard?" setup_dashboard
 ask_step "Setup Shellinabox?" setup_shellinabox
 ask_step "Setup INDI Control Panel?" setup_indi_control_panel
 
