@@ -25,7 +25,7 @@ server {
         proxy_pass http://localhost:5100/;
 	}
         location /static {
-            root /home/pi/indi-lite-tools/control-panel/;
+            root /home/pi/indi-lite-tools/indi-dashboard/;
     		try_files $uri $uri/ =404;
         }
 
