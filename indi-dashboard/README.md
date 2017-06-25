@@ -1,4 +1,4 @@
-# Control Panel for pyindi_sequence
+# Dashboard for pyindi_sequence
 
 ### Credits
 

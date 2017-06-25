@@ -1,2 +1,0 @@
-#!/bin/bash
-FLASK_APP="control-panel.py" flask run "$@"

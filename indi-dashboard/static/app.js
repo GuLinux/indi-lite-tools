@@ -115,7 +115,7 @@ notify = function(event) {
             requireInteraction: true,
             vibration: [500, 300, 100, 100, 100, 100, 500, 300, 100, 100, 100, 100],
             icon: '/static/icons/icon_128.png',
-            tag: 'controlpanel_' + event.time
+            tag: 'indi_dashboard_' + event.time
         });
     }
 }
