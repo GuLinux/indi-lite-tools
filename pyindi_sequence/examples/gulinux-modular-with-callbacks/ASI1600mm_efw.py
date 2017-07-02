@@ -101,3 +101,55 @@ def add_sequence(*args, **kwargs):
     seq.callbacks.add('on_finished', __on_sequence_ended)
 
 
+def create_sequence(settings):
+    sb.add_message_step('Changing filter wheel to {}'.format(settings['code']))
+    sb.add_filter_wheel_step(filter_number=settings['filter'])
+    change_settings(settings)
+    if 'refocus' in settings and settings['refocus']:
+        add_prompt_step('Focus check for {}'.format(settings['name']), led_text='FOCUS')
+        sb.add_filter_wheel_step(filter_number=FILTER_LUMINANCE)
+        change_settings(settings)
+    add_sequence(settings['name'], exposure=settings['exp'], count=settings['count'])
+
+
+
+def dark_bias(settings, name=None, frame_type='FRAME_DARK'):
+    if not name:
+        name = settings['name']
+    frame_name = 'Dark'
+    exposure = settings['exp']
+    count = settings['dark']
+    if frame_type == 'FRAME_BIAS':
+        exposure = ASI_BIAS_EXPOSURE
+        frame_name = 'Bias'
+        count = settings['bias']
+
+    sb.add_message_step('Taking {} {} frames for sequence {}'.format(count, frame_name.lower(), name))
+    sb.add_filter_wheel_step(filter_number=FILTER_DARK)
+    change_settings(settings, frame_type=frame_type)
+    add_sequence('{0}-{1}-{2}x{2}'.format(frame_name, name, settings['bin']), exposure, count=count, auto_dark = False)
+
+
+def change_settings(settings, frame_type='FRAME_LIGHT'):
+    height = 3520
+
+    # deal with INDI asi roi bug, solved in june 2017 - remove after rasbpberry daily builds get the updated solution
+    if settings['bin'] == 3:
+        height = 3519
+    sb.change_camera_settings(binning=settings['bin'], frame_type = frame_type )
+    sb.change_camera_settings(
+        roi = {'X': 0, 'Y': 0, 'WIDTH': 4656, 'HEIGHT': height},
+        compression_format = 'CCD_RAW',
+        controls = {
+            'HighSpeedMode': 1,
+            'HardwareBin': settings['hwbin'],
+            'Gain': settings['gain'],
+        },
+        switches = {'CCD_VIDEO_FORMAT': {'on': ['ASI_IMG_RAW16']}, 'CCD_CONTROLS_MODE': {'on': ['AUTO_BandWidth'], 'off': ['AUTO_Gain']} }
+    )
+
+
+def merge(a, b):
+    a = a.copy()
+    a.update(b)
+    return a
