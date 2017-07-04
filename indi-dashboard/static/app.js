@@ -153,3 +153,16 @@ if(Notification.permission == 'default') {
 var eventsTimer = window.setInterval(fetchEvents, 1000);
 var tempTimer = window.setInterval(fetchTemp, 2000);
 var lastEventIndex = -1;
+
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', function() {
+    navigator.serviceWorker.register('/svc.js').then(function(registration) {
+      // Registration was successful
+      console.log('ServiceWorker registration successful with scope: ', registration.scope);
+    }, function(err) {
+      // registration failed :(
+      console.log('ServiceWorker registration failed: ', err);
+    });
+  });
+}
+

@@ -1,4 +1,5 @@
 *.swp
+dashboard-client-android/
 *.pyc
 __pycache__
 indi-ccd-preview/static/images

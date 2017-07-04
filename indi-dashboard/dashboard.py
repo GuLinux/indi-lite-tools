@@ -1,4 +1,4 @@
-from flask import Flask, render_template, jsonify, request
+from flask import Flask, render_template, jsonify, request, make_response
 import json
 import os
 import argparse
@@ -127,6 +127,12 @@ def add_event():
     event['time'] = time.time()
     events.append(event)
     return 'event added', 200
+
+@app.route('/svc.js')
+def get_jsservice():
+    r = make_response(render_template('svc.js'))
+    r.headers['Content-Type'] = 'application/javascript'
+    return r
 
 def update_datetime(timestamp):
     # very hacky workaround.. and need sudoer permissions
