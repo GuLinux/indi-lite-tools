@@ -37,8 +37,8 @@ def set_led_text(text):
     else:
         requests.delete('http://localhost:5100/led')
 
-def send_event(event_type, event_text, notify=False):
-    requests.put('http://localhost:5100/events', json={'type': event_type, 'text': event_text, 'notify': notify})
+def send_event(event_type, event_text, notify=False, require_interaction=False):
+    requests.put('http://localhost:5100/events', json={'type': event_type, 'text': event_text, 'notify': notify, 'require_interaction': require_interaction})
 
 def send_buzzer(pattern, loop=True, duration=None):
     if buzzer_enabled:
@@ -49,7 +49,7 @@ def clear_buzzer():
 
 def add_prompt_step(message, led_text = 'USER'):
     sb.add_function(functools.partial(set_led_text, led_text))
-    sb.add_function(functools.partial(send_event, 'User confirmation', message, notify=True))
+    sb.add_function(functools.partial(send_event, 'User confirmation', message, notify=True, require_interaction=True))
     sb.add_function(functools.partial(send_buzzer, [{"frequency": 1500, "duration": 0.5}, {"frequency": 0, "duration": 0.2}]))
     sb.add_user_confirmation_prompt(message)
     sb.add_function(clear_buzzer)
@@ -73,7 +73,7 @@ def start_sequence():
         __save_coordinates()
     except:
         set_led_text('ERROR')
-        send_event('Error', str(sys.exc_info()[1]), notify=True)
+        send_event('Error', str(sys.exc_info()[1]), notify=True, require_interaction=True)
         send_buzzer([{"frequency": 2500, "duration": 0.2}, {"frequency": 0, "duration": 0.2}])
         print("Unexpected error:", sys.exc_info()[0])
         raise

@@ -112,7 +112,7 @@ notify = function(event) {
         localStorage.setItem('last_notified_ts', event.time);
         new Notification(event.type, {
             body: event.text,
-            requireInteraction: true,
+            requireInteraction: ('require_interaction' in event && event.require_interaction),
             vibration: [500, 300, 100, 100, 100, 100, 500, 300, 100, 100, 100, 100],
             icon: '/static/icons/icon_128.png',
             tag: 'indi_dashboard_' + event.time
