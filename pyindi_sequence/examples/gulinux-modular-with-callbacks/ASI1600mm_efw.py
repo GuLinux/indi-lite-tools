@@ -17,7 +17,8 @@ FILTER_RED=2
 FILTER_GREEN=3
 FILTER_BLUE=4
 FILTER_DARK=5
-buzzer_enabled = False
+
+buzzer_config = { 'enabled': False }
 
 # get session name from script name. This way, when you copy this script to, let's say, 2017-05-10-M42.py, your session name will be 'M42'
 
@@ -40,8 +41,11 @@ def set_led_text(text):
 def send_event(event_type, event_text, notify=False, require_interaction=False):
     requests.put('http://localhost:5100/events', json={'type': event_type, 'text': event_text, 'notify': notify, 'require_interaction': require_interaction})
 
+def enable_buzzer(enable):
+    buzzer_config['enable'] = enable
+
 def send_buzzer(pattern, loop=True, duration=None):
-    if buzzer_enabled:
+    if buzzer_config['enabled']:
         requests.put('http://localhost:5100/buzzer', json={'pattern': pattern, 'loop': loop, 'duration': duration})
 
 def clear_buzzer():

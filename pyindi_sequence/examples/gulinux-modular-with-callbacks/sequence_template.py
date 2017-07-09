@@ -1,5 +1,7 @@
 from ASI1600mm_efw import *
 
+enable_buzzer(False)
+
 LIGHT = {'name': 'Light', 'code': 'L', 'filter': FILTER_LUMINANCE, 'exp': 1, 'count': 1, 'gain': 140, 'dark': 20, 'bias': 50, 'bin': 1, 'hwbin': 0, 'refocus': True}
 
 # not really reliable way to calculate binned exposure
