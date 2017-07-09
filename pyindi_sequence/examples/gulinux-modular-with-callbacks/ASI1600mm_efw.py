@@ -40,7 +40,7 @@ def set_led_text(text):
 def send_event(event_type, event_text, notify=False):
     requests.put('http://localhost:5100/events', json={'type': event_type, 'text': event_text, 'notify': notify})
 
-def send_buzzed(pattern, loop=True, duration=None):
+def send_buzzer(pattern, loop=True, duration=None):
     if buzzer_enabled:
         requests.put('http://localhost:5100/buzzer', json={'pattern': pattern, 'loop': loop, 'duration': duration})
 
