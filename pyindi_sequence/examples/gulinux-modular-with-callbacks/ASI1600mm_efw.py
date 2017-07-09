@@ -42,7 +42,7 @@ def send_event(event_type, event_text, notify=False, require_interaction=False):
     requests.put('http://localhost:5100/events', json={'type': event_type, 'text': event_text, 'notify': notify, 'require_interaction': require_interaction})
 
 def enable_buzzer(enable):
-    buzzer_config['enable'] = enable
+    buzzer_config['enabled'] = enable
 
 def send_buzzer(pattern, loop=True, duration=None):
     if buzzer_config['enabled']:
