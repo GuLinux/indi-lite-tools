@@ -144,9 +144,9 @@ def dark_bias(settings, name=None, frame_type='FRAME_DARK'):
 def change_settings(settings, frame_type='FRAME_LIGHT'):
     height = 3520
 
-    # deal with INDI asi roi bug, solved in june 2017 - remove after rasbpberry daily builds get the updated solution
-    if settings['bin'] == 3:
-        height = 3519
+#    # uncomment the following if you're using an older INDI version, and you get an error using binning = 3
+#    if settings['bin'] == 3:
+#        height = 3519
     sb.change_camera_settings(binning=settings['bin'], frame_type = frame_type )
     sb.change_camera_settings(
         roi = {'X': 0, 'Y': 0, 'WIDTH': 4656, 'HEIGHT': height},
