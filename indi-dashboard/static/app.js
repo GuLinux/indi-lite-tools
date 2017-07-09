@@ -149,7 +149,10 @@ stopSaveTempHumidity = function() {
 clearEvents = function() {
     jQuery.ajax('/events', {
         method: 'DELETE',
-        success: function() { $('.event_row').remove(); }
+        success: function() {
+            $('.event_row').remove();
+            lastEventIndex = -1;
+        }
     });
 }
 
