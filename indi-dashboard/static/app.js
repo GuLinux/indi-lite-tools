@@ -83,7 +83,7 @@ var appendEvent = function(event) {
         lastEventIndex = event.index
     }
     html_event_id = 'event_id_' + event.index
-    event_html = '<tr id="' + html_event_id + '"><td><small>' +
+    event_html = '<tr class="event_row" id="' + html_event_id + '"><td><small>' +
     event.index + 
     '</small></td><td><small>' +
     new Date(event.time * 1000).toLocaleString() +
@@ -146,6 +146,13 @@ stopSaveTempHumidity = function() {
     });
 }
 
+clearEvents = function() {
+    jQuery.ajax('/events', {
+        method: 'DELETE',
+        success: function() { $('.event_row').remove(); }
+    });
+}
+
 if(Notification.permission == 'default') {
     Notification.requestPermission();
 }
@@ -154,7 +161,7 @@ var eventsTimer = window.setInterval(fetchEvents, 1000);
 var tempTimer = window.setInterval(fetchTemp, 2000);
 var lastEventIndex = -1;
 
-if ('serviceWorker' in navigator) {
+if ('serviceWorker' in navigator && false) {
   window.addEventListener('load', function() {
     navigator.serviceWorker.register('/svc.js').then(function(registration) {
       // Registration was successful

@@ -1,12 +1,14 @@
 # Temp/Humidity sensor, comment if you don't have it
-from adafruit_temp_humidity import AdafruitTempHumidity, Adafruit_DHT
+from sensors import AdafruitTempHumidity
+import Adafruit_DHT
 
 # Led segments (in this example, max7219)
 from luma.core.interface.serial import spi, noop
 from luma.core.render import canvas
 from luma.core.virtual import sevensegment
 from luma.led_matrix.device import max7219
-from luma_led_matrix import LumaLedMatrix
+from display import LumaLedMatrix
+from buzzer import Buzzer, Passive as PassiveBuzzer
 
 
 def setup(config):
@@ -19,5 +21,5 @@ def setup(config):
     device = max7219(serial)
     seg = sevensegment(device)
     config['led_display'] = LumaLedMatrix(seg)
-
+    config['buzzer'] = Buzzer(PassiveBuzzer(16))
 

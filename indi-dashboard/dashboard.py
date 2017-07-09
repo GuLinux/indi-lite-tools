@@ -34,7 +34,7 @@ def with_config(config_name):
 def with_json_request(func):
     @wraps(func)
     def dec(*args, **kwargs):
-        if not request.json:
+        if not request.is_json:
             return 'Bad json request', 400
         return func(*args, **kwargs)
     return dec
@@ -47,7 +47,7 @@ def index():
 @app.route("/coordinates", methods=["PUT"])
 @with_json_request
 def set_coordinates():
-    data = request.json
+    data = request.get_json()
     if data['update_datetime']:
         update_datetime(data['timestamp'])
     cached_objects['gps'] = data['coords']
@@ -97,7 +97,7 @@ def stop_save_temp_humidity(_):
 @with_json_request
 def replace_led_text(led_display):
     data = {'id': 'default', 'overwrite': True}
-    data.update(request.json)
+    data.update(request.get_json())
     if not data['overwrite'] and led_display.get_message() and data['id'] != led_display.get_message()['id']:
         return 'led message already present', 409
     led_display.set_message(data)
@@ -114,6 +114,20 @@ def remove_led_text(led_display):
 def get_led_text(led_display):
     return jsonify({ 'text': led_display.get_message() } )
 
+@app.route('/buzzer', methods=['PUT'])
+@with_config('buzzer')
+@with_json_request
+def start_buzzer(buzzer):
+    buzzer.start(request.get_json())
+    return 'buzzer started', 200
+
+@app.route('/buzzer', methods=['DELETE'])
+@with_config('buzzer')
+def stop_buzzer(buzzer):
+    buzzer.stop()
+    return 'buzzer stopped', 200
+
+#TODO use something else instead of index (timestamp?)
 @app.route('/events', methods=['GET'])
 def get_events():
     start = int(request.args.get('start', 0))
@@ -122,11 +136,16 @@ def get_events():
 @app.route('/events', methods=['PUT'])
 @with_json_request
 def add_event():
-    event = request.json
+    event = request.get_json()
     event['index'] = len(events)
     event['time'] = time.time()
     events.append(event)
     return 'event added', 200
+
+@app.route('/events', methods=['DELETE'])
+def remove_events():
+    del events[:]
+    return 'events removed, 200'
 
 @app.route('/svc.js')
 def get_jsservice():

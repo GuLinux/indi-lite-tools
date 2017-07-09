@@ -17,6 +17,7 @@ FILTER_RED=2
 FILTER_GREEN=3
 FILTER_BLUE=4
 FILTER_DARK=5
+buzzer_enabled = False
 
 # get session name from script name. This way, when you copy this script to, let's say, 2017-05-10-M42.py, your session name will be 'M42'
 
@@ -39,10 +40,19 @@ def set_led_text(text):
 def send_event(event_type, event_text, notify=False):
     requests.put('http://localhost:5100/events', json={'type': event_type, 'text': event_text, 'notify': notify})
 
+def send_buzzed(pattern, loop=True, duration=None):
+    if buzzer_enabled:
+        requests.put('http://localhost:5100/buzzer', json={'pattern': pattern, 'loop': loop, 'duration': duration})
+
+def clear_buzzer():
+    requests.delete('http://localhost:5100/buzzer')
+
 def add_prompt_step(message, led_text = 'USER'):
     sb.add_function(functools.partial(set_led_text, led_text))
     sb.add_function(functools.partial(send_event, 'User confirmation', message, notify=True))
+    sb.add_function(functools.partial(send_buzzer, [{"frequency": 1500, "duration": 0.5}, {"frequency": 0, "duration": 0.2}]))
     sb.add_user_confirmation_prompt(message)
+    sb.add_function(clear_buzzer)
     sb.add_function(functools.partial(set_led_text, None))
 
 def __save_coordinates():
@@ -64,6 +74,7 @@ def start_sequence():
     except:
         set_led_text('ERROR')
         send_event('Error', str(sys.exc_info()[1]), notify=True)
+        send_buzzer([{"frequency": 2500, "duration": 0.2}, {"frequency": 0, "duration": 0.2}])
         print("Unexpected error:", sys.exc_info()[0])
         raise
 

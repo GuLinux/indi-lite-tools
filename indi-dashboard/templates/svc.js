@@ -4,6 +4,6 @@ self.addEventListener('fetch', function(event) {
 });
 
 self.addEventListener('install', function(event) {
-    console.log('install');
-    console.log(event);
+    clients.claim();
+    console.log('install finished, claiming clients');
 });
