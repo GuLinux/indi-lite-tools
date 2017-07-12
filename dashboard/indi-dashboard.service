@@ -3,8 +3,8 @@ Description=INDI Dashboard
 
 [Service]
 Type=simple
-ExecStart=/home/pi/indi-lite-tools/indi-dashboard/run -p 5100
-WorkingDirectory=/home/pi/indi-lite-tools/indi-dashboard/
+ExecStart=/home/pi/indi-lite-tools/dashboard/run -p 5100
+WorkingDirectory=/home/pi/indi-lite-tools/dashboard/
 User=pi
 #ExecReload=/usr/sbin/postfix reload
 #ExecStop=/usr/sbin/postfix stop
