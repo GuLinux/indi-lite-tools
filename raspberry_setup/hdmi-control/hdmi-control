@@ -1,0 +1,10 @@
+#!/bin/bash
+HDMI_ENABLED=1
+[ -r /etc/hdmi-control.conf ] && . /etc/hdmi-control.conf
+
+if [ "$HDMI_ENABLED" != "1" ]; then
+    echo "Disabling HDMI port" >&2
+    /usr/bin/tvservice -o
+fi
+
+

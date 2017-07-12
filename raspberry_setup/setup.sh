@@ -102,6 +102,18 @@ setup_dashboard() {
     systemctl start indi-dashboard
 }
 
+setup_hdmi() {
+    cp hdmi-control/hdmi-control /usr/bin
+    cp hdmi-control/hdmi-control.service /etc/systemd/system
+    read -e -n 1 -p "Disable HDMI port on system startup? (saves a few mA of current) [Y/n] " disable_hdmi
+    [ "$disable_hdmi" == n ] && HDMI_ENABLED=1 || HDMI_ENABLED=0
+    echo "export HDMI_ENABLED=$HDMI_ENABLED" > /etc/hdmi-control.conf
+    systemctl daemon-reload
+    systemctl enable hdmi-control
+    systemctl restart hdmi-control
+}
+
+
 setup_shellinabox() {
     cp shellinabox/shellinabox /etc/default
     cp shellinabox/indi-tmux /usr/local/bin
@@ -160,6 +172,7 @@ ask_step "Setup wifi access point?" setup_wifi_ap
 ask_step "Setup python modules?" setup_python
 ask_step "Setup Adafruit DHT modules?" setup_AdafruitDHT
 ask_step "Setup INDI Dashboard?" setup_dashboard
+ask_step "Setup HDMI control?" setup_hdmi
 ask_step "Setup Shellinabox?" setup_shellinabox
 ask_step "Setup INDI Control Panel?" setup_indi_control_panel
 

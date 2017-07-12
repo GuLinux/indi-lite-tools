@@ -1,0 +1,9 @@
+[Unit]
+Description=HDMI Control
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/hdmi-control
+
+[Install]
+WantedBy=multi-user.target
