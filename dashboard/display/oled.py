@@ -34,9 +34,8 @@ class OLed:
     def __redraw(self):
         self.message['clock'] = time.strftime('%H:%M', time.gmtime())
         if self.message != self.__shown:
-            self.__shown = self.message
+            self.__shown = self.message.copy()
             with canvas(self.device) as draw_canvas:
-
                 start_y = self.__draw(draw_canvas, (90, 0), self.message['clock'], font_size=11)[1]
                 if 'title' in self.message:
                     self.__draw(draw_canvas, (0, 0), self.message['title'], font_size=11)
