@@ -5,6 +5,7 @@ import argparse
 import time
 import threading
 from functools import wraps
+import traceback
 
 
 app = Flask(__name__)
@@ -19,8 +20,9 @@ def initialize():
     try:
         import config
         config.setup(app_config)
+        app.logger.debug(config)
     except:
-        pass
+        traceback.print_exc()
 
 
 def with_config(config_name):
@@ -117,6 +119,18 @@ def remove_led_text(led_display):
 def get_led_text(led_display):
     return jsonify({ 'text': led_display.get_message() } )
 
+@app.route('/oled', methods=['PUT'])
+@with_config('oled')
+def set_oled_message(oled_display):
+    oled_display.update(request.get_json())
+    return 'Message updated', 200
+
+@app.route('/oled', methods=['DELETE'])
+@with_config('oled')
+def clear_oled_message(oled_display):
+    oled_display.clear()
+    return 'Message removed', 200
+ 
 @app.route('/buzzer', methods=['PUT'])
 @with_config('buzzer')
 @with_json_request
