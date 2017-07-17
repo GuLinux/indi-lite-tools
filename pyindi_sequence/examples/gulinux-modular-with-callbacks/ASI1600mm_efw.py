@@ -6,6 +6,7 @@ import requests
 import functools
 import json
 import time, datetime
+import textwrap
 
 #import urllib3
 
@@ -32,11 +33,11 @@ sb = SequenceBuilder(SESSION_NAME, camera_name='ZWO CCD ASI1600MM')
 sb.set_filter_wheel('EFW')
 
 
-def set_led_text(text):
-    if text:
-        requests.put('http://localhost:5100/led', json={'text': text, 'brightness': 0, 'id': 'sequence'})
-    else:
-        requests.delete('http://localhost:5100/led')
+def set_oled_message(title, text):
+    requests.put('http://localhost:5100/oled', json={'text': textwrap.fill(text, 21), 'title': title})
+
+def clear_oled():
+    requests.delete('http://localhost:5100/oled')
 
 def send_event(event_type, event_text, notify=False, require_interaction=False):
     requests.put('http://localhost:5100/events', json={'type': event_type, 'text': event_text, 'notify': notify, 'require_interaction': require_interaction})
@@ -51,13 +52,13 @@ def send_buzzer(pattern, loop=True, duration=None):
 def clear_buzzer():
     requests.delete('http://localhost:5100/buzzer')
 
-def add_prompt_step(message, led_text = 'USER'):
-    sb.add_function(functools.partial(set_led_text, led_text))
+def add_prompt_step(message):
+    sb.add_function(functools.partial(set_oled_message, 'Confirm', message))
     sb.add_function(functools.partial(send_event, 'User confirmation', message, notify=True, require_interaction=True))
     sb.add_function(functools.partial(send_buzzer, [{"frequency": 1500, "duration": 0.5}, {"frequency": 0, "duration": 0.2}]))
     sb.add_user_confirmation_prompt(message)
     sb.add_function(clear_buzzer)
-    sb.add_function(functools.partial(set_led_text, None))
+    sb.add_function(clear_oled)
 
 def __save_coordinates():
     c = requests.get('http://localhost:5100/coordinates')
@@ -70,13 +71,13 @@ def start_sequence():
     #sb.add_shell_command('gzip -1 {0}/*.fits'.format(sb.upload_path), shell=True)
     sb.add_shell_command('sync', shell=True)
 
-    add_prompt_step('Finished. Press Enter to quit', 'finished')
+    add_prompt_step('Finished. Press Enter to quit') 
     try:
         __save_coordinates()
         sb.start()
         __save_coordinates()
     except:
-        set_led_text('ERROR')
+        set_oled_message('Error', str(sys.exc_info()[1]))
         send_event('Error', str(sys.exc_info()[1]), notify=True, require_interaction=True)
         send_buzzer([{"frequency": 2500, "duration": 0.2}, {"frequency": 0, "duration": 0.2}])
         print("Unexpected error:", sys.exc_info()[0])
@@ -96,7 +97,14 @@ def __send_sequence_item_led(sequence, item):
       code = filter_codes[pattern]
   remaining_seconds = str(sequence.remaining_seconds())
   remaining_seconds = remaining_seconds[0:5] if '.' in remaining_seconds else remaining_seconds[0:4]
-  set_led_text('{}.{}.{}'.format(code, str(sequence.remaining_shots()).zfill(3), remaining_seconds.zfill(4)))
+  set_oled_message(sequence.name, 'shot: {} of {}\nremaining: {} shots\nelapsed: {}s of {}s, remaining: {}s\n'.format(
+        sequence.finished,
+        sequence.count,
+        sequence.remaining_shots(),
+        sequence.shot_seconds(),
+        sequence.total_seconds(),
+        sequence.remaining_seconds()
+      ))
 
 def __on_sequence_item_starting(sequence, item):
   send_event('Shoot', 'Shoot started {}/{}, exposure: {}s, remaining: {}, {}s'
@@ -121,7 +129,7 @@ def create_sequence(settings):
     sb.add_filter_wheel_step(filter_number=settings['filter'])
     change_settings(settings)
     if 'refocus' in settings and settings['refocus']:
-        add_prompt_step('Focus check for {}'.format(settings['name']), led_text='FOCUS')
+        add_prompt_step('Focus check for {}'.format(settings['name']))
         sb.add_filter_wheel_step(filter_number=FILTER_LUMINANCE)
         change_settings(settings)
     add_sequence(settings['name'], exposure=settings['exp'], count=settings['count'])
