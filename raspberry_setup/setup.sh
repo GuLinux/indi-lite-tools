@@ -96,7 +96,7 @@ setup_wifi_ap() {
 }
 
 setup_dashboard() {
-    cp ../indi-dashboard/dashboard.service /etc/systemd/system/
+    cp ../dashboard/indi-dashboard.service /etc/systemd/system/
     systemctl daemon-reload
     systemctl enable indi-dashboard
     systemctl start indi-dashboard
