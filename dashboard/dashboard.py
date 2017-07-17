@@ -13,11 +13,14 @@ events = []
 cached_objects = {}
 temp_humidity_saver = { 'saving': False }
 
-try:
-    import config
-    config.setup(app_config)
-except:
-    pass
+@app.before_first_request
+def initialize():
+    app.logger.debug('Initializing app configuration')
+    try:
+        import config
+        config.setup(app_config)
+    except:
+        pass
 
 
 def with_config(config_name):

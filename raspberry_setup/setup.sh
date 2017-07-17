@@ -17,7 +17,7 @@ install_prerequisites() {
     apt-get update && apt-get install -y cdbs libcfitsio3-dev libnova-dev libusb-1.0-0-dev libjpeg-dev \
         libusb-dev libtiff5-dev libftdi-dev fxload libkrb5-dev libcurl4-gnutls-dev libraw-dev libgphoto2-dev \
         libgsl0-dev dkms libboost-regex-dev libgps-dev libdc1394-22-dev vim curl wget nginx \
-        python-pip ipython python-dev git hostapd tmux dnsmasq swig shellinabox
+        python-pip ipython python-dev git hostapd tmux dnsmasq swig shellinabox libfreetype6-dev fonts-dejavu-core
 }
 
 install_indi() {
@@ -69,7 +69,7 @@ EOF
 
 setup_python() {
     pip2 install -U pip setuptools
-    pip2 install flask pyindi-client requests psutil bottle max7219 luma.led_matrix astropy
+    pip2 install flask pyindi-client requests psutil bottle max7219 luma.led_matrix luma.oled astropy
 }
 
 setup_nginx() {
