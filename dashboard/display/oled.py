@@ -8,7 +8,6 @@ class OLed:
         self.device = device
         self.message = {}
         self.__shown = {}
-        self.__lock = threading.Lock()
 
     def update(self, message):
         self.message = message
@@ -33,7 +32,6 @@ class OLed:
             time.sleep(1)
 
     def __redraw(self):
-        self.__lock.acquire()
         self.message['clock'] = time.strftime('%H:%M', time.gmtime())
         if self.message != self.__shown:
             self.__shown = self.message
@@ -44,7 +42,6 @@ class OLed:
                     self.__draw(draw_canvas, (0, 0), self.message['title'], font_size=11)
                 if 'text' in self.message:
                     self.__draw(draw_canvas, (0, start_y), self.message['text'], font_size=9)
-        self.__lock.release()
 
     def contrast(self, contrast):
         self.device.contrast(contrast)
