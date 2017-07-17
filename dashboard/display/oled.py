@@ -35,18 +35,15 @@ class OLed:
     def __redraw(self):
         self.__lock.acquire()
         self.message['clock'] = time.strftime('%H:%M', time.gmtime())
-        print('message={}, shown={}'.format(self.message, self.__shown))
         if self.message != self.__shown:
             self.__shown = self.message
             with canvas(self.device) as draw_canvas:
-                self.__draw(draw_canvas, (90, 0), self.message['clock'], font_size=11)
+
+                start_y = self.__draw(draw_canvas, (90, 0), self.message['clock'], font_size=11)[1]
                 if 'title' in self.message:
                     self.__draw(draw_canvas, (0, 0), self.message['title'], font_size=11)
-                if 'lines' in self.message:
-                    start_y = 12
-                    for line in self.message['lines']:
-                        self.__draw(draw_canvas, (0, start_y), line, font_size=9)
-                        start_y += 10
+                if 'text' in self.message:
+                    self.__draw(draw_canvas, (0, start_y), self.message['text'], font_size=9)
         self.__lock.release()
 
     def contrast(self, contrast):
@@ -54,7 +51,8 @@ class OLed:
                 
     def __draw(self, draw_canvas, coords, text, font_size=8):
         font = ImageFont.truetype('DejaVuSans.ttf', font_size)
-        draw_canvas.text(coords, text, fill='white', font=font)
+        draw_canvas.multiline_text(coords, text, fill='white', font=font)
+        return draw_canvas.multiline_textsize(text, font)
 
 
 
