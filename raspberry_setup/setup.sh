@@ -108,8 +108,8 @@ setup_nginx() {
 
 setup_wifi_ap() {
     [[ -r /etc/hostapd/.wifi_setup ]] && . /etc/hostapd/.wifi_setup
-    read -p "Enter your wifi access point ESSID: " -e AP_ESSID -i "$AP_ESSID"
-    read -p "Enter your wifi access point secret: " -e AP_SECRET -i "$AP_SECRET"
+    read -p "Enter your wifi access point ESSID: " -i "$AP_ESSID" -e AP_ESSID
+    read -p "Enter your wifi access point secret: " -i "$AP_SECRET" -e AP_SECRET
     cp wifi-ap/ap-mode /usr/local/bin/
     cp wifi-ap/dhcpcd.conf-ap-* wifi-ap/dnsmasq.conf /etc/
     cp wifi-ap/interfaces-ap-* /etc/network/
