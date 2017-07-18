@@ -9,15 +9,39 @@ if [[ "$PWD" != /home/pi/indi-lite-tools/raspberry_setup ]]; then
     exit 1
 fi
 
+PYTHON_VERSION=2
+ASSUME_YES=false
+
+while [[ -n "$1" ]]; do
+
+    case "$1" in
+        --yes|-y)
+            ASSUME_YES=true
+            ;;
+        --python3|-3)
+            PYTHON_VERSION=3
+            ;;
+        *)
+            echo "Usage: $0 options"
+            echo "Options:"
+            echo "-y|--yes      Assume yes to all questions"
+            echo "-3|--python3  Use python3 instead of python2"
+            exit 1
+            ;;
+    esac
+done
 full_upgrade() {
 	apt-get update && apt-get dist-upgrade -y
 }
+
+python_pkgname=python
+[[ "$PYTHON_VERSION" == 3 ]] && python_pkgname=python3
 
 install_prerequisites() {
     apt-get update && apt-get install -y cdbs libcfitsio3-dev libnova-dev libusb-1.0-0-dev libjpeg-dev \
         libusb-dev libtiff5-dev libftdi-dev fxload libkrb5-dev libcurl4-gnutls-dev libraw-dev libgphoto2-dev \
         libgsl0-dev dkms libboost-regex-dev libgps-dev libdc1394-22-dev vim curl wget nginx \
-        python-pip ipython python-dev git hostapd tmux dnsmasq swig shellinabox libfreetype6-dev fonts-dejavu-core python-numpy
+        ${python_pkgname}-pip i${python_pkgname} ${python_pkgname}-dev git hostapd tmux dnsmasq swig shellinabox libfreetype6-dev fonts-dejavu-core 
 }
 
 install_indi() {
@@ -68,8 +92,8 @@ EOF
 }
 
 setup_python() {
-    pip2 install -U pip setuptools
-    pip2 install flask pyindi-client requests psutil bottle max7219 luma.led_matrix luma.oled astropy
+    pip${PYTHON_VERSION} install -U pip setuptools
+    pip${PYTHON_VERSION}  install flask pyindi-client requests psutil bottle max7219 luma.led_matrix luma.oled astropy
 }
 
 setup_nginx() {
@@ -119,6 +143,8 @@ setup_shellinabox() {
     cp shellinabox/indi-tmux /usr/local/bin
     systemctl enable shellinabox
     systemctl start shellinabox
+    rm -f "/etc/shellinabox/options-enabled/01_Monochrome.css"
+    rm -f "/etc/shellinabox/options-enabled/00+Black on White.css"
 }
 
 setup_AdafruitDHT() {
@@ -126,7 +152,7 @@ setup_AdafruitDHT() {
     cd /tmp
     git clone https://github.com/adafruit/Adafruit_Python_DHT.git
     cd Adafruit_Python_DHT
-    sudo python setup.py install
+    sudo python${PYTHON_VERSION} setup.py install
     cd "$prevdir"
     rm -rf /tmp/Adafruit_Python_DHT
 }
