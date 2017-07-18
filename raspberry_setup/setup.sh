@@ -29,6 +29,7 @@ while [[ -n "$1" ]]; do
             exit 1
             ;;
     esac
+    shift
 done
 full_upgrade() {
 	apt-get update && apt-get dist-upgrade -y
@@ -177,7 +178,11 @@ EOF
 }
 
 ask_step() {
-read -p "$1 [Y/n] " -n 1 -e confirm
+    if [[ "$ASSUME_YES" == true ]]; then
+        confirm=y
+    else
+        read -p "$1 [Y/n] " -n 1 -e confirm
+    fi
     shift
     if [[ "$confirm" == "n" ]]; then
         return
