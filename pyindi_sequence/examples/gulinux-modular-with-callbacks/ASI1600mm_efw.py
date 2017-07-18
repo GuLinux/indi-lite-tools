@@ -1,12 +1,12 @@
 import sys
 import os
-import inspect
 from pyindi_sequence import SequenceBuilder, ShellCommandStep
 import requests
 import functools
 import json
 import time, datetime
 import textwrap
+import __main__
 
 #import urllib3
 
@@ -23,9 +23,7 @@ buzzer_config = { 'enabled': False }
 
 # get session name from script name. This way, when you copy this script to, let's say, 2017-05-10-M42.py, your session name will be 'M42'
 
-_frame = inspect.stack()[1]
-_module = inspect.getmodule(_frame[0])
-SESSION_NAME=os.path.splitext(os.path.basename(_module.__file__))[0].replace(' ', '_')
+SESSION_NAME=os.path.splitext(__main__.__file__)[0].replace(' ', '_')
 
 print('Session name: {}'.format(SESSION_NAME))
 
