@@ -1,7 +1,8 @@
 #!/bin/bash
 cur_dir="$( dirname "$0")"
+cur_dir_abs_path="$( cd "$cur_dir" && pwd )"
 mkdir -p ~/python_modules
-ln -fs "$cur_dir/ASI1600mm_efw.py" ~/python_modules/
+ln -fs "$cur_dir_abs_path/ASI1600mm_efw.py" ~/python_modules/
 mkdir -p ~/Shots
-ln -fs "$cur_dir/sequence_template.py" ~/Shots/
+ln -fs "$cur_dir_abs_path/sequence_template.py" ~/Shots/
 
