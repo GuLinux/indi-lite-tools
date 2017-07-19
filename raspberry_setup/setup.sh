@@ -107,6 +107,7 @@ setup_nginx() {
 }
 
 setup_wifi_ap() {
+    [[ -z "$AP_ESSID" ]] && AP_ESSID="$HOSTNAME"
     [[ -r /etc/hostapd/.wifi_setup ]] && . /etc/hostapd/.wifi_setup
     read -p "Enter your wifi access point ESSID: " -i "$AP_ESSID" -e AP_ESSID
     read -p "Enter your wifi access point secret: " -i "$AP_SECRET" -e AP_SECRET
