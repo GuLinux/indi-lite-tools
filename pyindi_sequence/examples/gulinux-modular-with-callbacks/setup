@@ -1,0 +1,7 @@
+#!/bin/bash
+cur_dir="$( dirname "$0")"
+mkdir -p ~/python_modules
+ln -fs "$cur_dir/ASI1600mm_efw.py" ~/python_modules/
+mkdir -p ~/Shots
+ln -fs "$cur_dir/sequence_template.py" ~/Shots/
+
