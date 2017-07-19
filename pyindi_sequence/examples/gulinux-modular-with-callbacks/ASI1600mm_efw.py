@@ -19,7 +19,7 @@ FILTER_GREEN=3
 FILTER_BLUE=4
 FILTER_DARK=5
 
-buzzer_config = { 'enabled': False }
+buzzer_config = { 'enabled': False, 'default_duration': 10 }
 
 # get session name from script name. This way, when you copy this script to, let's say, 2017-05-10-M42.py, your session name will be 'M42'
 
@@ -40,8 +40,9 @@ def clear_oled():
 def send_event(event_type, event_text, notify=False, require_interaction=False):
     requests.put('http://localhost:5100/events', json={'type': event_type, 'text': event_text, 'notify': notify, 'require_interaction': require_interaction})
 
-def enable_buzzer(enable):
+def enable_buzzer(enable, default_duration=10):
     buzzer_config['enabled'] = enable
+    buzzer_config['default_duration'] = default_duration
 
 def send_buzzer(pattern, loop=True, duration=None):
     if buzzer_config['enabled']:
@@ -53,7 +54,7 @@ def clear_buzzer():
 def add_prompt_step(message):
     sb.add_function(functools.partial(set_oled_message, 'Confirm', message))
     sb.add_function(functools.partial(send_event, 'User confirmation', message, notify=True, require_interaction=True))
-    sb.add_function(functools.partial(send_buzzer, [{"frequency": 1500, "duration": 0.5}, {"frequency": 0, "duration": 0.2}]))
+    sb.add_function(functools.partial(send_buzzer, [{"frequency": 1500, "duration": 0.5}, {"frequency": 0, "duration": 0.2}], duration=buzzer_config['default_duration']))
     sb.add_user_confirmation_prompt(message)
     sb.add_function(clear_buzzer)
     sb.add_function(clear_oled)
