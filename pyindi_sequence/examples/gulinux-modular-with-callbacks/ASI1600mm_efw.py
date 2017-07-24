@@ -31,8 +31,10 @@ sb = SequenceBuilder(SESSION_NAME, camera_name='ZWO CCD ASI1600MM')
 sb.set_filter_wheel('EFW')
 
 
-def set_oled_message(title, text):
-    requests.put('http://localhost:5100/oled', json={'text': textwrap.fill(text, 21), 'title': title})
+def set_oled_message(title, text, wrap=True):
+    if wrap:
+        text = textwrap.fill(text, 21)
+    requests.put('http://localhost:5100/oled', json={'text': text, 'title': title})
 
 def clear_oled():
     requests.delete('http://localhost:5100/oled')
@@ -96,14 +98,14 @@ def __send_sequence_item_led(sequence, item):
       code = filter_codes[pattern]
   remaining_seconds = str(sequence.remaining_seconds())
   remaining_seconds = remaining_seconds[0:5] if '.' in remaining_seconds else remaining_seconds[0:4]
-  set_oled_message(sequence.name, 'shot {}/{}/{}\n\nTime {}/{}/{}'.format(
+  set_oled_message(sequence.name, 'shot {}/{}/{}\nTime {}/{}/{}'.format(
         sequence.finished,
         sequence.remaining_shots(),
         sequence.count,
         sequence.shot_seconds(),
         sequence.remaining_seconds(),
         sequence.total_seconds()
-      ))
+      ), wrap=False)
 
 def __on_sequence_item_starting(sequence, item):
   send_event('Shoot', 'Shoot started {}/{}, exposure: {}s, remaining: {}, {}s'
