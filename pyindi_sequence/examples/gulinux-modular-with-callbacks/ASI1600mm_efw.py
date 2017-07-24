@@ -96,7 +96,7 @@ def __send_sequence_item_led(sequence, item):
       code = filter_codes[pattern]
   remaining_seconds = str(sequence.remaining_seconds())
   remaining_seconds = remaining_seconds[0:5] if '.' in remaining_seconds else remaining_seconds[0:4]
-  set_oled_message(sequence.name, 'shot: {} of {}\nremaining: {} shots\nelapsed: {}s of {}s, remaining: {}s\n'.format(
+  set_oled_message(sequence.name, 'shot: {} of {}\nrem: {} shots\nel: {}s of {}s, rem: {}s\n'.format(
         sequence.finished,
         sequence.count,
         sequence.remaining_shots(),
