@@ -5,7 +5,7 @@ sys.path.append(os.path.join(os.environ['HOME'], 'indi-lite-tools')) # Change th
 from pyindi_sequence import SequenceBuilder, ShellCommandStep
 
 
-ASI_BIAS_EXPOSURE=0.00032
+ASI_BIAS_EXPOSURE=0.000032
 
 # get session name from script name. This way, when you copy this script to, let's say, 2017-05-10-M42.py, your session name will be 'M42'
 SESSION_NAME=os.path.splitext(os.path.basename(__file__))[0].replace(' ', '_')
