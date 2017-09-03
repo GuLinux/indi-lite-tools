@@ -49,7 +49,7 @@ install_indi() {
     mkdir /tmp/indi_install
     cd /tmp/indi_install
     wget "indilib.org/jdownloads/Raspberry PI/libindi_1.5.0_rpi.tar.gz"
-    tar xf "libindi_1.4.1_rpi.tar.gz"
+    tar xf "libindi_1.5.0_rpi.tar.gz"
     dpkg -i libindi*/*.deb
     cd -
     rm -rf /tmp/indi_install
