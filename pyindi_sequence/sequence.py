@@ -34,7 +34,7 @@ class Sequence:
 
     def run(self):
         self.camera.set_upload_to('local')
-        sequence_prefix='{0}_{1}s_'.format(self.name, self.exposure)
+        sequence_prefix = '{0}_{1}s_'.format(self.name, self.exposure)
         tmp_prefix = sequence_prefix + 'TMP'
         tmp_file = os.path.join(self.upload_path, tmp_prefix + '.fits')
 
@@ -51,7 +51,8 @@ class Sequence:
             self.camera.shoot(self.exposure)
             temp_after = self.ccd_temperature
 
-            file_name = os.path.join(self.upload_path, '{0}{1:03}.fits'.format(sequence_prefix, sequence+self.start_index))
+            file_name = os.path.join(self.upload_path,
+                                     '{0}{1:03}.fits'.format(sequence_prefix, sequence + self.start_index))
             shutil.move(tmp_file, file_name)
 
             if temp_before is not None and temp_after is not None:
@@ -72,7 +73,7 @@ class Sequence:
         if self.camera.has_control('CCD_TEMPERATURE', 'number'):
             return self.camera.values('CCD_TEMPERATURE', 'number')['CCD_TEMPERATURE_VALUE']
         return None
-        
+
     @property
     def total_seconds(self):
         return self.exposure * self.count
@@ -85,7 +86,7 @@ class Sequence:
     def remaining_seconds(self):
         return self.remaining_shots * self.exposure
 
-    @property 
+    @property
     def remaining_shots(self):
         return self.count - self.finished
 
@@ -98,8 +99,10 @@ class Sequence:
         return self.next_index - 1
 
     def __str__(self):
-        return 'Sequence {0}: {1} {2}s exposure (total exp time: {3}s)'.format(self.name, self.count, self.exposure,
-                                                                               self.total_seconds)
+        return 'Sequence {0}: {1} {2}s exposure (total exp time: {3}s), start index: {4}'.format(self.name, self.count,
+                                                                                                 self.exposure,
+                                                                                                 self.total_seconds,
+                                                                                                 self.start_index)
 
     def __repr__(self):
         return self.__str__()
