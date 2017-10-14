@@ -150,7 +150,7 @@ def create_sequence(settings):
         sb.add_filter_wheel_step(filter_number=FILTER_LUMINANCE)
         change_settings(settings)
     start_index = settings['start_index'] if 'start_index' in settings else 1
-    add_sequence(settings['name'], exposure=settings['exp'], count=settings['count'], start_index=1)
+    add_sequence(settings['name'], exposure=settings['exp'], count=settings['count'], start_index=start_index)
 
 
 def dark_bias(settings, name=None, frame_type='FRAME_DARK'):
