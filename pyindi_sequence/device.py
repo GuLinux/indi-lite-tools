@@ -36,7 +36,7 @@ class Device:
         self.indi_client.sendNewSwitch(c)
 
         if sync:
-            self.__wait_for_ctl_status(c, timeout=timeout)
+            self.__wait_for_ctl_statuses(c, statuses=[PyIndi.IPS_IDLE, PyIndi.IPS_OK], timeout=timeout)
 
         return c
         
@@ -47,7 +47,7 @@ class Device:
         self.indi_client.sendNewNumber(c)
 
         if sync:
-            self.__wait_for_ctl_status(c, timeout=timeout)
+            self.__wait_for_ctl_statuses(c, timeout=timeout)
         return c
 
     def set_text(self, control_name, values, sync = True, timeout=None):
@@ -57,19 +57,19 @@ class Device:
         self.indi_client.sendNewText(c)
 
         if sync:
-            self.__wait_for_ctl_status(c, timeout=timeout)
+            self.__wait_for_ctl_statuses(c, timeout=timeout)
 
         return c
                 
-    def __wait_for_ctl_status(self, ctl, status = PyIndi.IPS_OK, timeout=None):
+
+    def __wait_for_ctl_statuses(self, ctl, statuses=[PyIndi.IPS_OK, PyIndi.IPS_IDLE], timeout=None):
         started = time.time()
         if timeout is None:
             timeout = self.timeout
-        while ctl.s != status:
+        while ctl.s not in statuses:
             if timeout > 0 and time.time() - started > timeout:
                 raise RuntimeError('Timeout error while changing property {}'.format(ctl.name))
             time.sleep(0.5)
-
 
     def __map_indexes(self, ctl, values):
         result = {}

@@ -28,7 +28,7 @@ SESSION_NAME=os.path.splitext(__main__.__file__)[0].replace(' ', '_')
 print('Session name: {}'.format(SESSION_NAME))
 
 sb = SequenceBuilder(SESSION_NAME, camera_name='ZWO CCD ASI1600MM')
-sb.set_filter_wheel('EFW')
+sb.set_filter_wheel('ASI EFW')
 
 
 def set_oled_message(title, text, wrap=True):
