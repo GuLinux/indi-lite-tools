@@ -18,7 +18,7 @@ class SequenceCallbacks:
             callback(*args, **kwargs)
 
 class Sequence:
-    def __init__(self, camera, name, exposure, count, upload_path, **kwargs):
+    def __init__(self, camera, name, exposure, count, upload_path, start_index=1, **kwargs):
         self.camera = camera
         self.name = name
         self.count = count
@@ -26,6 +26,7 @@ class Sequence:
         self.upload_path = upload_path
         self.callbacks = SequenceCallbacks(**kwargs)
         self.finished = 0
+        self.start_index = start_index
         if not os.path.isdir(upload_path):
             os.makedirs(upload_path)
 
@@ -48,7 +49,7 @@ class Sequence:
             self.camera.shoot(self.exposure)
             temp_after = self.ccd_temperature()
 
-            file_name = os.path.join(self.upload_path, '{0}{1:03}.fits'.format(sequence_prefix, sequence+1))
+            file_name = os.path.join(self.upload_path, '{0}{1:03}.fits'.format(sequence_prefix, sequence+self.start_index))
             shutil.move(tmp_file, file_name)
 
             if temp_before is not None and temp_after is not None:
@@ -82,6 +83,15 @@ class Sequence:
     
     def remaining_shots(self):
         return self.count - self.finished
+
+    @property
+    def next_index(self):
+        return self.finished + self.start_index
+
+    @property
+    def last_index(self):
+        return self.next_index - 1
+
 
     def __str__(self):
         return 'Sequence {0}: {1} {2}s exposure (total exp time: {3}s)'.format(self.name, self.count, self.exposure, self.total_seconds())
