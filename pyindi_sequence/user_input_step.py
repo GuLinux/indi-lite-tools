@@ -1,9 +1,11 @@
 import sys
 
+
 class UserInputStep:
     DEFAULT_PROMPT = 'Press Enter to continue'
+
     # the on_input callback, if specified, will be called with the user entered input
-    def __init__(self, prompt = DEFAULT_PROMPT, on_input = None):
+    def __init__(self, prompt=DEFAULT_PROMPT, on_input=None):
         self.prompt = prompt
         self.on_input = on_input
 

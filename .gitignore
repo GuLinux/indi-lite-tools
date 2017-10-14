@@ -1,4 +1,5 @@
 *.swp
+.idea
 dashboard-client-android/
 *.pyc
 __pycache__

@@ -96,25 +96,25 @@ def __send_sequence_item_led(sequence, item):
   for pattern in filter_codes:
     if pattern in sequence.name.lower():
       code = filter_codes[pattern]
-  remaining_seconds = str(sequence.remaining_seconds())
+  remaining_seconds = str(sequence.remaining_seconds)
   remaining_seconds = remaining_seconds[0:5] if '.' in remaining_seconds else remaining_seconds[0:4]
   set_oled_message(sequence.name, 'shot {}/{}/{}\nTime {}/{}/{}'.format(
         sequence.finished,
-        sequence.remaining_shots(),
+        sequence.remaining_shots,
         sequence.count,
-        sequence.shot_seconds(),
-        sequence.remaining_seconds(),
-        sequence.total_seconds()
+        sequence.shot_seconds,
+        sequence.remaining_seconds,
+        sequence.total_seconds
       ), wrap=False)
 
 def __on_sequence_item_starting(sequence, item):
   send_event('Shoot', 'Shoot started {}/{}, exposure: {}s, remaining: {}, {}s'
-             .format(item+1, sequence.count, sequence.exposure, sequence.remaining_shots(), sequence.remaining_seconds()))
+             .format(item+1, sequence.count, sequence.exposure, sequence.remaining_shots, sequence.remaining_seconds))
   __send_sequence_item_led(sequence, item)
 
 def __on_sequence_item_ended(sequence, item, file_name):
     send_event('Shoot', 'Shoot finished {}/{}, filename: {}, exposure: {}s, remaining: {}, {}s'
-             .format(item+1, sequence.count, file_name, sequence.exposure, sequence.remaining_shots(), sequence.remaining_seconds()))
+             .format(item+1, sequence.count, file_name, sequence.exposure, sequence.remaining_shots, sequence.remaining_seconds))
     __send_sequence_item_led(sequence, item)
 
 def add_sequence(*args, **kwargs):

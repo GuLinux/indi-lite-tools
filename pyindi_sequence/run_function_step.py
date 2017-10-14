@@ -1,6 +1,6 @@
 class RunFunctionStep:
-    def __init__(self, function):
-        self.function = function
+    def __init__(self, _function):
+        self.function = _function
 
     def run(self):
         self.function()

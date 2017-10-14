@@ -13,11 +13,14 @@ import time
 
 
 class SequenceBuilder:
-    def __init__(self, name, camera_name = None, upload_path = None, indi_host = INDIClient.DEFAULT_HOST, indi_port = INDIClient.DEFAULT_PORT):
+    def __init__(self, name, camera_name=None, upload_path=None, indi_host=INDIClient.DEFAULT_HOST,
+                 indi_port=INDIClient.DEFAULT_PORT):
         self.sequences = []
         self.name = name
         self.indi_client = INDIClient(indi_host, indi_port)
         self.auto_dark_calculator = AutoDarkCalculator()
+        self.camera = None
+        self.filter_wheel = None
         self.set_camera(camera_name)
 
         if not upload_path:
@@ -25,13 +28,14 @@ class SequenceBuilder:
         print('Will save fits file into {0}'.format(upload_path))
         self.upload_path = upload_path
 
+    @property
     def devices(self):
-        return self.indi_client.listDeviceNames()
+        return self.indi_client.device_names
 
     def set_camera(self, camera_name):
         if not camera_name:
             time.sleep(1)
-            print('Camera name cannot be empty. Available devices: {0}'.format(', '.join(self.devices())))
+            print('Camera name cannot be empty. Available devices: {0}'.format(', '.join(self.devices)))
             self.camera = None
             return
         self.camera = Camera(camera_name, self.indi_client)
@@ -39,7 +43,7 @@ class SequenceBuilder:
     def set_filter_wheel(self, filter_wheel_name):
         self.filter_wheel = FilterWheel(filter_wheel_name, self.indi_client)
 
-    def add_sequence(self, sequence_name, exposure, count, auto_dark = True, start_index=1):
+    def add_sequence(self, sequence_name, exposure, count, auto_dark=True, start_index=1):
         return self.__append(
             Sequence(
                 self.camera,
@@ -51,8 +55,8 @@ class SequenceBuilder:
                 start_index=start_index
         ))
 
-    def add_filter_wheel_step(self, filter_name = None, filter_number = None):
-        return self.__append(FilterWheelStep(self.filter_wheel, filter_name = filter_name, filter_number = filter_number))
+    def add_filter_wheel_step(self, filter_name=None, filter_number=None):
+        return self.__append(FilterWheelStep(self.filter_wheel, filter_name=filter_name, filter_number=filter_number))
 
     def add_user_confirmation_prompt(self, message = UserInputStep.DEFAULT_PROMPT, on_input = None):
         return self.__append(UserInputStep(message, on_input))
@@ -63,14 +67,14 @@ class SequenceBuilder:
     def add_shell_command(self, command, shell = False, abort_on_failure = False):
         return self.__append(ShellCommandStep(command, shell, abort_on_failure))
 
-    def add_auto_dark(self, name = 'Dark', count = 10):
+    def add_auto_dark(self, name='Dark', count = 10):
         return self.__append(AutoDarkSequence(self.camera, self.auto_dark_calculator, self.upload_path, name, count)) 
 
     def change_camera_settings(self, roi = None, binning = None, compression_format = None, frame_type = None, controls = None, numbers = None, switches = None):
         return self.__append(CameraChangeSettingsStep(self.camera, roi, binning, compression_format, frame_type, controls, numbers, switches))
 
-    def add_function(self, function):
-        return self.__append(RunFunctionStep(function))
+    def add_function(self, f):
+        return self.__append(RunFunctionStep(f))
 
     def start(self):
         sequence_def = {

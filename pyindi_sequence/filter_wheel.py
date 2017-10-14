@@ -1,8 +1,8 @@
 from pyindi_sequence.device import Device
-import PyIndi
+
 
 class FilterWheelStep:
-    def __init__(self, filter_wheel, filter_name = None, filter_number = None):
+    def __init__(self, filter_wheel, filter_name=None, filter_number=None):
         self.filter_wheel = filter_wheel
 
         if not filter_name and not filter_number:
@@ -18,28 +18,28 @@ class FilterWheelStep:
         self.filter_wheel.set_filter_number(self.filter_number)
 
     def __str__(self):
-        return 'Change filter to {0} ({1}) on filter wheel {2}'.format(self.filter_name, self.filter_number, self.filter_wheel)
+        return 'Change filter to {0} ({1}) on filter wheel {2}' \
+            .format(self.filter_name, self.filter_number, self.filter_wheel)
 
     def __repr__(self):
         return self.__str__()
 
-    
 
 class FilterWheel(Device):
-    def __init__(self, name, indi_client, connect_on_create = True):
+    def __init__(self, name, indi_client, connect_on_create=True):
         Device.__init__(self, name, indi_client)
         if connect_on_create:
             self.connect()
 
     def set_filter(self, name):
-       self.set_filter_number(self.filters()[name])
+        self.set_filter_number(self.filters()[name])
 
     def set_filter_number(self, number):
-       self.set_number('FILTER_SLOT', {'FILTER_SLOT_VALUE': number})
+        self.set_number('FILTER_SLOT', {'FILTER_SLOT_VALUE': number})
 
     def filters(self):
         ctl = self.getControl('FILTER_NAME', 'text')
-        filters = [(x.text, self.__name2number(x.name)) for x in ctl]
+        filters = [(x.text, FilterWheel.__name2number(x.name)) for x in ctl]
         return dict(filters)
 
     def current_filter(self):
@@ -50,18 +50,20 @@ class FilterWheel(Device):
     def filter_name(self, number):
         return [a for a, b in self.filters().items() if b == number][0]
 
-    def __name2number(self, name):
+    @staticmethod
+    def __name2number(name):
         return int(name.replace('FILTER_SLOT_NAME_', ''))
 
-    def __number2name(self, number):
+    @staticmethod
+    def __number2name(number):
         return 'FILTER_SLOT_NAME_{0}'.format(number)
 
     def __str__(self):
         filters = [(n, i) for n, i in self.filters().items()]
         filters.sort(key=lambda x: x[1])
-        filters = ['{0} ({1})'.format(i[0], i[1]) for i in filters] 
-        return 'FilterWheel {0}, current filter: {1}, available: {2}'.format(self.name, self.current_filter(), ', '.join(filters))
+        filters = ['{0} ({1})'.format(i[0], i[1]) for i in filters]
+        return 'FilterWheel {0}, current filter: {1}, available: {2}' \
+            .format(self.name, self.current_filter(), ', '.join(filters))
 
     def __repr__(self):
         return self.__str__()
-

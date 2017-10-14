@@ -5,16 +5,16 @@ class INDIClient(PyIndi.BaseClient):
     DEFAULT_HOST = 'localhost'
     DEFAULT_PORT = 7624
 
-    def __init__(self, address = DEFAULT_HOST, port = DEFAULT_PORT):
+    def __init__(self, address=DEFAULT_HOST, port=DEFAULT_PORT):
         super(INDIClient, self).__init__()
         self.host = address
         self.port = port
         self.setServer(address, port)
         self.connectServer()
 
-    def listDeviceNames(self):
+    @property
+    def device_names(self):
         return [d.getDeviceName() for d in self.getDevices()]
-            
 
     def newDevice(self, d):
         pass

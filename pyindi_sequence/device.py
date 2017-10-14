@@ -60,14 +60,13 @@ class Device:
             self.__wait_for_ctl_statuses(c, timeout=timeout)
 
         return c
-                
 
     def __wait_for_ctl_statuses(self, ctl, statuses=[PyIndi.IPS_OK, PyIndi.IPS_IDLE], timeout=None):
         started = time.time()
         if timeout is None:
             timeout = self.timeout
         while ctl.s not in statuses:
-            if timeout > 0 and time.time() - started > timeout:
+            if 0 < timeout < time.time() - started:
                 raise RuntimeError('Timeout error while changing property {}'.format(ctl.name))
             time.sleep(0.5)
 
@@ -77,7 +76,6 @@ class Device:
              if c.name in values:
                 result[c.name] = i
         return result
-
 
     def getControl(self, name, ctl_type, timeout=None):
         ctl = None
@@ -92,11 +90,10 @@ class Device:
         started = time.time()
         while not(ctl):
             ctl = getattr(self.device, attr)(name)
-            if not ctl and timeout > 0 and time.time() - started > timeout:
+            if not ctl and 0 < timeout < time.time() - started:
                 raise RuntimeError('Timeout finding control {}'.format(name))
             time.sleep(0.1)
         return ctl
-
 
     def has_control(self, name, ctl_type):
         try:

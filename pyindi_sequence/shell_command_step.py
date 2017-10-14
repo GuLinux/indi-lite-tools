@@ -1,6 +1,8 @@
 import subprocess
+
+
 class ShellCommandStep:
-    def __init__(self, arguments, shell = False, abort_on_failure = False):
+    def __init__(self, arguments, shell=False, abort_on_failure=False):
         self.arguments = arguments
         self.shell = shell
         self.abort_on_failure = abort_on_failure
