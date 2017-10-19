@@ -16,5 +16,4 @@ SHELLINABOX_PORT=4200
 #   Beeps are disabled because of reports of the VLC plugin crashing
 #   Firefox on Linux/x86_64.
 #SHELLINABOX_ARGS="--no-beep --disable-ssl "
-#SHELLINABOX_ARGS="--no-beep --disable-ssl --service /:pi:pi:/home/pi:'bash --login'"
-SHELLINABOX_ARGS="--no-beep --disable-ssl --service /:pi:pi:/home/pi:'/usr/local/bin/indi-tmux'"
+

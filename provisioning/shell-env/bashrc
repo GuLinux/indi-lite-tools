@@ -1,0 +1,5 @@
+TARGET_DIRECTORY="/opt/indi-lite-tools"
+
+export PATH="$HOME/bin:$TARGET_DIRECTORY/provisioning/shell-env/bin:$PATH"
+export PYTHONPATH="$HOME/python_modules:$TARGET_DIRECTORY/provisioning/shell-env:$TARGET_DIRECTORY:$HOME/indi-lite-tools:$PYTHONPATH"
+
