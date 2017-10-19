@@ -38,7 +38,7 @@ EOF
 }
 
 setup_dashboard() {
-    cp "$PROJECT_PATH"/dashboard/indi-dashboard.service /etc/systemd/system/
+    sed "s/%%%USER%%%/$indi_user/g" "$PROJECT_PATH"/dashboard/indi-dashboard.service > /etc/systemd/system/indi-dashboard.service
     systemctl daemon-reload
     systemctl enable indi-dashboard
     systemctl start indi-dashboard
@@ -52,12 +52,9 @@ setup_shellinabox() {
     systemctl start shellinabox
     rm -f "/etc/shellinabox/options-enabled/01_Monochrome.css"
     rm -f "/etc/shellinabox/options-enabled/00+Black on White.css"
-    read -p "Default username for shellinabox automatic login (blank to disable): " sh_user
-    if [ -n "$sh_user" ]; then
     cat >>/etc/default/shellinabox <<EOF
 SHELLINABOX_ARGS="--no-beep --disable-ssl --service /:$sh_user:$sh_user:/home/$sh_user:'/usr/local/bin/indi-tmux'"
 EOF
-    fi
 }
 
 setup_AdafruitDHT() {
@@ -71,16 +68,8 @@ setup_AdafruitDHT() {
 }
 
 setup_indi_control_panel() {
-    cd /opt
-    if [[ -d indiwebmanager ]]; then
-        cd indiwebmanager && git pull
-
-    else
-        git clone https://github.com/knro/indiwebmanager.git
-    fi
-
-    cp /opt/indiwebmanager/indiwebmanager.service /etc/systemd/system
-    sed -i 's|/home/pi/servermanager|/opt/indiwebmanager/servermanager|g' /etc/systemd/system/indiwebmanager.service
+    pip"${PYTHON_VERSION}" install -U indiweb
+    curl https://raw.githubusercontent.com/knro/indiwebmanager/master/indiwebmanager.service | sed "s|User=pi|User=$indi_user|g" > /etc/systemd/system/indiwebmanager.service
 
     systemctl daemon-reload
     systemctl enable indiwebmanager

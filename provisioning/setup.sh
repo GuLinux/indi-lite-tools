@@ -17,6 +17,7 @@ usage() {
     echo "-y|--yes                    Assume yes to all questions"
     echo "-3|--python3                Use python3 instead of python2"
     echo "-d|--distribution <distro>  Distribution type to setup (currently supported: ubuntu, raspbian"
+    echo "-u|--user <user>            User for services like indiwebmanager, indi-dashboard, etc"
     exit 1
 }
 
@@ -32,6 +33,9 @@ while [[ -n "$1" ]]; do
         -d|--distribution)
             distribution="$2"; shift
             ;;
+        -u|--user)
+            indi_user="$2"; shift
+            ;;
         *)
             usage
             ;;
@@ -43,6 +47,10 @@ done
 if [ -r "$SCRIPT_PATH/libs/$distribution.sh" ]; then
     . "$SCRIPT_PATH/libs/$distribution.sh"
 else
+    usage
+fi
+
+if [ -z "$indi_user" ] || [ "$indi_user" == "root" ] || ! grep -q "$indi_user" /etc/passwd; then
     usage
 fi
 

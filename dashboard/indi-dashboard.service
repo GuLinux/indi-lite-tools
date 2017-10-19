@@ -3,9 +3,9 @@ Description=INDI Dashboard
 
 [Service]
 Type=simple
-ExecStart=/home/pi/indi-lite-tools/dashboard/run -p 5100
-WorkingDirectory=/home/pi/indi-lite-tools/dashboard/
-User=pi
+ExecStart=/opt/indi-lite-tools/dashboard/run -p 5100
+WorkingDirectory=/opt/indi-lite-tools/dashboard/
+User=%%%USER%%%
 
 [Install]
 WantedBy=multi-user.target
