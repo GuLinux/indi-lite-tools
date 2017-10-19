@@ -1,6 +1,8 @@
 
 setup_shell() {
     cp -av "$SCRIPT_PATH/shell-env/bashrc" /etc/profile.d/indi-lite-tools.sh
+    mkdir -p ~$indi_user/bin; chown -R $indi_user ~$indi_user/bin
+    mkdir -p ~$indi_user/python_modules; chown -R $indi_user ~$indi_user/python_modules
 }
 
 setup_python() {
