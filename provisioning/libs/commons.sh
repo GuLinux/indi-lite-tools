@@ -5,7 +5,8 @@ setup_shell() {
 
 setup_python() {
     pip${PYTHON_VERSION} install -U pip setuptools
-    pip${PYTHON_VERSION}  install flask pyindi-client requests psutil bottle luma.led_matrix luma.oled astropy
+    pip${PYTHON_VERSION}  install flask requests psutil bottle luma.led_matrix luma.oled astropy
+    CFLAGS="-std=c++11" pip${PYTHON_VERSION} install pyindi-client 
 }
 
 setup_nginx() {
