@@ -68,7 +68,7 @@ class Device:
         while ctl.s not in statuses:
             if 0 < timeout < time.time() - started:
                 raise RuntimeError('Timeout error while changing property {}'.format(ctl.name))
-            time.sleep(0.5)
+            time.sleep(0.01)
 
     def __map_indexes(self, ctl, values):
         result = {}
@@ -92,7 +92,7 @@ class Device:
             ctl = getattr(self.device, attr)(name)
             if not ctl and 0 < timeout < time.time() - started:
                 raise RuntimeError('Timeout finding control {}'.format(name))
-            time.sleep(0.1)
+            time.sleep(0.01)
         return ctl
 
     def has_control(self, name, ctl_type):
