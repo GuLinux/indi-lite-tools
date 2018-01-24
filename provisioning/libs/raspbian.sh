@@ -38,8 +38,9 @@ setup_hdmi() {
 install_indi() {
     mkdir /tmp/indi_install
     cd /tmp/indi_install
-    wget "indilib.org/jdownloads/Raspberry PI/libindi_1.6.0_rpi.tar.gz"
-    tar xf "libindi_1.5.0_rpi.tar.gz"
+    INDI_VERSION=1.6.0
+    wget "indilib.org/jdownloads/Raspberry PI/libindi_${INDI_VERSION}_rpi.tar.gz"
+    tar xf "libindi_${INDI_VERSION}_rpi.tar.gz"
     dpkg -i libindi*/*.deb
     cd -
     rm -rf /tmp/indi_install
