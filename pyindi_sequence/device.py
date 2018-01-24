@@ -83,7 +83,7 @@ class Device:
             'number': 'getNumber',
             'switch': 'getSwitch',
             'text': 'getText',
-            'blob': 'getBlob'
+            'blob': 'getBLOB'
         }[ctl_type]
         if timeout is None:
             timeout = self.timeout
