@@ -1,5 +1,7 @@
 import PyIndi
 import time
+import ctypes
+
 
 class Device:
     DEFAULT_TIMEOUT = 30
@@ -22,6 +24,33 @@ class Device:
 
     def values(self, ctl_name, ctl_type):
         return dict(map(lambda c: (c.name, c.value), self.getControl(ctl_name, ctl_type)))
+
+    @property
+    def interfaces(self):
+        interface = self.device.getDriverInterface()
+        interface.acquire()
+        device_interfaces = int(ctypes.cast(interface.__int__(), ctypes.POINTER(ctypes.c_uint16)).contents.value)
+        interface.disown()
+        interfaces = {
+            PyIndi.BaseDevice.GENERAL_INTERFACE: 'general', 
+            PyIndi.BaseDevice.TELESCOPE_INTERFACE: 'telescope',
+            PyIndi.BaseDevice.CCD_INTERFACE: 'ccd',
+            PyIndi.BaseDevice.GUIDER_INTERFACE: 'guider',
+            PyIndi.BaseDevice.FOCUSER_INTERFACE: 'focuser',
+            PyIndi.BaseDevice.FILTER_INTERFACE: 'filter',
+            PyIndi.BaseDevice.DOME_INTERFACE: 'dome',
+            PyIndi.BaseDevice.GPS_INTERFACE: 'gps',
+            PyIndi.BaseDevice.WEATHER_INTERFACE: 'weather',
+            PyIndi.BaseDevice.AO_INTERFACE: 'ao',
+            PyIndi.BaseDevice.DUSTCAP_INTERFACE: 'dustcap',
+            PyIndi.BaseDevice.LIGHTBOX_INTERFACE: 'lightbox',
+            PyIndi.BaseDevice.DETECTOR_INTERFACE: 'detector',
+            PyIndi.BaseDevice.ROTATOR_INTERFACE: 'rotator',
+            PyIndi.BaseDevice.AUX_INTERFACE: 'aux'
+        }
+        interfaces = [interfaces[x] for x in interfaces if x & device_interfaces]
+        return interfaces
+        
 
     def switch_values(self, switch_name):
         return dict(map(lambda sw: (sw.name, sw.s == PyIndi.ISS_ON), self.getControl(switch_name, 'switch')))

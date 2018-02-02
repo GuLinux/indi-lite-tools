@@ -3,6 +3,7 @@ from pyindi_sequence.sequence_builder import SequenceBuilder
 from pyindi_sequence.sequence_runner import SequenceRunner 
 from pyindi_sequence.sequence import Sequence
 from pyindi_sequence.camera import Camera, CameraChangeSettingsStep
+from pyindi_sequence.device import Device
 from pyindi_sequence.indiclient import INDIClient 
 from pyindi_sequence.filter_wheel import FilterWheel, FilterWheelStep
 from pyindi_sequence.user_input_step import UserInputStep
