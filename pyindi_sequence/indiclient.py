@@ -5,11 +5,12 @@ class INDIClient(PyIndi.BaseClient):
     DEFAULT_HOST = 'localhost'
     DEFAULT_PORT = 7624
 
-    def __init__(self, address=DEFAULT_HOST, port=DEFAULT_PORT):
-        super(INDIClient, self).__init__()
+    def __init__(self, address=DEFAULT_HOST, port=DEFAULT_PORT, callbacks={}):
+        PyIndi.BaseClient.__init__(self)
         self.host = address
         self.port = port
         self.setServer(address, port)
+        self.callbacks = callbacks
         self.connectServer()
 
     @property
@@ -44,10 +45,15 @@ class INDIClient(PyIndi.BaseClient):
         pass
 
     def serverConnected(self):
-        pass
+        self.run_callback('serverConnected')        
 
     def serverDisconnected(self, code):
-        pass
+        self.run_callback('serverDisconnected', code)
+
+    def run_callback(self, name, *args, **kwargs):
+        callback = self.callbacks.get(name)
+        if callback:
+            callback(*args, **kwargs)
 
     def __str__(self):
         return 'INDI client connected to {0}:{1}'.format(self.host, self.port)
