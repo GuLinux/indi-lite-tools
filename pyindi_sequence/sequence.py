@@ -1,7 +1,9 @@
 import os, time
 from astropy.io import fits
+import threading
 import shutil
-
+import functools
+import tempfile
 
 class SequenceCallbacks:
     def __init__(self, **kwargs):
@@ -31,14 +33,17 @@ class Sequence:
         self.start_index = start_index
         if not os.path.isdir(upload_path):
             os.makedirs(upload_path)
+        self.async_move_thread = None
 
     def run(self):
         self.camera.set_upload_to('local')
         sequence_prefix = '{0}_{1}s_'.format(self.name, self.exposure)
         tmp_prefix = sequence_prefix + 'TMP'
-        tmp_file = os.path.join(self.upload_path, tmp_prefix + '.fits')
+        tmp_upload_path = tempfile.gettempdir()
+        tmp_file = os.path.join(tmp_upload_path, tmp_prefix + '.fits')
 
-        self.camera.set_upload_path(self.upload_path, tmp_prefix)
+
+        self.camera.set_upload_path(tmp_upload_path, tmp_prefix)
         self.callbacks.run('on_started', self)
 
         for sequence in range(0, self.count):
@@ -53,20 +58,38 @@ class Sequence:
 
             file_name = os.path.join(self.upload_path,
                                      '{0}{1:03}.fits'.format(sequence_prefix, sequence + self.start_index))
-            shutil.move(tmp_file, file_name)
 
+            temperature = None
             if temp_before is not None and temp_after is not None:
-                temp_avg = (temp_before + temp_after) / 2
-                fits_file = fits.open(file_name, mode='append')
-                if 'CCD-TEMP' not in fits_file[0].header:
-                    fits_file[0].header['CCD-TEMP'] = (temp_avg, 'CCD Temperature (Celsius)')
-                    fits_file.writeto(file_name, overwrite=True)
-                fits_file.close()
+                temperature = (temp_before + temp_after) / 2
+
+            if self.async_move_thread:
+                self.async_move_thread.join()
+            self.async_move_thread = threading.Thread(target=functools.partial(Sequence.__after_capture, self, tmp_file, file_name, temperature))
+            self.async_move_thread.start()
 
             self.finished += 1
             self.callbacks.run('on_each_finished', self, sequence, file_name)
 
         self.callbacks.run('on_finished', self)
+
+    def __after_capture(self, temp_file, dest_file, temperature=None):
+        # If temp_file and dest_file are on different filesystems (like /tmp and $HOME), the move will take some time, potentially clashing with the next capture.
+        temp_unique_file = os.path.join(os.path.dirname(temp_file), os.path.basename(dest_file))
+        # First, do a "fast" rename within the same filesystem, in order to free the temporary global file
+        shutil.move(temp_file, temp_unique_file)
+        
+        # Write the average CCD temperature, if not present
+        if temperature is not None:
+            with fits.open(temp_unique_file, mode='append') as fits_file:
+                if 'CCD-TEMP' not in fits_file[0].header:
+                    fits_file[0].header['CCD-TEMP'] = (temperature, 'CCD Temperature (Celsius)')
+                    fits_file.writeto(temp_unique_file, overwrite=True)
+
+
+        # Then run the slower cross-fs move (cp + rm)
+        shutil.move(temp_unique_file, dest_file)
+
 
     @property
     def ccd_temperature(self):
