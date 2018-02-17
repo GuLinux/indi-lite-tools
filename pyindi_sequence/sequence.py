@@ -22,6 +22,7 @@ class SequenceCallbacks:
 
 
 class Sequence:
+
     def __init__(self, camera, name, exposure, count, upload_path, start_index=1, **kwargs):
         self.camera = camera
         self.name = name
@@ -33,7 +34,11 @@ class Sequence:
         self.start_index = start_index
         if not os.path.isdir(upload_path):
             os.makedirs(upload_path)
-        self.async_move_thread = None
+        self.max_threads = 2
+        if 'MAX_INDI_MOVE_THREADS' in os.environ:
+            self.max_threads = int(os.environ['MAX_INDI_MOVE_THREADS'])
+        self.async_move_threads = [None] * self.max_threads
+        self.__next_index = 0
 
     def run(self):
         self.camera.set_upload_to('local')
@@ -63,17 +68,24 @@ class Sequence:
             if temp_before is not None and temp_after is not None:
                 temperature = (temp_before + temp_after) / 2
 
-            if self.async_move_thread:
-                self.async_move_thread.join()
-            self.async_move_thread = threading.Thread(target=functools.partial(Sequence.__after_capture, self, tmp_file, file_name, temperature))
-            self.async_move_thread.start()
-
+            self.__start_thread_move(tmp_file, file_name, temperature)
             self.finished += 1
             self.callbacks.run('on_each_finished', self, sequence, file_name)
 
         self.callbacks.run('on_finished', self)
 
-    def __after_capture(self, temp_file, dest_file, temperature=None):
+    def __start_thread_move(self, tmp_file, file_name, temperature):
+        if self.max_threads == 0:
+            self.__move_tmp_file(tmp_file, file_name, temperature)
+        else:
+            async_move_thread = threading.Thread(target=functools.partial(Sequence.__move_tmp_file, self, tmp_file, file_name, temperature))
+            async_move_thread.start()
+            if self.async_move_threads[self.__next_index]:
+                self.async_move_threads[self.__next_index].join()
+            self.async_move_threads[self.__next_index] = async_move_thread
+            self.__next_index = (self.__next_index + 1) % self.max_threads
+
+    def __move_tmp_file(self, temp_file, dest_file, temperature=None):
         # If temp_file and dest_file are on different filesystems (like /tmp and $HOME), the move will take some time, potentially clashing with the next capture.
         temp_unique_file = os.path.join(os.path.dirname(temp_file), os.path.basename(dest_file))
         # First, do a "fast" rename within the same filesystem, in order to free the temporary global file
