@@ -106,6 +106,12 @@ class Device:
                 result[c.name] = i
         return result
 
+    def get_properties(self):
+        properties = self.device.getProperties()
+        state_to_str = { PyIndi.IPS_IDLE: 'IDLE', PyIndi.IPS_OK: 'OK', PyIndi.IPS_BUSY: 'BUSY', PyIndi.IPS_ALERT: 'ALERT' }
+        type_to_str = { PyIndi.INDI_NUMBER: 'NUMBER', PyIndi.INDI_SWITCH: 'SWITCH', PyIndi.INDI_TEXT: 'TEXT', PyIndi.INDI_LIGHT: 'LIGHT', PyIndi.INDI_BLOB: 'BLOB', PyIndi.INDI_UNKNOWN: 'UNKNOWN' }
+        return [{ 'name': p.getName(), 'label': p.getLabel(), 'group': p.getGroupName(), 'device': p.getDeviceName(), 'type': type_to_str[p.getType()], 'state': state_to_str[p.getState()]} for p in properties]
+
     def getControl(self, name, ctl_type, timeout=None):
         ctl = None
         attr = {
