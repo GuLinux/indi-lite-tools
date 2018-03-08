@@ -27,37 +27,37 @@ class INDIClient(PyIndi.BaseClient):
         return [d.getDeviceName() for d in self.getDevices()]
 
     def newDevice(self, d):
-        pass
+        self.run_callback('on_new_device', d)
 
     def newProperty(self, p):
-        pass
+        self.run_callback('on_new_property', p)
 
     def removeProperty(self, p):
-        pass
+        self.run_callback('on_remove_property', p)
 
     def newBLOB(self, bp):
-        pass
+        self.run_callback('on_new_blob', bp)
 
     def newSwitch(self, svp):
-        pass
+        self.run_callback('on_new_switch', svp)
 
     def newNumber(self, nvp):
-        pass
+        self.run_callback('on_new_number', nvp)
 
     def newText(self, tvp):
-        pass
+        self.run_callback('on_new_text', tvp)
 
     def newLight(self, lvp):
-        pass
+        self.run_callback('on_new_light', lvp)
 
     def newMessage(self, d, m):
-        pass
+        self.run_callback('on_new_message', d, m)
 
     def serverConnected(self):
-        self.run_callback('serverConnected')        
+        self.run_callback('on_server_connected')        
 
     def serverDisconnected(self, code):
-        self.run_callback('serverDisconnected', code)
+        self.run_callback('on_server_disconnected', code)
 
     def run_callback(self, name, *args, **kwargs):
         callback = self.callbacks.get(name)
