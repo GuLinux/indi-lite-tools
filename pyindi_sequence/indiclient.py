@@ -16,6 +16,9 @@ class INDIClient(PyIndi.BaseClient):
         self.callbacks = callbacks
         self.connectServer()
 
+    def devices(self):
+        return [Device(x, self) for x in self.device_names]
+
     def cameras(self):
        return [Camera(x, self) for x in self.__devices_by_interface('ccd')]
 
@@ -65,10 +68,8 @@ class INDIClient(PyIndi.BaseClient):
             callback(*args, **kwargs)
 
     def __devices_by_interface(self, interface):
-        devices = [Device(x, self) for x in self.device_names]
-        return [x.name for x in devices if interface in x.interfaces]
+        return [x.name for x in self.devices() if interface in x.interfaces]
  
-
     def __str__(self):
         return 'INDI client connected to {0}:{1}'.format(self.host, self.port)
 
