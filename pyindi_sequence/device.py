@@ -55,8 +55,24 @@ class Device:
         return interfaces
         
 
-    def switch_values(self, switch_name):
-        return dict(map(lambda sw: (sw.name, sw.s == PyIndi.ISS_ON), self.getControl(switch_name, 'switch')))
+    def switch_values(self, name, ctl = None):
+        ctl = ctl if ctl else self.getControl(name, 'text')
+        return [{'value': c.s == PyIndi.ISS_ON, 'name': c.name} for c in ctl]
+
+    def text_values(self, name, ctl = None):
+        ctl = ctl if ctl else self.getControl(name, 'text')
+        return [{'value': c.text, 'name': c.name} for c in ctl]
+
+    def number_values(self, name, ctl = None):
+        ctl = ctl if ctl else self.getControl(name, 'number')
+        return [{'min': c.min, 'max': c.max, 'step': c.step, 'value': c.value, 'name': c.name} for c in ctl]
+
+    def light_values(self, name, ctl = None):
+        ctl = ctl if ctl else self.getControl(name, 'text')
+        return [{'value': self.__state_to_str[c.s], 'name': c.name} for c in ctl]
+
+    def __map_values(self, control, attribute_name, transform = lambda v: v):
+        return dict(map(lambda ctl: (ctl.name, transform(getattr(ctl, attribute_name))), control))
 
     def set_switch(self, name, on_switches = [], off_switches = [], sync = True, timeout=None):
         c = self.getControl(name, 'switch')
@@ -114,16 +130,18 @@ class Device:
         return [ self.__read_property(p) for p in properties]
 
     def __read_property(self, p):
-        base_dict = { 'name': p.getName(), 'label': p.getLabel(), 'group': p.getGroupName(), 'device': p.getDeviceName(), 'type': self.__type_to_str[p.getType()], 'state': self.__state_to_str[p.getState()]}
+        name = p.getName()
+        base_dict = { 'name': name, 'label': p.getLabel(), 'group': p.getGroupName(), 'device': p.getDeviceName(), 'type': self.__type_to_str[p.getType()], 'state': self.__state_to_str[p.getState()]}
+        control = self.getControl(base_dict['name'], base_dict['type'])
 
-
-        #self.__type_to_str = { PyIndi.INDI_NUMBER: 'NUMBER', PyIndi.INDI_SWITCH: 'SWITCH', PyIndi.INDI_TEXT: 'TEXT', PyIndi.INDI_LIGHT: 'LIGHT', PyIndi.INDI_BLOB: 'BLOB', PyIndi.INDI_UNKNOWN: 'UNKNOWN' }
         if p.getType() == PyIndi.INDI_NUMBER:
-            pass
+            base_dict['values'] = self.number_values(name, control)
         elif p.getType() == PyIndi.INDI_SWITCH:
-            pass
+            base_dict['values'] = self.switch_values(name, control)
         elif p.getType() == PyIndi.INDI_TEXT:
-            pass
+            base_dict['values'] = self.text_values(name, control)
+        elif p.getText() == PyIndi.INDI_LIGHT:
+            base_dict['values'] = self.light_values(name, control)
         return base_dict
 
     def getControl(self, name, ctl_type, timeout=None):
