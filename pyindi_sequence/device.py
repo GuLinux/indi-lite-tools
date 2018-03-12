@@ -56,23 +56,26 @@ class Device:
         
 
     def switch_values(self, name, ctl = None):
-        ctl = ctl if ctl else self.getControl(name, 'text')
-        return [{'value': c.s == PyIndi.ISS_ON, 'name': c.name} for c in ctl]
+        return self.__control2dict(name, 'switch', lambda c: {'value': c.s == PyIndi.ISS_ON}, ctl)
 
     def text_values(self, name, ctl = None):
-        ctl = ctl if ctl else self.getControl(name, 'text')
-        return [{'value': c.text, 'name': c.name} for c in ctl]
+        return self.__control2dict(name, 'text', lambda c: {'value': c.text}, ctl)
 
     def number_values(self, name, ctl = None):
-        ctl = ctl if ctl else self.getControl(name, 'number')
-        return [{'min': c.min, 'max': c.max, 'step': c.step, 'value': c.value, 'name': c.name} for c in ctl]
+        return self.__control2dict(name, 'text', lambda c: {'value': c.value, 'min': c.min, 'max': c.max, 'step': c.step, 'format': c.format}, ctl)
 
     def light_values(self, name, ctl = None):
-        ctl = ctl if ctl else self.getControl(name, 'text')
-        return [{'value': self.__state_to_str[c.s], 'name': c.name} for c in ctl]
+        return self.__control2dict(name, 'text', lambda c: {'value': self.__state_to_str[c.s]}, ctl)
 
-    def __map_values(self, control, attribute_name, transform = lambda v: v):
-        return dict(map(lambda ctl: (ctl.name, transform(getattr(ctl, attribute_name))), control))
+
+    def __control2dict(self, control_name, control_type, transform, control = None):
+        def get_dict(element):
+            dest = {'name': element.name, 'label': element.label}
+            dest.update(transform(element))
+            return dest
+
+        control = control if control else self.getControl(control_name, control_type)
+        return [ get_dict(c) for c in control]
 
     def set_switch(self, name, on_switches = [], off_switches = [], sync = True, timeout=None):
         c = self.getControl(name, 'switch')
