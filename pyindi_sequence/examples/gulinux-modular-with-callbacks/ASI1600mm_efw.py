@@ -17,8 +17,24 @@ FILTER_DARK = 5
 
 buzzer_config = {'enabled': False, 'default_duration': 10}
 
+
+
 # get session name from script name.
 # This way, when you copy this script to, let's say, 2017-05-10-M42.py, your session name will be 'M42'
+
+SKIP_WEB_DASHBOARD = os.environ.get('SKIP_WEB_DASHBOARD', False)
+
+try:
+    requests.get('http://locahost:5100/status')
+except:
+    sys.stderr.write('web dashboard not available\n')
+    SKIP_WEB_DASHBOARD = True
+
+def using_dashboard(f):
+    def f_wrap(*args, **kwargs):
+        if not SKIP_WEB_DASHBOARD:
+            f(*args, **kwargs)
+    return f_wrap
 
 SESSION_NAME = os.path.splitext(__main__.__file__)[0].replace(' ', '_')
 
@@ -28,31 +44,33 @@ sb = SequenceBuilder(SESSION_NAME, camera_name='ZWO CCD ASI1600MM')
 sb.set_filter_wheel('ASI EFW')
 
 
+
+@using_dashboard
 def set_oled_message(title, text, wrap=True):
     if wrap:
         text = textwrap.fill(text, 21)
     requests.put('http://localhost:5100/oled', json={'text': text, 'title': title})
 
-
+@using_dashboard
 def clear_oled():
     requests.delete('http://localhost:5100/oled')
 
-
+@using_dashboard
 def send_event(event_type, event_text, notify=False, require_interaction=False):
     requests.put('http://localhost:5100/events', json={'type': event_type, 'text': event_text, 'notify': notify,
                                                        'require_interaction': require_interaction})
 
-
+@using_dashboard
 def enable_buzzer(enable, default_duration=10):
     buzzer_config['enabled'] = enable
     buzzer_config['default_duration'] = default_duration
 
-
+@using_dashboard
 def send_buzzer(pattern, loop=True, duration=None):
     if buzzer_config['enabled']:
         requests.put('http://localhost:5100/buzzer', json={'pattern': pattern, 'loop': loop, 'duration': duration})
 
-
+@using_dashboard
 def clear_buzzer():
     requests.delete('http://localhost:5100/buzzer')
 
@@ -67,7 +85,7 @@ def add_prompt_step(message):
     sb.add_function(clear_buzzer)
     sb.add_function(clear_oled)
 
-
+@using_dashboard
 def __save_coordinates():
     c = requests.get('http://localhost:5100/coordinates')
     if c.status_code == 200:
@@ -99,7 +117,7 @@ def __on_sequence_starting(sequence):
 def __on_sequence_ended(sequence):
     send_event('Sequence finished', str(sequence), notify=True)
 
-
+@using_dashboard
 def __send_sequence_item_led(sequence, item):
     code = 'u'
     filter_codes = {'light': 'L', 'luminance': 'L', 'red': 'r', 'green': 'G', 'blue': 'b', 'dark': 'd', 'bias': 'o',
@@ -171,6 +189,7 @@ def dark_bias(settings, name=None, frame_type='FRAME_DARK'):
 
 
 def change_settings(settings, frame_type='FRAME_LIGHT'):
+    width = 4656
     height = 3520
 
     #    # uncomment the following if you're using an older INDI version, and you get an error using binning = 3
@@ -178,7 +197,7 @@ def change_settings(settings, frame_type='FRAME_LIGHT'):
     #        height = 3519
     sb.change_camera_settings(binning=settings['bin'], frame_type=frame_type)
     sb.change_camera_settings(
-        roi={'X': 0, 'Y': 0, 'WIDTH': 4656, 'HEIGHT': height},
+        roi={'X': 0, 'Y': 0, 'WIDTH': width, 'HEIGHT': height},
         compression_format='CCD_RAW',
         controls={
             'HighSpeedMode': 1,

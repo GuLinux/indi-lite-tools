@@ -49,6 +49,10 @@ def with_json_request(func):
 def index():
     return render_template('index.html')
 
+@app.route('/status')
+def status():
+    return jsonify({'dashboard': 'ok'})
+
 @app.route("/coordinates", methods=["PUT"])
 @with_json_request
 def set_coordinates():

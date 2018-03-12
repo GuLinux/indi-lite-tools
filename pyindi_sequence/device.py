@@ -118,6 +118,7 @@ class Device:
         if timeout is None:
             timeout = self.timeout
         while ctl.s not in statuses:
+            # print('{}/{}/{}: {}'.format(ctl.device, ctl.group, ctl.name, self.__state_to_str[ctl.s]))
             if 0 < timeout < time.time() - started:
                 raise RuntimeError('Timeout error while changing property {}'.format(ctl.name))
             time.sleep(0.01)
