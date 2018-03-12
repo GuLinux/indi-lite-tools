@@ -157,6 +157,7 @@ def add_sequence(*args, **kwargs):
     seq.callbacks.add('on_each_started', __on_sequence_item_starting)
     seq.callbacks.add('on_each_finished', __on_sequence_item_ended)
     seq.callbacks.add('on_finished', __on_sequence_ended)
+    return seq
 
 
 def create_sequence(settings):
@@ -168,7 +169,7 @@ def create_sequence(settings):
         sb.add_filter_wheel_step(filter_number=FILTER_LUMINANCE)
         change_settings(settings)
     start_index = settings['start_index'] if 'start_index' in settings else 1
-    add_sequence(settings['name'], exposure=settings['exp'], count=settings['count'], start_index=start_index)
+    return add_sequence(settings['name'], exposure=settings['exp'], count=settings['count'], start_index=start_index)
 
 
 def dark_bias(settings, name=None, frame_type='FRAME_DARK'):
