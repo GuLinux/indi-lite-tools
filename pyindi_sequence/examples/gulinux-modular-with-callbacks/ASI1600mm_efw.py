@@ -24,11 +24,14 @@ buzzer_config = {'enabled': False, 'default_duration': 10}
 
 SKIP_WEB_DASHBOARD = os.environ.get('SKIP_WEB_DASHBOARD', False)
 
-try:
-    requests.get('http://locahost:5100/status')
-except:
-    sys.stderr.write('web dashboard not available\n')
-    SKIP_WEB_DASHBOARD = True
+if not SKIP_WEB_DASHBOARD:
+    try:
+        requests.get('http://localhost:5100/status')
+    except:
+        sys.stderr.write('web dashboard not available\n')
+        SKIP_WEB_DASHBOARD = True
+else:
+    sys.stderr.write('dashboard disabled\n')
 
 def using_dashboard(f):
     def f_wrap(*args, **kwargs):
