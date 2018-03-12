@@ -12,6 +12,9 @@ class Device:
         self.__find_device()
         self.timeout = Device.DEFAULT_TIMEOUT
 
+        self.__state_to_str = { PyIndi.IPS_IDLE: 'IDLE', PyIndi.IPS_OK: 'OK', PyIndi.IPS_BUSY: 'BUSY', PyIndi.IPS_ALERT: 'ALERT' }
+        self.__type_to_str = { PyIndi.INDI_NUMBER: 'number', PyIndi.INDI_SWITCH: 'switch', PyIndi.INDI_TEXT: 'text', PyIndi.INDI_LIGHT: 'light', PyIndi.INDI_BLOB: 'blob', PyIndi.INDI_UNKNOWN: 'unknown' }
+
     def __find_device(self):
         self.device = None
         while not self.device:
@@ -108,9 +111,20 @@ class Device:
 
     def get_properties(self):
         properties = self.device.getProperties()
-        state_to_str = { PyIndi.IPS_IDLE: 'IDLE', PyIndi.IPS_OK: 'OK', PyIndi.IPS_BUSY: 'BUSY', PyIndi.IPS_ALERT: 'ALERT' }
-        type_to_str = { PyIndi.INDI_NUMBER: 'NUMBER', PyIndi.INDI_SWITCH: 'SWITCH', PyIndi.INDI_TEXT: 'TEXT', PyIndi.INDI_LIGHT: 'LIGHT', PyIndi.INDI_BLOB: 'BLOB', PyIndi.INDI_UNKNOWN: 'UNKNOWN' }
-        return [{ 'name': p.getName(), 'label': p.getLabel(), 'group': p.getGroupName(), 'device': p.getDeviceName(), 'type': type_to_str[p.getType()], 'state': state_to_str[p.getState()]} for p in properties]
+        return [ self.__read_property(p) for p in properties]
+
+    def __read_property(self, p):
+        base_dict = { 'name': p.getName(), 'label': p.getLabel(), 'group': p.getGroupName(), 'device': p.getDeviceName(), 'type': self.__type_to_str[p.getType()], 'state': self.__state_to_str[p.getState()]}
+
+
+        #self.__type_to_str = { PyIndi.INDI_NUMBER: 'NUMBER', PyIndi.INDI_SWITCH: 'SWITCH', PyIndi.INDI_TEXT: 'TEXT', PyIndi.INDI_LIGHT: 'LIGHT', PyIndi.INDI_BLOB: 'BLOB', PyIndi.INDI_UNKNOWN: 'UNKNOWN' }
+        if p.getType() == PyIndi.INDI_NUMBER:
+            pass
+        elif p.getType() == PyIndi.INDI_SWITCH:
+            pass
+        elif p.getType() == PyIndi.INDI_TEXT:
+            pass
+        return base_dict
 
     def getControl(self, name, ctl_type, timeout=None):
         ctl = None
@@ -118,6 +132,7 @@ class Device:
             'number': 'getNumber',
             'switch': 'getSwitch',
             'text': 'getText',
+            'light': 'getLight',
             'blob': 'getBLOB'
         }[ctl_type]
         if timeout is None:
