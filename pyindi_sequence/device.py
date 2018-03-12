@@ -13,6 +13,7 @@ class Device:
         self.timeout = Device.DEFAULT_TIMEOUT
 
         self.__state_to_str = { PyIndi.IPS_IDLE: 'IDLE', PyIndi.IPS_OK: 'OK', PyIndi.IPS_BUSY: 'BUSY', PyIndi.IPS_ALERT: 'ALERT' }
+        self.__switch_types = { PyIndi.ISR_1OFMANY: 'ONE_OF_MANY', PyIndi.ISR_ATMOST1: 'AT_MOST_ONE', PyIndi.ISR_NOFMANY: 'ANY'}
         self.__type_to_str = { PyIndi.INDI_NUMBER: 'number', PyIndi.INDI_SWITCH: 'switch', PyIndi.INDI_TEXT: 'text', PyIndi.INDI_LIGHT: 'light', PyIndi.INDI_BLOB: 'blob', PyIndi.INDI_UNKNOWN: 'unknown' }
 
     def __find_device(self):
@@ -65,7 +66,7 @@ class Device:
         return self.__control2dict(name, 'text', lambda c: {'value': c.value, 'min': c.min, 'max': c.max, 'step': c.step, 'format': c.format}, ctl)
 
     def light_values(self, name, ctl = None):
-        return self.__control2dict(name, 'text', lambda c: {'value': self.__state_to_str[c.s]}, ctl)
+        return self.__control2dict(name, 'light', lambda c: {'value': self.__state_to_str[c.s]}, ctl)
 
 
     def __control2dict(self, control_name, control_type, transform, control = None):
@@ -140,10 +141,11 @@ class Device:
         if p.getType() == PyIndi.INDI_NUMBER:
             base_dict['values'] = self.number_values(name, control)
         elif p.getType() == PyIndi.INDI_SWITCH:
+            base_dict['rule'] = self.__switch_types[control.r]
             base_dict['values'] = self.switch_values(name, control)
         elif p.getType() == PyIndi.INDI_TEXT:
             base_dict['values'] = self.text_values(name, control)
-        elif p.getText() == PyIndi.INDI_LIGHT:
+        elif p.getType() == PyIndi.INDI_LIGHT:
             base_dict['values'] = self.light_values(name, control)
         return base_dict
 
