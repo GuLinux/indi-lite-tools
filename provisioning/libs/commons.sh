@@ -1,8 +1,12 @@
 
 setup_shell() {
+    user_home="$( eval echo "~$indi_user" )"
     cp -av "$SCRIPT_PATH/shell-env/bashrc" /etc/profile.d/indi-lite-tools.sh
-    mkdir -p ~$indi_user/bin; chown -R $indi_user ~$indi_user/bin
-    mkdir -p ~$indi_user/python_modules; chown -R $indi_user ~$indi_user/python_modules
+    mkdir -p $user_home/bin; chown -R $indi_user $user_home/bin
+    mkdir -p $user_home/python_modules; chown -R $indi_user $user_home/python_modules
+    if [ "$PYTHON_VERSION" == 3 ]; then
+        sed -i 's/python/python3/g' "$user_home/bin/new_sequence"
+    fi
 }
 
 setup_python() {
