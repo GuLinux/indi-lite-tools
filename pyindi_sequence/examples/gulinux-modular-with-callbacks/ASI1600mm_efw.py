@@ -204,8 +204,9 @@ def change_settings(settings, frame_type='FRAME_LIGHT'):
         roi={'X': 0, 'Y': 0, 'WIDTH': width, 'HEIGHT': height},
         compression_format='CCD_RAW',
         controls={
-            'HighSpeedMode': 1,
-            'HardwareBin': settings['hwbin'],
+            'HighSpeedMode': settings.get('highspeed', 1),
+            'HardwareBin': settings.get('hwbin', 0),
+            'BandWidth': settings.get('bandwidth', 40),
             'Gain': settings['gain'],
         },
         switches={'CCD_VIDEO_FORMAT': {'on': ['ASI_IMG_RAW16']},
