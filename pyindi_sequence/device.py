@@ -137,6 +137,9 @@ class Device:
     def __read_property(self, p):
         name = p.getName()
         base_dict = { 'name': name, 'label': p.getLabel(), 'group': p.getGroupName(), 'device': p.getDeviceName(), 'type': self.__type_to_str[p.getType()], 'state': self.__state_to_str[p.getState()]}
+        permission = p.getPermission()
+        base_dict['perm_read'] = permission in [PyIndi.IP_RO, PyIndi.IP_RW]
+        base_dict['perm_write'] = permission in [PyIndi.IP_WO, PyIndi.IP_RW]
         control = self.getControl(base_dict['name'], base_dict['type'])
 
         if p.getType() == PyIndi.INDI_NUMBER:
