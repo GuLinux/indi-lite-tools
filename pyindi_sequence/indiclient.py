@@ -37,7 +37,7 @@ class INDIClient(PyIndi.BaseClient):
         self.run_callback('on_device_removed', dd.getDeviceName())
 
     def newProperty(self, p):
-        self.run_callback('on_new_property', p)
+        self.run_callback('on_new_property', device=p.getDeviceName(), group=p.getGroupName(), property_name=p.getName())
 
     def removeProperty(self, p):
         self.run_callback('on_remove_property', p)
@@ -58,7 +58,9 @@ class INDIClient(PyIndi.BaseClient):
         self.run_callback('on_new_light', lvp)
 
     def newMessage(self, d, m):
-        self.run_callback('on_new_message', d, m)
+        device = Device(d.getDeviceName(), self)
+        message = device.get_queued_message(m)
+        self.run_callback('on_new_message', device, message)
 
     def serverConnected(self):
         self.run_callback('on_server_connected')        
