@@ -80,11 +80,18 @@ class Device:
 
     def set_switch(self, name, on_switches = [], off_switches = [], sync = True, timeout=None):
         c = self.getControl(name, 'switch')
-        if c.r == PyIndi.ISR_ATMOST1 or c.r == PyIndi.ISR_1OFMANY:
+        is_exclusive = c.r == PyIndi.ISR_ATMOST1 or c.r == PyIndi.ISR_1OFMANY
+        if is_exclusive :
             on_switches = on_switches[0:1]
             off_switches = [s.name for s in c if s.name not in on_switches]
         for index in range(0, len(c)):
-            c[index].s = PyIndi.ISS_ON if c[index].name in on_switches else PyIndi.ISS_OFF
+            current_state = c[index].s
+            new_state = current_state
+            if c[index].name in on_switches:
+                new_state = PyIndi.ISS_ON
+            elif is_exclusive or c[index].name in off_switches:
+                new_state = PyIndi.ISS_OFF
+            c[index].s = new_state
         self.indi_client.sendNewSwitch(c)
 
         if sync:
@@ -137,6 +144,7 @@ class Device:
     def get_queued_message(self, index):
         message = self.device.messageQueue(index)
         message.acquire()
+        # TODO: this might be a bit hacky
         message_string = ctypes.cast(message.__int__(), ctypes.POINTER(ctypes.c_char_p)).contents.value.decode('utf-8')
         message.disown()
         return message_string
