@@ -134,6 +134,14 @@ class Device:
         properties = self.device.getProperties()
         return [ self.__read_property(p) for p in properties]
 
+    def get_queued_message(self, index):
+        message = self.device.messageQueue(index)
+        message.acquire()
+        message_string = ctypes.cast(message.__int__(), ctypes.POINTER(ctypes.c_char_p)).contents.value.decode('utf-8')
+        message.disown()
+        return message_string
+
+
     def __read_property(self, p):
         name = p.getName()
         base_dict = { 'name': name, 'label': p.getLabel(), 'group': p.getGroupName(), 'device': p.getDeviceName(), 'type': self.__type_to_str[p.getType()], 'state': self.__state_to_str[p.getState()]}
