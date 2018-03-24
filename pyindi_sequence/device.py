@@ -141,6 +141,10 @@ class Device:
         properties = self.device.getProperties()
         return [ self.__read_property(p) for p in properties]
 
+    def get_property(self, name):
+        indi_property = self.device.getProperty(name)
+        return self.__read_property(indi_property) if indi_property else None
+
     def get_queued_message(self, index):
         message = self.device.messageQueue(index)
         message.acquire()
