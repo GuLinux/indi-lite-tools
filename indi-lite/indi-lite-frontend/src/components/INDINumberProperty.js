@@ -1,7 +1,18 @@
 import React from 'react';
 import CommitPendingValuesButton from './CommitPendingValuesButton'
 import INDILight from './INDILight'
+import PRINTJ from 'printj'
 
+
+const formatValue = (value, displayValue) => {
+    if(value.format.endsWith('m')) {
+        // TODO: return degrees formatting
+        return displayValue;
+    }
+//    return displayValue;
+    let formatted = PRINTJ.sprintf(value.format, displayValue)
+    return formatted;
+}
 
 const INDINumberProperty = ({device, property, isWriteable, pendingValues, displayValues, addPendingValues, commitPendingValues }) => (
     <div className="row">
@@ -18,7 +29,7 @@ const INDINumberProperty = ({device, property, isWriteable, pendingValues, displ
                         max={value.max}
                         step={value.step}
                         name={value.name}
-                        value={displayValues[value.name]}
+                        value={formatValue(value, displayValues[value.name])}
                         onChange={e => addPendingValues(device, property, { [value.name]: parseFloat(e.target.value) })}
                         readOnly={!isWriteable}
                         />
