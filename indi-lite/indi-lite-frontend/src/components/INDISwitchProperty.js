@@ -19,7 +19,7 @@ const onCheckbox = (device, property, value, displayValue, addPendingValues, pen
 
 const switchHTMLId = (property, value) => `${property.id}_${value.name}`
 
-const renderSwitch = (device, property, value, displayValue, canUpdate, pendingValues, addPendingValues) => {
+const renderSwitch = (device, property, value, displayValue, isWriteable, pendingValues, addPendingValues) => {
     switch(property.rule) {
         case "ONE_OF_MANY":
         case "AT_MOST_ONE":
@@ -27,7 +27,7 @@ const renderSwitch = (device, property, value, displayValue, canUpdate, pendingV
                         key={value.name}
                         active={displayValue}
                         onClick={e => onButtonClick(device, property, value, displayValue, addPendingValues, pendingValues)}
-                        disabled={!canUpdate}
+                        disabled={!isWriteable}
                         bsSize="xsmall">{value.label}</Button> )
         case "ANY":
             return (
@@ -37,7 +37,7 @@ const renderSwitch = (device, property, value, displayValue, canUpdate, pendingV
                         checked={displayValue}
                         name={value.name}
                         id={switchHTMLId(property, value)}
-                        readOnly={!canUpdate}
+                        readOnly={!isWriteable}
                         onChange={e => onCheckbox(device, property, value, displayValue, addPendingValues, pendingValues)}
                     />
                     <label htmlFor={switchHTMLId(property, value)}>{value.label}</label>
@@ -47,12 +47,12 @@ const renderSwitch = (device, property, value, displayValue, canUpdate, pendingV
     }
 }
 
-const INDISwitchProperty = ({device, property, canUpdate, pendingValues, displayValues, addPendingValues }) => (
+const INDISwitchProperty = ({device, property, isWriteable, pendingValues, displayValues, addPendingValues }) => (
     <div className="row">
         <div className="col-xs-1"><INDILight state={property.state} /></div> 
         <div className="col-xs-2">{property.label}</div> 
         <div className="col-xs-9">
-            {property.values.map(value => renderSwitch(device, property, value, displayValues[value.name], canUpdate, pendingValues, addPendingValues))}
+            {property.values.map(value => renderSwitch(device, property, value, displayValues[value.name], isWriteable, pendingValues, addPendingValues))}
         </div>
     </div>
 )

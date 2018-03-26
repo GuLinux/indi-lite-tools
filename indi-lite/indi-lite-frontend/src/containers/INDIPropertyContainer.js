@@ -23,7 +23,7 @@ const mapStateToProps = (state, ownProps) => {
     return {
         device,
         property,
-        canUpdate: property.perm_write && property.state != 'BUSY',
+        isWriteable: property.perm_write,
         pendingValues,
         displayValues,
     }
