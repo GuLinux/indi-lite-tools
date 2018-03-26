@@ -1,9 +1,9 @@
 import React from 'react';
-import { CommitPendingPropertiesButton, pendingProperty, displayValue, canUpdate } from './INDIPropertyHandlers'
+import { CommitPendingValuesButton } from './INDIPropertyHandlers'
 import INDILight from './INDILight'
 
 
-const INDINumberProperty = ({property, pendingProperties, addPendingProperties, commitPendingProperties}) => (
+const INDINumberProperty = ({device, property, canUpdate, pendingValues, displayValues, addPendingValues, commitPendingValues }) => (
     <div className="row">
         <div className="col-xs-1"><INDILight state={property.state} /></div> 
         <div className="col-xs-2">{property.label}</div> 
@@ -18,14 +18,14 @@ const INDINumberProperty = ({property, pendingProperties, addPendingProperties, 
                         max={value.max}
                         step={value.step}
                         name={value.name}
-                        value={displayValue(value, pendingProperties)}
-                        onChange={e => addPendingProperties([pendingProperty(property, value, parseFloat(e.target.value))])}
-                        readOnly={!canUpdate(property)}
+                        value={displayValues[value.name]}
+                        onChange={e => addPendingValues(device, property, { [value.name]: parseFloat(e.target.value) })}
+                        readOnly={!canUpdate}
                         />
                 </div> 
             ))}
         </div>
-        <div className="col-xs-1"><CommitPendingPropertiesButton bsStyle="primary" size="xsmall" pendingProperties={pendingProperties} commitPendingProperties={commitPendingProperties} property={property} /></div>
+        <div className="col-xs-1"><CommitPendingValuesButton bsStyle="primary" size="xsmall" pendingValues={pendingValues} commitPendingValues={commitPendingValues} property={property} /></div>
     </div>
 )
  

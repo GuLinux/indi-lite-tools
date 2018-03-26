@@ -1,4 +1,4 @@
-import { getINDIServerStatusAPI, setINDIServerConnectionAPI, getINDIDevicesAPI, getINDIDevicePropertiesAPI, setINDIPropertiesAPI } from '../middleware/api'
+import { getINDIServerStatusAPI, setINDIServerConnectionAPI, getINDIDevicesAPI, getINDIDevicePropertiesAPI, setINDIValuesAPI } from '../middleware/api'
 import Notifications from './notifications'
 
 export const INDIServer = {
@@ -79,18 +79,18 @@ export const INDIServer = {
         }
     },
 
-    addPendingProperties: (pendingProperties, autoApply) => {
+    addPendingValues: (device, property, pendingValues, autoApply) => {
         return dispatch => {
-            dispatch({ type: 'ADD_PENDING_PROPERTIES', pendingProperties, autoApply })
+            dispatch({ type: 'ADD_PENDING_VALUES', device, property, pendingValues, autoApply })
             if(autoApply) {
-                dispatch(INDIServer.commitPendingProperties(pendingProperties));
+                dispatch(INDIServer.commitPendingValues(device, property, pendingValues));
             }
         }
     },
 
-    commitPendingProperties: (pendingProperties) => {
-        setINDIPropertiesAPI(pendingProperties, json => console.log(json), error => console.log(error));
-        return { type: 'COMMIT_PENDING_PROPERTIES', pendingProperties }
+    commitPendingValues: (device, property, pendingValues) => {
+        setINDIValuesAPI(device, property, pendingValues, json => console.log(json), error => console.log(error));
+        return { type: 'COMMIT_PENDING_VALUES', property, pendingValues }
     },
 
     deviceMessage: (device, message) => ({ type: 'INDI_DEVICE_MESSAGE', device, message }),

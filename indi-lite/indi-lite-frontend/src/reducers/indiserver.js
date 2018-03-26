@@ -8,7 +8,7 @@ const defaultState = {
     devices: [],
     groups: {},
     properties: {},
-    pendingProperties: [],
+    pendingValues: {},
     messages: [],
 };
 
@@ -20,9 +20,9 @@ const receivedServerState = (state, action) => {
     if(! nextState.state.connected) {
         nextState.devices = [];
         nextState.deviceEntities = {}
-        nextState.groups = [];
-        nextState.properties = [];
-        nextState.pendingProperties = [];
+        nextState.groups = {};
+        nextState.properties = {};
+        nextState.pendingValues = {};
     }
     return nextState;
 }
@@ -70,30 +70,17 @@ const indiPropertyRemoved = (state, property) => {
     return {...state, properties, groups};    
 };
 
-
-
-const addPendingProperty = (state, pendingProperty) => {
-    let isSamePendingProperty = (first, second) => {
-        return first.device === second.device && first.group === second.group && first.name === second.name && first.valueName === second.valueName;
-    }
-    let pendingProperties = state.pendingProperties.filter(p => ! isSamePendingProperty(p, pendingProperty));
-    if(pendingProperty.currentValue !== pendingProperty.newValue) {
-        pendingProperties = [...pendingProperties, pendingProperty]
-    }
-    return {...state, pendingProperties};
+const addPendingValues = (state, property, pendingValues) => {
+    Object.keys(pendingValues).forEach(name => {
+        if(pendingValues[name] === property.values.filter(v => v.name === name)[0].value)
+            delete pendingValues[name]
+    });
+    return {...state, pendingValues: {...pendingValues, [property.id]: pendingValues} };
 }
 
-const addPendingProperties = (state, pendingProperties) => {
-    let newState = state;
-    for(let p of pendingProperties) {
-        newState = addPendingProperty(newState, p);
-    }
-    return newState;
-}
-
-const commitPendingProperties = (state, pendingProperties) => {
+const commitPendingValues = (state, property, pendingValues) => {
     // TODO: set status as busy
-    return {...state, pendingProperties: []};
+    return {...state, pendingValues: {...state.pendingValues, [property.id]: {} }};
 }
 
 const deviceEntity = (device, groups=[], properties=[]) => ({...device, properties, groups, })
@@ -112,10 +99,10 @@ const indiserver = (state = defaultState, action) => {
             return receivedINDIDevices(state, action.devices);
         case 'RECEIVED_DEVICE_PROPERTIES':
             return receivedDeviceProperties(state, action.device, action.properties)
-        case 'ADD_PENDING_PROPERTIES':
-            return addPendingProperties(state, action.pendingProperties);
-        case 'COMMIT_PENDING_PROPERTIES':
-            return commitPendingProperties(state, action.pendingProperties);
+        case 'ADD_PENDING_VALUES':
+            return addPendingValues(state, action.property, action.pendingValues);
+        case 'COMMIT_PENDING_VALUES':
+            return commitPendingValues(state, action.property, action.pendingValues);
         case 'INDI_DEVICE_MESSAGE':
             return {...state, messages: [...state.messages, { device: action.device.id, message: action.message}]}
         case 'INDI_PROPERTY_UPDATED':
