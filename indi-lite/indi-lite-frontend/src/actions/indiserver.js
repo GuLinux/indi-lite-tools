@@ -36,29 +36,18 @@ export const INDIServer = {
     },
 
     receivedDevices: (devices, dispatch) => {
-        devices.forEach(device => dispatch(INDIServer.fetchDeviceProperties(device.name)));
+        devices.forEach(device => dispatch(INDIServer.fetchDeviceProperties(device)));
         return {
             type: 'RECEIVED_INDI_DEVICES',
             devices
         }
     },
 
-    receivedDeviceProperties(device, data) {
-        let groups = []
-        let properties = {}
-
-        data.forEach(property => {
-            groups.push(property.group)
-            properties = [...properties, property]
-        });
-        groups = groups.filter( (value, index, self) => self.indexOf(value) === index).map(group => { return {device, name: group} });
-        return {
+    receivedDeviceProperties: (device, data) => ({
             type: 'RECEIVED_DEVICE_PROPERTIES',
             device,
-            groups,
-            properties
-        }
-    },
+            properties: data
+    }),
 
     fetchDeviceProperties: device => {
         return dispatch => {

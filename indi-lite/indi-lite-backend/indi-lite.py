@@ -44,7 +44,7 @@ def get_devices():
 @app.route('/api/server/devices/<name>/properties', methods=['GET'])
 @json_api
 @indi_connected
-def get_camera_properties(name):
+def get_device_properties(name):
     device = controller.indi_server.device(name=name)
     return [p.to_map() for p in device.properties()]
 

@@ -55,6 +55,7 @@ class Property:
     def to_map(self):
         base_property = { 'id': self.id }
         base_property.update(self.indi_property)
+        base_property['device'] = device.Device(self.client, self.logger, name=self.device).id
         return base_property
 
     def find_indi_property(self):

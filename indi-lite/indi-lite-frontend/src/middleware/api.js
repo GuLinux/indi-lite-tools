@@ -76,7 +76,7 @@ export const getINDIDevicesAPI = (onSuccess, onError) => {
 }
 
 export const getINDIDevicePropertiesAPI = (device, onSuccess, onError) => {
-    return fetch('/api/server/devices/' + device + '/properties').then(response => response.json(), onError).then(json => onSuccess(json))
+    return fetch('/api/server/devices/' + device.name + '/properties').then(response => response.json(), onError).then(json => onSuccess(json))
 }
 
 export const setINDIPropertiesAPI = (pendingProperties, onSuccess, onError) => {
