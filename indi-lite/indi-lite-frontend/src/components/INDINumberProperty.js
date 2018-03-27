@@ -5,7 +5,7 @@ import PRINTJ from 'printj'
 
 // copied from INDI github repo: https://github.com/indilib/indi/blob/bda9177ef25c6a219ac3879994c6efcae3b2d1c6/libindi/libs/indicom.c#L117
 // TODO: rewrite in a more modern/readable way
-
+// TODO: also look into https://www.npmjs.com/package/react-numeric-input
 const sex2string = (format, value) => {
     // %010.6m
     // 0.0008388807046051948 => 0:00:03
