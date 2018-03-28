@@ -15,27 +15,7 @@ class Device:
         self.__state_to_str = { PyIndi.IPS_IDLE: 'IDLE', PyIndi.IPS_OK: 'OK', PyIndi.IPS_BUSY: 'BUSY', PyIndi.IPS_ALERT: 'ALERT' }
         self.__switch_types = { PyIndi.ISR_1OFMANY: 'ONE_OF_MANY', PyIndi.ISR_ATMOST1: 'AT_MOST_ONE', PyIndi.ISR_NOFMANY: 'ANY'}
         self.__type_to_str = { PyIndi.INDI_NUMBER: 'number', PyIndi.INDI_SWITCH: 'switch', PyIndi.INDI_TEXT: 'text', PyIndi.INDI_LIGHT: 'light', PyIndi.INDI_BLOB: 'blob', PyIndi.INDI_UNKNOWN: 'unknown' }
-
-    def __find_device(self):
-        self.device = None
-        while not self.device:
-            self.device = self.indi_client.getDevice(self.name)
-
-    def connect(self):
-        if self.device.isConnected():
-            return
-        self.set_switch('CONNECTION', ['CONNECT'])
-
-    def values(self, ctl_name, ctl_type):
-        return dict(map(lambda c: (c.name, c.value), self.getControl(ctl_name, ctl_type)))
-
-    @property
-    def interfaces(self):
-        interface = self.device.getDriverInterface()
-        interface.acquire()
-        device_interfaces = int(ctypes.cast(interface.__int__(), ctypes.POINTER(ctypes.c_uint16)).contents.value)
-        interface.disown()
-        interfaces = {
+        self.interfaces = {
             PyIndi.BaseDevice.GENERAL_INTERFACE: 'general', 
             PyIndi.BaseDevice.TELESCOPE_INTERFACE: 'telescope',
             PyIndi.BaseDevice.CCD_INTERFACE: 'ccd',
@@ -52,7 +32,28 @@ class Device:
             PyIndi.BaseDevice.ROTATOR_INTERFACE: 'rotator',
             PyIndi.BaseDevice.AUX_INTERFACE: 'aux'
         }
-        interfaces = [interfaces[x] for x in interfaces if x & device_interfaces]
+
+
+    def __find_device(self):
+        self.device = None
+        while not self.device:
+            self.device = self.indi_client.getDevice(self.name)
+
+    def connect(self):
+        if self.device.isConnected():
+            return
+        self.set_switch('CONNECTION', ['CONNECT'])
+
+    def values(self, ctl_name, ctl_type):
+        return dict(map(lambda c: (c.name, c.value), self.get_control(ctl_name, ctl_type)))
+
+    @property
+    def interfaces(self):
+        interface = self.device.getDriverInterface()
+        interface.acquire()
+        device_interfaces = int(ctypes.cast(interface.__int__(), ctypes.POINTER(ctypes.c_uint16)).contents.value)
+        interface.disown()
+        interfaces = [interface for interface, indi_interface in self.interfaces.items() if interface & device_interfaces]
         return interfaces
         
 
@@ -75,11 +76,11 @@ class Device:
             dest.update(transform(element))
             return dest
 
-        control = control if control else self.getControl(control_name, control_type)
+        control = control if control else self.get_control(control_name, control_type)
         return [ get_dict(c) for c in control]
 
     def set_switch(self, name, on_switches = [], off_switches = [], sync = True, timeout=None):
-        c = self.getControl(name, 'switch')
+        c = self.get_control(name, 'switch')
         is_exclusive = c.r == PyIndi.ISR_ATMOST1 or c.r == PyIndi.ISR_1OFMANY
         if is_exclusive :
             on_switches = on_switches[0:1]
@@ -100,7 +101,7 @@ class Device:
         return c
         
     def set_number(self, name, values, sync = True, timeout=None):
-        c = self.getControl(name, 'number')
+        c = self.get_control(name, 'number')
         for control_name, index in self.__map_indexes(c, values.keys()).items():
             c[index].value = values[control_name]
         self.indi_client.sendNewNumber(c)
@@ -110,7 +111,7 @@ class Device:
         return c
 
     def set_text(self, control_name, values, sync = True, timeout=None):
-        c = self.getControl(control_name, 'text')
+        c = self.get_control(control_name, 'text')
         for control_name, index in self.__map_indexes(c, values.keys()).items():
             c[index].text = values[control_name]
         self.indi_client.sendNewText(c)
@@ -160,7 +161,7 @@ class Device:
         permission = p.getPermission()
         base_dict['perm_read'] = permission in [PyIndi.IP_RO, PyIndi.IP_RW]
         base_dict['perm_write'] = permission in [PyIndi.IP_WO, PyIndi.IP_RW]
-        control = self.getControl(base_dict['name'], base_dict['type'])
+        control = self.get_control(base_dict['name'], base_dict['type'])
 
         if p.getType() == PyIndi.INDI_NUMBER:
             base_dict['values'] = self.number_values(name, control)
@@ -173,7 +174,7 @@ class Device:
             base_dict['values'] = self.light_values(name, control)
         return base_dict
 
-    def getControl(self, name, ctl_type, timeout=None):
+    def get_control(self, name, ctl_type, timeout=None):
         ctl = None
         attr = {
             'number': 'getNumber',
@@ -194,7 +195,7 @@ class Device:
 
     def has_control(self, name, ctl_type):
         try:
-            self.getControl(name, ctl_type, timeout=0.1)
+            self.get_control(name, ctl_type, timeout=0.1)
             return True
         except:
             return False

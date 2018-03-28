@@ -38,12 +38,12 @@ class FilterWheel(Device):
         self.set_number('FILTER_SLOT', {'FILTER_SLOT_VALUE': number})
 
     def filters(self):
-        ctl = self.getControl('FILTER_NAME', 'text')
+        ctl = self.get_control('FILTER_NAME', 'text')
         filters = [(x.text, FilterWheel.__name2number(x.name)) for x in ctl]
         return dict(filters)
 
     def current_filter(self):
-        ctl = self.getControl('FILTER_SLOT', 'number')
+        ctl = self.get_control('FILTER_SLOT', 'number')
         number = int(ctl[0].value)
         return number, self.filter_name(number)
 

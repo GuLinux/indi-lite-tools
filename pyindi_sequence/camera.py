@@ -89,7 +89,7 @@ class Camera(Device):
         self.set_switch('UPLOAD_MODE', [upload_to] )
 
     def exposure_range(self):
-        ctl = self.getControl('CCD_EXPOSURE', 'number')[0]
+        ctl = self.get_control('CCD_EXPOSURE', 'number')[0]
         return {
             'minimum': ctl.min,
             'maximum': ctl.max,
