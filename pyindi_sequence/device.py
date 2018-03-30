@@ -15,7 +15,7 @@ class Device:
         self.__state_to_str = { PyIndi.IPS_IDLE: 'IDLE', PyIndi.IPS_OK: 'OK', PyIndi.IPS_BUSY: 'BUSY', PyIndi.IPS_ALERT: 'ALERT' }
         self.__switch_types = { PyIndi.ISR_1OFMANY: 'ONE_OF_MANY', PyIndi.ISR_ATMOST1: 'AT_MOST_ONE', PyIndi.ISR_NOFMANY: 'ANY'}
         self.__type_to_str = { PyIndi.INDI_NUMBER: 'number', PyIndi.INDI_SWITCH: 'switch', PyIndi.INDI_TEXT: 'text', PyIndi.INDI_LIGHT: 'light', PyIndi.INDI_BLOB: 'blob', PyIndi.INDI_UNKNOWN: 'unknown' }
-        self.interfaces = self.__find_interfaces()
+        self.interfaces = Device.find_interfaces(self.device)
 
     def __find_device(self):
         self.device = None
@@ -95,9 +95,10 @@ class Device:
             self.__wait_for_ctl_statuses(c, timeout=timeout)
 
         return c
-
-    def __find_interfaces(self):
-        interface = self.device.getDriverInterface()
+    
+    @staticmethod
+    def find_interfaces(indidevice):
+        interface = indidevice.getDriverInterface()
         interface.acquire()
         device_interfaces = int(ctypes.cast(interface.__int__(), ctypes.POINTER(ctypes.c_uint16)).contents.value)
         interface.disown()
