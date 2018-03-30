@@ -22,14 +22,17 @@ class Device:
         while not self.device:
             self.device = self.indi_client.getDevice(self.name)
 
+    @property
+    def connected(self):
+        return self.device.isConnected()
+
     def connect(self):
-        if self.device.isConnected():
+        if self.connected:
             return
         self.set_switch('CONNECTION', ['CONNECT'])
 
     def values(self, ctl_name, ctl_type):
         return dict(map(lambda c: (c.name, c.value), self.getControl(ctl_name, ctl_type)))
-
        
 
     def switch_values(self, name, ctl = None):
