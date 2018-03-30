@@ -1,8 +1,8 @@
 
 setup_shell() {
     user_home="$( eval echo "~$indi_user" )"
-    cp -av "$SCRIPT_PATH/shell-env/bashrc" "${user_home}/"
-    cp -av "$SCRIPT_PATH/shell-env/bin" /etc/profile.d/indi-lite-tools.sh
+    cp -av "$SCRIPT_PATH/shell-env/bin" "${user_home}/"
+    cp -av "$SCRIPT_PATH/shell-env/bashrc" /etc/profile.d/indi-lite-tools.sh
     mkdir -p $user_home/bin; chown -R $indi_user $user_home/bin
     mkdir -p $user_home/python_modules; chown -R $indi_user $user_home/python_modules
     if [ "$PYTHON_VERSION" == 3 ]; then
