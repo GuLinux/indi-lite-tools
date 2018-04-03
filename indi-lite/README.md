@@ -1,6 +1,6 @@
 # Repository Moved
 
-The *INDI Lite* application previously found here has been renamed to [StarQueW](ttps://github.com/GuLinux/StarQueW).
+The *INDI Lite* application previously found here has been renamed to [StarQueW](https://github.com/GuLinux/StarQueW).
 
 [StarQueW](https://github.com/GuLinux/StarQueW) is an INDI client and sequence generator written in Python and ReactJS.
 
