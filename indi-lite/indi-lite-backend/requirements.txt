@@ -1,7 +1,0 @@
-pyindi-client
-astropy
-flask
-gunicorn
-gevent
-greenlet
-
