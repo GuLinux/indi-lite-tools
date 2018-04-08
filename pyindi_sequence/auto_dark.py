@@ -22,7 +22,7 @@ class AutoDarkSequence:
     def run(self):
         self.camera.set_frame_type('FRAME_DARK')
         for exposure in self.auto_dark_calculator.exposures:
-            sequence = Sequence(self.camera, self.name, exposure, self.count, self.upload_path)
+            sequence = Sequence(self.camera, exposure, self.count, self.upload_path, name=self.name)
             sequence.callbacks = self.callbacks
             sequence.run()
         self.auto_dark_calculator.reset() 

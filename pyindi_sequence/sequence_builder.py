@@ -47,12 +47,12 @@ class SequenceBuilder:
         return self.__append(
             Sequence(
                 self.camera,
-                sequence_name,
                 exposure=exposure,
                 count=count,
                 upload_path=self.upload_path,
                 on_finished=[self.auto_dark_calculator.sequence_finished] if auto_dark else [],
-                start_index=start_index
+                start_index=start_index,
+                name=sequence_name
         ))
 
     def add_filter_wheel_step(self, filter_name=None, filter_number=None):

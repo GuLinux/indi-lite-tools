@@ -23,15 +23,16 @@ class SequenceCallbacks:
 
 class Sequence:
 
-    def __init__(self, camera, name, exposure, count, upload_path, start_index=1, **kwargs):
+    def __init__(self, camera, exposure, count, upload_path, start_index=1, name=None, filename_template='{name}_{exposure}s_{number:04}.fits', **kwargs):
         self.camera = camera
-        self.name = name
         self.count = count
         self.exposure = exposure
         self.upload_path = upload_path
         self.callbacks = SequenceCallbacks(**kwargs)
         self.finished = 0
         self.start_index = start_index
+        self.name = name
+        self.filename_template = filename_template
         if not os.path.isdir(upload_path):
             os.makedirs(upload_path)
         self.max_threads = 2
@@ -42,8 +43,7 @@ class Sequence:
 
     def run(self):
         self.camera.set_upload_to('local')
-        sequence_prefix = '{0}_{1}s_'.format(self.name, self.exposure)
-        tmp_prefix = sequence_prefix + 'TMP'
+        tmp_prefix = self.name + 'TMP'
         tmp_upload_path = tempfile.gettempdir()
         tmp_file = os.path.join(tmp_upload_path, tmp_prefix + '.fits')
 
@@ -61,8 +61,7 @@ class Sequence:
             self.camera.shoot(self.exposure)
             temp_after = self.ccd_temperature
 
-            file_name = os.path.join(self.upload_path,
-                                     '{0}{1:03}.fits'.format(sequence_prefix, sequence + self.start_index))
+            file_name = os.path.join(self.upload_path, self.filename_template.format(name=self.name, exposure=self.exposure, number=sequence + self.start_index))
 
             temperature = None
             if temp_before is not None and temp_after is not None:
