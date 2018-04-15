@@ -131,6 +131,8 @@ class Device:
             timeout = self.timeout
         while ctl.s not in statuses:
             # print('{}/{}/{}: {}'.format(ctl.device, ctl.group, ctl.name, self.__state_to_str[ctl.s]))
+            if ctl.s == PyIndi.IPS_ALERT and 0.5 > time.time() - started:
+                raise RuntimeError('Error while changing property {}'.format(ctl.name))
             if 0 < timeout < time.time() - started:
                 raise RuntimeError('Timeout error while changing property {}'.format(ctl.name))
             time.sleep(0.01)
