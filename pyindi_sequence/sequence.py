@@ -23,7 +23,7 @@ class SequenceCallbacks:
 
 class Sequence:
 
-    def __init__(self, camera, exposure, count, upload_path, start_index=1, name=None, filename_template='{name}_{exposure}s_{number:04}.fits', **kwargs):
+    def __init__(self, camera, exposure, count, upload_path, start_index=1, name=None, filename_template='{name}_{exposure}s_{number:04}.fits', filename_template_params={}, **kwargs):
         self.camera = camera
         self.count = count
         self.exposure = exposure
@@ -33,6 +33,7 @@ class Sequence:
         self.start_index = start_index
         self.name = name
         self.filename_template = filename_template
+        self.filename_template_params = filename_template_params
         if not os.path.isdir(upload_path):
             os.makedirs(upload_path)
         self.max_threads = 2
@@ -43,7 +44,7 @@ class Sequence:
 
     def run(self):
         self.camera.set_upload_to('local')
-        tmp_prefix = self.name + 'TMP'
+        tmp_prefix = self.name + 'TMP' if self.name else '__sequence_TMP'
         tmp_upload_path = tempfile.gettempdir()
         tmp_file = os.path.join(tmp_upload_path, tmp_prefix + '.fits')
 
@@ -60,8 +61,16 @@ class Sequence:
             temp_before = self.ccd_temperature
             self.camera.shoot(self.exposure)
             temp_after = self.ccd_temperature
+            
+            format_params = { 'name': self.name, 'exposure': self.exposure, 'number': sequence + self.start_index}
+            format_params.update(self.filename_template_params)
 
-            file_name = os.path.join(self.upload_path, self.filename_template.format(name=self.name, exposure=self.exposure, number=sequence + self.start_index))
+            for key, value in format_params.items():
+                if callable(value):
+                    format_params[key] = value(self)
+
+
+            file_name = os.path.join(self.upload_path, self.filename_template.format(**format_params))
 
             temperature = None
             if temp_before is not None and temp_after is not None:
