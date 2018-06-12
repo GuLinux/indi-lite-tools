@@ -20,10 +20,10 @@ class INDIClient(PyIndi.BaseClient):
         return [Device(x, self) for x in self.device_names]
 
     def cameras(self):
-       return [Camera(x, self) for x in self.__devices_by_interface('ccd')]
+       return [Camera(x, self, connect_on_create=False) for x in self.__devices_by_interface('ccd')]
 
     def filter_wheels(self):
-       return [FilterWheel(x, self) for x in self.__devices_by_interface('filter')]
+       return [FilterWheel(x, self, connect_on_create=False) for x in self.__devices_by_interface('filter')]
 
     @property
     def device_names(self):
