@@ -2,6 +2,7 @@ import time
 from pyindi_sequence.device import Device
 import PyIndi
 
+
 class CameraChangeSettingsStep:
     def __init__(self, camera, roi = None, binning = None, compression_format = None, frame_type = None, controls = None, numbers = None, switches = None):
         self.camera = camera
@@ -65,6 +66,13 @@ class Camera(Device):
 
     def roi(self):
         return self.values('CCD_FRAME', 'number')
+
+    def clear_roi(self):
+        ccd_info = self.ccd_info()
+        self.set_roi({'X': 0, 'Y': 0, 'WIDTH': ccd_info['CCD_MAX_X'], 'HEIGHT': ccd_info['CCD_MAX_Y']})
+
+    def ccd_info(self):
+        return self.values('CCD_INFO', 'number')
 
     def compression_format(self):
         return self.switch_values('CCD_COMPRESSION')
