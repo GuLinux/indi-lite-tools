@@ -4,6 +4,10 @@ import threading
 import shutil
 import functools
 import tempfile
+import multiprocessing
+import threading
+import json
+from argparse import Namespace
 
 class SequenceCallbacks:
     def __init__(self, **kwargs):
@@ -19,6 +23,39 @@ class SequenceCallbacks:
             return
         for callback in self.callbacks[name]:
             callback(*args, **kwargs)
+
+
+def process_sequence_files(input_queue, notify_queue):
+    finished = False
+    while not finished:
+        item = Namespace(**input_queue.get())
+        if item.type == 'finish':
+            finished = True
+        elif item.type == 'exposure_finished':
+            info_json = os.path.join(os.path.dirname(item.output_file), os.path.basename(item.output_file) + '.json')
+            info = {
+                'exposure': item.exposure,
+                'number': item.number,
+                'time_started': item.time_started,
+                'time_finished': item.time_finished,
+            }
+            if item.temperature_started is not None:
+                info.update({ 'temperature_started': item.temperature_started })
+            if item.temperature_finished is not None:
+                info.update({ 'temperature_finished': item.temperature_started })
+            if item.temperature_started is not None and item.temperature_finished is not None:
+                info.update({ 'temperature_average': (item.temperature_started + item.temperature_finished) / 2 })
+            with open(info_json, 'w') as info_file:
+                json.dump(info, info_file)
+
+            temp_move_file = os.path.join(os.path.dirname(item.output_file), os.path.basename(item.temp_filename))
+            shutil.move(item.temp_filename, temp_move_file)
+            os.rename(temp_move_file, item.output_file)
+            notify_queue.put({
+                'type': 'each_finished',
+                'sequence': item.number,
+                'file_name': item.output_file,
+            })
 
 
 class Sequence:
@@ -42,12 +79,29 @@ class Sequence:
         self.async_move_threads = [None] * self.max_threads
         self.__next_index = 0
 
+    def __notify_sequence_finished(self, notify_queue):
+        finished = False
+        while not finished:
+            item = Namespace(**notify_queue.get())
+            if item.type == 'finish':
+                finished = True
+            elif item.type == 'each_finished':
+                self.callbacks.run('on_each_finished', self, item.sequence, item.file_name)
+
     def run(self):
         self.camera.set_upload_to('local')
         tmp_prefix = self.name + 'TMP' if self.name else '__sequence_TMP'
         tmp_upload_path = tempfile.gettempdir()
         tmp_file = os.path.join(tmp_upload_path, tmp_prefix + '.fits')
 
+        files_queue = multiprocessing.Queue()
+        notify_queue = multiprocessing.Queue()
+
+        process_files = multiprocessing.Process(target=process_sequence_files, args=(files_queue, notify_queue))
+        notify_thread = threading.Thread(target=self.__notify_sequence_finished, args=(notify_queue,))
+
+        process_files.start()
+        notify_thread.start()
 
         self.camera.set_upload_path(tmp_upload_path, tmp_prefix)
         self.callbacks.run('on_started', self)
@@ -59,8 +113,10 @@ class Sequence:
                 time.sleep(0.5)
 
             temp_before = self.ccd_temperature
+            time_started = time.time()
             self.camera.shoot(self.exposure)
             temp_after = self.ccd_temperature
+            time_finished = time.time()
             
             format_params = { 'name': self.name, 'exposure': self.exposure, 'number': sequence + self.start_index}
             format_params.update(self.filename_template_params)
@@ -69,17 +125,30 @@ class Sequence:
                 if callable(value):
                     format_params[key] = value(self)
 
-
             file_name = os.path.join(self.upload_path, self.filename_template.format(**format_params))
+            unique_temp_file = os.path.join(tmp_upload_path, '__seq_tmp_{}'.format(time_finished))
+            os.rename(tmp_file, unique_temp_file)
 
-            temperature = None
-            if temp_before is not None and temp_after is not None:
-                temperature = (temp_before + temp_after) / 2
+            files_queue.put({
+                'type': 'exposure_finished',
+                'number': sequence+1,
+                'exposure': self.exposure,
+                'time_started': time_started,
+                'time_finished': time_finished,
+                'temperature_started': temp_before,
+                'temperature_finished': temp_after,
+                'temp_filename': unique_temp_file,
+                'output_file': file_name,
+            })
 
-            self.__start_thread_move(tmp_file, file_name, temperature)
             self.finished += 1
-            self.callbacks.run('on_each_finished', self, sequence, file_name)
 
+        files_queue.put({ 'type': 'finish' })
+        notify_queue.put({ 'type': 'finish' })
+        process_files.join()
+        notify_thread.join()
+
+        # Note: this means we wait for *all* images in this sequences to be saved, before starting the next sequence. Which might be a bottleneck, but then again, if you're shooting much faster than you can save, then you probably have a bigger issue...
         self.callbacks.run('on_finished', self)
 
     def __start_thread_move(self, tmp_file, file_name, temperature):
