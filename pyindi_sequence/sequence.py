@@ -100,53 +100,55 @@ class Sequence:
         process_files = multiprocessing.Process(target=process_sequence_files, args=(files_queue, notify_queue))
         notify_thread = threading.Thread(target=self.__notify_sequence_finished, args=(notify_queue,))
 
-        process_files.start()
-        notify_thread.start()
-
         self.camera.set_upload_path(tmp_upload_path, tmp_prefix)
         self.callbacks.run('on_started', self)
 
-        for sequence in range(0, self.count):
-            self.callbacks.run('on_each_started', self, sequence)
-            # Check for 'pause' file
-            while os.path.isfile(os.path.join(self.upload_path, 'pause')):
-                time.sleep(0.5)
+        process_files.start()
+        notify_thread.start()
 
-            temp_before = self.ccd_temperature
-            time_started = time.time()
-            self.camera.shoot(self.exposure)
-            temp_after = self.ccd_temperature
-            time_finished = time.time()
-            
-            format_params = { 'name': self.name, 'exposure': self.exposure, 'number': sequence + self.start_index}
-            format_params.update(self.filename_template_params)
+        try:
+            for sequence in range(0, self.count):
+                self.callbacks.run('on_each_started', self, sequence)
+                # Check for 'pause' file
+                while os.path.isfile(os.path.join(self.upload_path, 'pause')):
+                    time.sleep(0.5)
 
-            for key, value in format_params.items():
-                if callable(value):
-                    format_params[key] = value(self)
+                temp_before = self.ccd_temperature
+                time_started = time.time()
+                self.camera.shoot(self.exposure)
+                temp_after = self.ccd_temperature
+                time_finished = time.time()
+                
+                format_params = { 'name': self.name, 'exposure': self.exposure, 'number': sequence + self.start_index}
+                format_params.update(self.filename_template_params)
 
-            file_name = os.path.join(self.upload_path, self.filename_template.format(**format_params))
-            unique_temp_file = os.path.join(tmp_upload_path, '__seq_tmp_{}'.format(time_finished))
-            os.rename(tmp_file, unique_temp_file)
+                for key, value in format_params.items():
+                    if callable(value):
+                        format_params[key] = value(self)
 
-            files_queue.put({
-                'type': 'exposure_finished',
-                'number': sequence+1,
-                'exposure': self.exposure,
-                'time_started': time_started,
-                'time_finished': time_finished,
-                'temperature_started': temp_before,
-                'temperature_finished': temp_after,
-                'temp_filename': unique_temp_file,
-                'output_file': file_name,
-            })
+                file_name = os.path.join(self.upload_path, self.filename_template.format(**format_params))
+                unique_temp_file = os.path.join(tmp_upload_path, '__seq_tmp_{}'.format(time_finished))
+                os.rename(tmp_file, unique_temp_file)
 
-            self.finished += 1
+                files_queue.put({
+                    'type': 'exposure_finished',
+                    'number': sequence+1,
+                    'exposure': self.exposure,
+                    'time_started': time_started,
+                    'time_finished': time_finished,
+                    'temperature_started': temp_before,
+                    'temperature_finished': temp_after,
+                    'temp_filename': unique_temp_file,
+                    'output_file': file_name,
+                })
 
-        files_queue.put({ 'type': 'finish' })
-        notify_queue.put({ 'type': 'finish' })
-        process_files.join()
-        notify_thread.join()
+                self.finished += 1
+
+        finally:
+            files_queue.put({ 'type': 'finish' })
+            notify_queue.put({ 'type': 'finish' })
+            process_files.join()
+            notify_thread.join()
 
         # Note: this means we wait for *all* images in this sequences to be saved, before starting the next sequence. Which might be a bottleneck, but then again, if you're shooting much faster than you can save, then you probably have a bigger issue...
         self.callbacks.run('on_finished', self)
