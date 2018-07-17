@@ -86,7 +86,7 @@ class Sequence:
             if item.type == 'finish':
                 finished = True
             elif item.type == 'each_finished':
-                self.callbacks.run('on_each_finished', self, item.sequence, item.file_name)
+                self.callbacks.run('on_each_saved', self, item.sequence, item.file_name)
 
     def run(self):
         self.camera.set_upload_to('local')
@@ -143,6 +143,7 @@ class Sequence:
                 })
 
                 self.finished += 1
+                self.callbacks.run('on_each_finished', self, sequence, file_name)
 
         finally:
             files_queue.put({ 'type': 'finish' })
