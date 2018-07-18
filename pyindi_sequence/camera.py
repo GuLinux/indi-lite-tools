@@ -48,7 +48,7 @@ class Camera(Device):
             self.connect()
 
     def shoot(self, exposure, sync=True):
-        self.set_number('CCD_EXPOSURE', {'CCD_EXPOSURE_VALUE': exposure}, sync=sync, timeout=exposure * 1.5 + 20)
+        self.set_number('CCD_EXPOSURE', {'CCD_EXPOSURE_VALUE': exposure}, sync=sync, timeout=exposure * 1.5 + 60)
 
     def set_upload_path(self, path, prefix = 'IMAGE_XXX'):
         self.set_text('UPLOAD_SETTINGS', {'UPLOAD_DIR': path, 'UPLOAD_PREFIX': prefix})
