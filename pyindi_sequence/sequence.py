@@ -130,6 +130,9 @@ class Sequence:
                 unique_temp_file = os.path.join(tmp_upload_path, '__seq_tmp_{}'.format(time_finished))
                 os.rename(tmp_file, unique_temp_file)
 
+                self.finished += 1
+                self.callbacks.run('on_each_finished', self, sequence, file_name)
+
                 files_queue.put({
                     'type': 'exposure_finished',
                     'number': sequence+1,
@@ -141,9 +144,6 @@ class Sequence:
                     'temp_filename': unique_temp_file,
                     'output_file': file_name,
                 })
-
-                self.finished += 1
-                self.callbacks.run('on_each_finished', self, sequence, file_name)
 
         finally:
             files_queue.put({ 'type': 'finish' })
