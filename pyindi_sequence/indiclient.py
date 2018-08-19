@@ -8,13 +8,14 @@ class INDIClient(PyIndi.BaseClient):
     DEFAULT_HOST = 'localhost'
     DEFAULT_PORT = 7624
 
-    def __init__(self, address=DEFAULT_HOST, port=DEFAULT_PORT, callbacks={}):
+    def __init__(self, address=DEFAULT_HOST, port=DEFAULT_PORT, callbacks={}, autoconnect=True):
         PyIndi.BaseClient.__init__(self)
         self.host = address
         self.port = port
         self.setServer(address, port)
         self.callbacks = callbacks
-        self.connectServer()
+        if autoconnect:
+            self.connectServer()
 
     def devices(self):
         return [Device(x, self) for x in self.device_names]
