@@ -56,6 +56,7 @@ def process_sequence_files(input_queue, notify_queue):
                 'sequence': item.number,
                 'file_name': item.output_file,
             })
+    notify_queue.put({ 'type': 'finish' })
 
 
 class Sequence:
@@ -147,7 +148,6 @@ class Sequence:
 
         finally:
             files_queue.put({ 'type': 'finish' })
-            notify_queue.put({ 'type': 'finish' })
             process_files.join()
             notify_thread.join()
 
