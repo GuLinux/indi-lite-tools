@@ -26,6 +26,13 @@ class INDIClient(PyIndi.BaseClient):
     def filter_wheels(self):
        return [FilterWheel(x, self, connect_on_create=False) for x in self.__devices_by_interface('filter')]
 
+    def telescopes(self):
+       return self.devices_by_interface('telescope')
+
+    def devices_by_interface(self, interface):
+       return [Device(x, self) for x in self.__devices_by_interface(interface)]
+    
+
     @property
     def device_names(self):
         return [d.getDeviceName() for d in self.getDevices()]
