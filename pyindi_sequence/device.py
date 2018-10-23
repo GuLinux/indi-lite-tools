@@ -124,7 +124,7 @@ class Device:
         }
         interfaces = [interfaces[x] for x in interfaces if x & device_interfaces]
         return interfaces
- 
+
     def __wait_for_ctl_statuses(self, ctl, statuses=[PyIndi.IPS_OK, PyIndi.IPS_IDLE], timeout=None):
         started = time.time()
         if timeout is None:
@@ -133,8 +133,9 @@ class Device:
             # print('{}/{}/{}: {}'.format(ctl.device, ctl.group, ctl.name, self.__state_to_str[ctl.s]))
             if ctl.s == PyIndi.IPS_ALERT and 0.5 > time.time() - started:
                 raise RuntimeError('Error while changing property {}'.format(ctl.name))
-            if 0 < timeout < time.time() - started:
-                raise RuntimeError('Timeout error while changing property {}'.format(ctl.name))
+            elapsed = time.time() - started
+            if 0 < timeout < elapsed:
+                raise RuntimeError('Timeout error while changing property {}: elapsed={}, timeout={}, status={}'.format(ctl.name, elapsed, timeout, self.__state_to_str[ctl.s] ))
             time.sleep(0.01)
 
     def __map_indexes(self, ctl, values):
