@@ -154,13 +154,7 @@ class Device:
         return self.__read_property(indi_property) if indi_property else None
 
     def get_queued_message(self, index):
-        message = self.device.messageQueue(index)
-        message.acquire()
-        # TODO: this might be a bit hacky
-        message_string = ctypes.cast(message.__int__(), ctypes.POINTER(ctypes.c_char_p)).contents.value.decode('utf-8')
-        message.disown()
-        return message_string
-
+        return self.device.messageQueue(index)
 
     def __read_property(self, p):
         name = p.getName()
