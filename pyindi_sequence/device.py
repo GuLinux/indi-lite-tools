@@ -147,7 +147,7 @@ class Device:
 
     def get_properties(self):
         properties = self.device.getProperties()
-        return [ self.__read_property(p) for p in properties]
+        return [ self.__read_property(p) for p in properties if p]
 
     def get_property(self, name):
         indi_property = self.device.getProperty(name)
