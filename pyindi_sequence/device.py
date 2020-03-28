@@ -102,9 +102,13 @@ class Device:
     @staticmethod
     def find_interfaces(indidevice):
         interface = indidevice.getDriverInterface()
-        interface.acquire()
-        device_interfaces = int(ctypes.cast(interface.__int__(), ctypes.POINTER(ctypes.c_uint16)).contents.value)
-        interface.disown()
+        if type(interface) is int:
+            device_interfaces = interface
+        else:
+            interface.acquire()
+            device_interfaces = int(ctypes.cast(interface.__int__(), ctypes.POINTER(ctypes.c_uint16)).contents.value)
+            interface.disown()
+
         interfaces = {
             PyIndi.BaseDevice.GENERAL_INTERFACE: 'general', 
             PyIndi.BaseDevice.TELESCOPE_INTERFACE: 'telescope',
