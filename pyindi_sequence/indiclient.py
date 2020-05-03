@@ -29,6 +29,10 @@ class INDIClient(PyIndi.BaseClient):
     def telescopes(self):
        return self.devices_by_interface('telescope')
 
+    def guiders(self):
+       return self.devices_by_interface('guider')
+
+
     def devices_by_interface(self, interface):
        return [Device(x, self) for x in self.__devices_by_interface(interface)]
     
