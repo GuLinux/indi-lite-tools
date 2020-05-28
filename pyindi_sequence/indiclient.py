@@ -46,7 +46,7 @@ class INDIClient(PyIndi.BaseClient):
         self.run_callback('on_new_device', device)
 
     def removeDevice(self, d):
-        self.run_callback('on_device_removed', dd.getDeviceName())
+        self.run_callback('on_device_removed', d.getDeviceName())
 
     def newProperty(self, p):
         self.run_callback('on_new_property', device=p.getDeviceName(), group=p.getGroupName(), property_name=p.getName())
